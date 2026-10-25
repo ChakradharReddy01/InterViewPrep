@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Module 2: CompletableFuture & Asynchronous Programming | Interview A-Z</title>
+  <link rel="stylesheet" href="../../assets/css/style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+</head>
+<body>
+
+  <!-- Top Navigation -->
+  <nav class="navbar">
+    <div class="brand">
+      <span class="brand-badge">Interview A-Z</span>
+      <span>Engineering & Architecture Handbook</span>
+    </div>
+    <div class="nav-links">
+      <a href="../../index.html" class="nav-link">Home</a>
+      <a href="../../index.html#module-2" class="nav-link">Module Catalog</a>
+      <a href="https://github.com" target="_blank" class="nav-link">GitHub</a>
+    </div>
+  </nav>
+
+  <div class="container">
+    <div class="article-layout">
+      <!-- Sticky Sidebar Table of Contents -->
+      <aside class="sidebar-toc">
+        <h3>On This Page</h3>
+        <ul class="toc-links" id="dynamic-toc">
+          <!-- Dynamically populated via main.js -->
+        </ul>
+      </aside>
+
+      <!-- Main Article Content -->
+      <main class="article-content">
+        <!-- Breadcrumb -->
+        <nav class="breadcrumb">
+          <a href="../../index.html">Home</a>
+          <span>/</span>
+          <span>Module 2: Multithreading</span>
+          <span>/</span>
+          <span style="color: #fff;">Async Programming</span>
+        </nav>
+
+        <!-- Article Header -->
+        <header class="article-header">
+          <h1>Module 2: Asynchronous Programming with CompletableFuture</h1>
+          <div class="article-meta">
+            <span class="badge badge-multithread">Async Programming</span>
+            <span class="badge badge-advanced">Non-Blocking</span>
+            <span class="badge badge-prod">CompletableFuture Internals</span>
+            <span>⏱️ 45 min deep dive</span>
+            <span>Target Roles: SDE-2, SDE-3, Senior Microservices Engineer</span>
+          </div>
+        </header>
+
+        <!-- SECTION 1: COMPLETABLEFUTURE ARCHITECTURE -->
+        <section>
+          <h2>1. CompletableFuture & CompletionStage Architecture</h2>
+
+          <h3>1.1 The Evolution Beyond Legacy <code>Future&lt;V&gt;</code></h3>
+          <p>
+            Java 5's <code>Future&lt;V&gt;</code> was a major step forward, but had severe architectural shortcomings:
+          </p>
+          <ul>
+            <li><strong>Blocking Retrieval:</strong> To get a result, caller threads had to call <code>future.get()</code>, blocking OS threads.</li>
+            <li><strong>No Callback Chaining:</strong> You could not attach callbacks like "when this future completes, immediately execute task B".</li>
+            <li><strong>No Composition / Combination:</strong> Combining multiple independent asynchronous computations required complex, brittle manual state tracking.</li>
+            <li><strong>No Declarative Error Recovery:</strong> Handling exceptions required wrapping blocking <code>get()</code> calls in manual <code>try-catch</code> blocks.</li>
+          </ul>
+
+          <p>
+            Java 8 introduced <strong><code>CompletableFuture&lt;T&gt;</code></strong>, which implements both <code>Future&lt;T&gt;</code> and <strong><code>CompletionStage&lt;T&gt;</code></strong>, enabling purely non-blocking, event-driven pipelines.
+          </p>
+
+          <pre><code>+-----------------------------------------------------------------------------------------+
+| ASYNCHRONOUS PIPELINE FLOW                                                              |
+|                                                                                         |
+| [ supplyAsync(fetchUser) ]                                                              |
+|            |                                                                            |
+|            v                                                                            |
+|   .thenApply(extractId)            &lt;-- Transformation (T -&gt; U)                          |
+|            |                                                                            |
+|            v                                                                            |
+|   .thenCompose(fetchOrdersAsync)   &lt;-- FlatMap / Dependency chaining (T -&gt; CF&lt;U&gt;)      |
+|            |                                                                            |
+|            v                                                                            |
+|   .thenCombine(fetchCreditAsync)   &lt;-- Combine two independent CFs ((U, V) -&gt; W)        |
+|            |                                                                            |
+|            v                                                                            |
+|   .exceptionally(fallbackHandler)  &lt;-- Catch and recover from errors                    |
++-----------------------------------------------------------------------------------------+</code></pre>
+        </section>
+
+        <!-- SECTION 2: CORE PIPELINE OPERATORS -->
+        <section>
+          <h2>2. Core Transformation & Composition Operators</h2>
+
+          <h3>2.1 <code>thenApply</code> vs. <code>thenCompose</code> (Map vs. FlatMap)</h3>
+          <ul>
+            <li><strong><code>thenApply(Function&lt;T, U&gt;)</code>:</strong> Synchronous transformation. Converts the output $T$ into $U$. Similar to <code>Stream.map()</code>.
+              <pre><code>CompletableFuture&lt;String&gt; cf = CompletableFuture.supplyAsync(() -&gt; "Hello")
+    .thenApply(s -&gt; s + " World"); // Returns CompletableFuture&lt;String&gt;</code></pre>
+            </li>
+            <li><strong><code>thenCompose(Function&lt;T, CompletableFuture&lt;U&gt;&gt;)</code>:</strong> Asynchronous composition. Used when the transformation function itself returns another <code>CompletableFuture</code>. Prevents nested structures (<code>CompletableFuture&lt;CompletableFuture&lt;U&gt;&gt;</code>). Similar to <code>Stream.flatMap()</code>.
+              <pre><code>CompletableFuture&lt;Order&gt; orderFuture = CompletableFuture.supplyAsync(() -&gt; fetchUserId())
+    .thenCompose(userId -&gt; orderService.fetchLatestOrderAsync(userId));</code></pre>
+            </li>
+          </ul>
+
+          <h3>2.2 <code>thenCombine</code> (Combining Two Independent Futures)</h3>
+          <p>
+            Executes two asynchronous tasks completely in parallel. When <strong>both</strong> finish, it applies a <code>BiFunction</code> to combine their results:
+          </p>
+          <div class="code-header">
+            <span>Combining User Details and Credit Score in Parallel</span>
+            <span>Java</span>
+          </div>
+          <pre><code>CompletableFuture&lt;User&gt; userFuture = CompletableFuture.supplyAsync(() -&gt; userService.getUser(id));
+CompletableFuture&lt;CreditScore&gt; creditFuture = CompletableFuture.supplyAsync(() -&gt; creditService.getScore(id));
+
+CompletableFuture&lt;LoanDecision&gt; decisionFuture = userFuture.thenCombine(
+    creditFuture,
+    (user, credit) -&gt; loanEngine.evaluate(user, credit) // Invoked only when BOTH complete!
+);</code></pre>
+
+          <h3>2.3 Synchronous vs. Async Variations (e.g. <code>thenApply</code> vs <code>thenApplyAsync</code>)</h3>
+          <ul>
+            <li><strong><code>thenApply(fn)</code>:</strong> Executes the callback on the <em>same thread</em> that completed the preceding stage, or synchronously on the calling thread if the stage is already complete.</li>
+            <li><strong><code>thenApplyAsync(fn, customExecutor)</code>:</strong> Submits the callback as a new task to the specified thread pool, preventing long-running transformations from blocking the upstream worker thread.</li>
+          </ul>
+        </section>
+
+        <!-- SECTION 3: EXCEPTION HANDLING & MULTI-FUTURE ORCHESTRATION -->
+        <section>
+          <h2>3. Exception Handling & Multi-Future Orchestration</h2>
+
+          <h3>3.1 Exception Handling: <code>exceptionally</code> vs. <code>handle</code></h3>
+          <ul>
+            <li><strong><code>exceptionally(Function&lt;Throwable, T&gt;)</code>:</strong> Triggered <em>only</em> if an exception was thrown in the upstream pipeline. Returns a fallback value of type $T$.
+              <pre><code>CompletableFuture&lt;Price&gt; priceFuture = CompletableFuture.supplyAsync(() -&gt; pricingService.fetchPrice())
+    .exceptionally(ex -&gt; {
+        logger.warn("Pricing service failed, returning cached price: {}", ex.getMessage());
+        return Price.DEFAULT_CACHED_PRICE; // Fallback
+    });</code></pre>
+            </li>
+            <li><strong><code>handle(BiFunction&lt;T, Throwable, R&gt;)</code>:</strong> Always executes upon completion, whether the stage succeeded or threw an error. Both the result and the exception are passed in (one will be null):
+              <pre><code>.handle((result, ex) -&gt; {
+    if (ex != null) {
+        logger.error("Failed executing task", ex);
+        return "Fallback Result";
+    }
+    return "Processed: " + result;
+});</code></pre>
+            </li>
+          </ul>
+
+          <h3>3.2 <code>CompletableFuture.allOf()</code> & <code>anyOf()</code></h3>
+          <ul>
+            <li><strong><code>allOf(cf1, cf2, ... cfN)</code>:</strong> Returns a <code>CompletableFuture&lt;Void&gt;</code> that completes when <strong>all</strong> given futures complete.
+              <div class="code-header">
+                <span>Waiting for All Futures and Aggregating Results</span>
+                <span>Java</span>
+              </div>
+              <pre><code>List&lt;CompletableFuture&lt;String&gt;&gt; futures = targets.stream()
+    .map(target -&gt; CompletableFuture.supplyAsync(() -&gt; pingService(target), customPool))
+    .toList();
+
+// Wait for all to complete:
+CompletableFuture&lt;Void&gt; allFutures = CompletableFuture.allOf(futures.toArray(new CompletableFuture[0]));
+
+// Transform to List&lt;String&gt; non-blockingly:
+CompletableFuture&lt;List&lt;String&gt;&gt; aggregatedResults = allFutures.thenApply(v -&gt; 
+    futures.stream()
+        .map(CompletableFuture::join) // join() never blocks here because allOf has finished!
+        .toList()
+);</code></pre>
+            </li>
+            <li><strong><code>anyOf(cf1, cf2, ... cfN)</code>:</strong> Returns a <code>CompletableFuture&lt;Object&gt;</code> that completes as soon as <strong>any</strong> one of the given futures completes (fastest responder wins, ideal for redundant multi-provider lookups).</li>
+          </ul>
+        </section>
+
+        <!-- SECTION 4: REAL-TIME PRODUCTION ISSUES -->
+        <section>
+          <h2>4. Real-Time Production Issues & Post-Mortems</h2>
+
+          <!-- Incident 1 -->
+          <div class="callout callout-production">
+            <div class="callout-title">🚨 Incident 1: Microservice Gridlock via Default ForkJoinPool.commonPool()</div>
+            <p><strong>Scenario:</strong> A checkout aggregator called <code>CompletableFuture.supplyAsync(() -&gt; callPaymentGateway())</code> without providing a custom executor. During peak traffic, all async pipelines across the service froze, with requests timing out.</p>
+          </div>
+
+          <div class="callout callout-warning">
+            <div class="callout-title">🔍 Root Cause Analysis (RCA)</div>
+            <p>
+              When no custom <code>Executor</code> is passed to <code>supplyAsync()</code>, CompletableFuture defaults to the JVM-wide <strong><code>ForkJoinPool.commonPool()</code></strong>. The common pool is sized strictly for CPU-bound tasks (<code>CPU cores - 1</code>, e.g. 7 threads on an 8-core CPU).
+              <br><br>
+              When 50 concurrent payment HTTP calls blocked on network I/O, all 7 threads in the common pool were held in <code>WAITING</code>. Because the pool was saturated, other unrelated business tasks queuing on the common pool could not execute, freezing the entire application.
+            </p>
+          </div>
+
+          <div class="callout callout-solution">
+            <div class="callout-title">💡 Production Resolution</div>
+            <p><strong>Strict Production Rule:</strong> Never invoke <code>supplyAsync()</code> or <code>runAsync()</code> without explicitly passing a dedicated, bounded I/O thread pool:</p>
+            <pre><code>private final ExecutorService ioPool = new ThreadPoolExecutor(
+    20, 100, 60L, TimeUnit.SECONDS, new ArrayBlockingQueue&lt;&gt;(1000)
+);
+
+// Always pass custom executor:
+CompletableFuture.supplyAsync(() -&gt; callPaymentGateway(), ioPool);</code></pre>
+          </div>
+
+          <!-- Incident 2 -->
+          <div class="callout callout-production">
+            <div class="callout-title">🚨 Incident 2: Silent Thread Termination via Swallowed Exceptions in Unhandled Pipelines</div>
+            <p><strong>Scenario:</strong> An inventory reservation task failed, but no error was logged in Datadog/Splunk. The database remained un-updated, and client webhooks were never triggered.</p>
+          </div>
+
+          <div class="callout callout-warning">
+            <div class="callout-title">🔍 Root Cause Analysis (RCA)</div>
+            <p>
+              A developer created an async chain: <code>CompletableFuture.supplyAsync(...)</code> without attaching an <code>exceptionally()</code>, <code>handle()</code>, or calling <code>join()</code>/<code>get()</code>.
+              When a <code>NullPointerException</code> was thrown inside the supplier, the exception was wrapped inside an <code>ExecutionException</code> inside the CompletableFuture object and <strong>silently ignored</strong> because no consumer ever queried the future's result!
+            </p>
+          </div>
+
+          <div class="callout callout-solution">
+            <div class="callout-title">💡 Production Resolution</div>
+            <p>Always terminate async pipelines with <code>exceptionally()</code> or <code>whenComplete()</code> for robust logging.</p>
+          </div>
+        </section>
+
+        <!-- SECTION 5: SENIOR INTERVIEW Q&A -->
+        <section>
+          <h2>5. Senior / Staff Technical Interview Q&A</h2>
+
+          <div class="callout callout-interview">
+            <div class="callout-title">🎯 Q1: What is the difference between join() and get() on CompletableFuture?</div>
+            <p><strong>Answer:</strong> 
+              - <strong><code>get()</code></strong> is declared in <code>Future&lt;V&gt;</code> and throws <em>checked exceptions</em>: <code>InterruptedException</code> and <code>ExecutionException</code>. It forces callers to wrap calls in checked <code>try-catch</code> blocks.
+              <br>
+              - <strong><code>join()</code></strong> is declared in <code>CompletableFuture&lt;V&gt;</code> and throws an <em>unchecked exception</em>: <code>CompletionException</code>. This makes <code>join()</code> seamlessly compatible with Java 8 Stream API and lambda expressions without checked exception boilerplate.
+            </p>
+          </div>
+
+          <div class="callout callout-interview">
+            <div class="callout-title">🎯 Q2: When does thenApply execute synchronously vs asynchronously?</div>
+            <p><strong>Answer:</strong> If the preceding stage has <em>already completed</em> by the time <code>thenApply(fn)</code> is registered, <code>fn</code> executes immediately and synchronously on the <strong>current calling thread</strong>. If the preceding stage is <em>still executing</em>, <code>fn</code> executes on the <strong>same worker thread</strong> that completes the upstream stage. If you need <code>fn</code> to execute on an independent thread pool regardless of timing, you must explicitly use <code>thenApplyAsync(fn, executor)</code>.</p>
+          </div>
+        </section>
+
+      </main>
+    </div>
+  </div>
+
+  <footer>
+    <p>Interview A-Z Handbook &bull; Built for GitHub Pages &bull; Production Grade Interview Prep</p>
+  </footer>
+
+  <script src="../../assets/js/main.js"></script>
+</body>
+</html>

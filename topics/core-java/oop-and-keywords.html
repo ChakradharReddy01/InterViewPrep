@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Module 1: OOP & Java Keywords Deep Dive | Interview A-Z</title>
+  <link rel="stylesheet" href="../../assets/css/style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+</head>
+<body>
+
+  <!-- Top Navigation -->
+  <nav class="navbar">
+    <div class="brand">
+      <span class="brand-badge">Interview A-Z</span>
+      <span>Engineering & Architecture Handbook</span>
+    </div>
+    <div class="nav-links">
+      <a href="../../index.html" class="nav-link">Home</a>
+      <a href="../../index.html#topics" class="nav-link">Topic Catalog</a>
+      <a href="https://github.com" target="_blank" class="nav-link">GitHub</a>
+    </div>
+  </nav>
+
+  <div class="container">
+    <div class="article-layout">
+      <!-- Sticky Sidebar Table of Contents -->
+      <aside class="sidebar-toc">
+        <h3>On This Page</h3>
+        <ul class="toc-links" id="dynamic-toc">
+          <!-- Dynamically populated via main.js -->
+        </ul>
+      </aside>
+
+      <!-- Main Article Content -->
+      <main class="article-content">
+        <!-- Breadcrumb -->
+        <nav class="breadcrumb">
+          <a href="../../index.html">Home</a>
+          <span>/</span>
+          <span>Core Java</span>
+          <span>/</span>
+          <span style="color: #fff;">OOP & Java Keywords</span>
+        </nav>
+
+        <!-- Article Header -->
+        <header class="article-header">
+          <h1>Module 1: OOP Principles & Core Java Keywords Internals</h1>
+          <div class="article-meta">
+            <span class="badge badge-core">Core Java</span>
+            <span class="badge badge-advanced">Advanced Architecture</span>
+            <span class="badge badge-prod">Concurrency & JMM</span>
+            <span>⏱️ 40 min deep dive</span>
+            <span>Target Roles: SDE-2, SDE-3, Backend Tech Lead</span>
+          </div>
+        </header>
+
+        <!-- Intro -->
+        <section>
+          <p>
+            While every engineer knows the textbook definitions of Object-Oriented Programming (OOP), senior technical interviews test how polymorphism maps to the JVM's <strong>Virtual Method Table (vtable)</strong> and dynamic method dispatch, why <strong>Composition over Inheritance</strong> prevents the Fragile Base Class problem, and how Java keywords (<code>volatile</code>, <code>synchronized</code>, <code>final</code>, <code>transient</code>) interact directly with CPU caches, memory barriers, and the Java Memory Model (JMM).
+          </p>
+        </section>
+
+        <!-- PART 1: OOP CORE CONCEPTS -->
+        <section>
+          <h2>1. OOP Core Mechanics: Classes, Objects & The 4 Pillars</h2>
+
+          <h3>1.1 Class vs. Object: Runtime Metaspace vs. Heap Allocation</h3>
+          <p>
+            A <strong>Class</strong> is a blueprint containing type descriptors, method bytecode, annotations, and vtables stored in off-heap <strong>Metaspace</strong>. An <strong>Object</strong> is a physical instance dynamically allocated on the <strong>Heap</strong> with an 8-byte aligned memory footprint (Mark Word + Klass Word + Instance Data + Padding).
+          </p>
+
+          <h3>1.2 Encapsulation (Data Hiding & Invariant Protection)</h3>
+          <p>
+            Encapsulation is not just about making fields <code>private</code> and generating getters/setters. True enterprise encapsulation ensures that an object maintains strict internal business invariants that outside callers cannot bypass or corrupt.
+          </p>
+          <div class="code-header">
+            <span>Defensive Copying & Invariant Protection</span>
+            <span>Java</span>
+          </div>
+          <pre><code>public final class MoneyAccount {
+    private final String accountId;
+    private long balanceCents; // Immutable representation in minor currency units
+
+    public MoneyAccount(String accountId, long initialDeposit) {
+        if (initialDeposit &lt; 0) {
+            throw new IllegalArgumentException("Initial balance cannot be negative");
+        }
+        this.accountId = Objects.requireNonNull(accountId);
+        this.balanceCents = initialDeposit;
+    }
+
+    public synchronized void debit(long amountCents) {
+        if (amountCents &lt;= 0 || amountCents &gt; this.balanceCents) {
+            throw new IllegalStateException("Insufficient funds or invalid debit amount");
+        }
+        this.balanceCents -= amountCents;
+    }
+
+    public synchronized long getBalanceCents() {
+        return this.balanceCents;
+    }
+}</code></pre>
+
+          <h3>1.3 Inheritance vs. Composition (IS-A vs. HAS-A)</h3>
+          <ul>
+            <li><strong>Inheritance (IS-A):</strong> Reuses code via subclassing (<code>class Dog extends Animal</code>). Tightly couples the child to the parent's internal state. Violating the Liskov Substitution Principle (LSP) causes the <em>Fragile Base Class problem</em>, where modifying a parent method breaks subclasses.</li>
+            <li><strong>Composition (HAS-A):</strong> Assembles functionality by holding references to other classes (<code>class OrderService { private final PaymentProcessor processor; }</code>). Allows runtime swapping of behaviors, cleaner unit testing via mocks, and avoids tight class hierarchies.</li>
+            <li><strong>Aggregation:</strong> A specialized form of HAS-A representing a "weak" relationship where the child can exist independently of the parent (e.g., a <code>Department</code> HAS-A <code>Teacher</code>; if the department closes, the teacher still exists).</li>
+            <li><strong>Association:</strong> The most general structural relationship where two objects interact (1-to-1, 1-to-many, many-to-many).</li>
+          </ul>
+
+          <h3>1.4 Abstraction: Interface vs. Abstract Class</h3>
+          <table>
+            <thead>
+              <tr>
+                <th>Dimension</th>
+                <th>Interface</th>
+                <th>Abstract Class</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Multiple Inheritance</strong></td>
+                <td>A class can implement unlimited interfaces.</td>
+                <td>Single inheritance only (<code>extends</code> one class).</td>
+              </tr>
+              <tr>
+                <td><strong>State & Fields</strong></td>
+                <td>Only <code>public static final</code> constants (no instance state).</td>
+                <td>Can hold full instance state (fields, constructors, mutables).</td>
+              </tr>
+              <tr>
+                <td><strong>Method Capabilities</strong></td>
+                <td>Abstract methods, <code>default</code> methods (Java 8), <code>static</code> methods, and <code>private</code> helper methods (Java 9).</td>
+                <td>Abstract methods, concrete methods, protected/package-private methods.</td>
+              </tr>
+              <tr>
+                <td><strong>Design Intent</strong></td>
+                <td>Defines a <em>contract</em> or capability ("what" it can do, e.g., <code>Comparable</code>, <code>Serializable</code>).</td>
+                <td>Provides a shared <em>identity</em> and partial skeleton implementation (Template Method Pattern).</td>
+              </tr>
+            </tbody>
+          </table>
+        </section>
+
+        <!-- PART 2: POLYMORPHISM & METHOD DISPATCH -->
+        <section>
+          <h2>2. Polymorphism & Dynamic Method Dispatch Internals</h2>
+
+          <h3>2.1 Method Overloading vs. Overriding</h3>
+          <ul>
+            <li><strong>Method Overloading (Compile-Time / Static Polymorphism):</strong> Same method name, different parameter signature in the same class. Resolved at compile time based on parameter static reference types.</li>
+            <li><strong>Method Overriding (Runtime / Dynamic Polymorphism):</strong> Subclass provides a specific implementation of a method declared in its parent. Must share same name, parameter types, and have a <em>covariant return type</em> (can return a subclass of the parent's return type). Access level cannot be reduced, and checked exceptions cannot be broader than the parent's.</li>
+          </ul>
+
+          <h3>2.2 Under the Hood: Dynamic Method Dispatch & Virtual Method Table (vtable)</h3>
+          <p>
+            When Java executes an overridden method like <code>animal.makeSound()</code>, how does the JVM know which subclass method to invoke at runtime without expensive string lookups?
+          </p>
+          <ol>
+            <li>Every class loaded in Metaspace has an internal structure called the <strong>vtable (Virtual Method Table)</strong>.</li>
+            <li>The vtable is an array of direct pointers to the executable machine code or bytecode of every virtual method. Subclasses inherit the parent's vtable structure.</li>
+            <li>When a subclass overrides a method, its vtable slot at index <code>K</code> is overwritten with the address of the subclass's method implementation.</li>
+            <li>At runtime, the bytecode instruction <code>invokevirtual</code> simply reads the object's Klass pointer from its header, navigates to the vtable at predetermined offset <code>K</code>, and executes the jump in $O(1)$ constant time.</li>
+          </ol>
+
+          <pre><code>Bytecode Invocations Comparison:
+- invokevirtual:   Standard polymorphic instance methods resolved via vtable.
+- invokeinterface: Interface method calls resolved via itable (Interface Table).
+- invokespecial:   Constructors (&lt;init&gt;), private methods, and super calls (bypasses vtable).
+- invokestatic:    Static methods resolved at compile-time (no object receiver).
+- invokedynamic:   Bootstrapped dynamic call sites for lambdas and dynamic languages.</code></pre>
+        </section>
+
+        <!-- PART 3: JAVA KEYWORDS INTERNALS -->
+        <section>
+          <h2>3. Java Keywords: Internals, JMM & Memory Semantics</h2>
+
+          <h3>3.1 <code>static</code></h3>
+          <p>
+            Associated with the class rather than any object instance.
+          </p>
+          <ul>
+            <li><strong>Static Fields:</strong> In Java 8+, static variables reside on the Heap inside the <code>java.lang.Class</code> instance (moved out of PermGen).</li>
+            <li><strong>Static Initializer Block (<code>&lt;clinit&gt;</code>):</strong> Generated by <code>javac</code> to execute static field initialization. Executed exactly once during class initialization, protected by an internal JVM class-initialization lock (thread-safe by specification).</li>
+            <li><strong>Static Nested Class:</strong> Does not hold an implicit reference to the enclosing class instance, eliminating the risk of accidental memory leaks.</li>
+          </ul>
+
+          <h3>3.2 <code>final</code> & Immutability Guarantees</h3>
+          <ul>
+            <li><strong>Final Variable:</strong> Can be initialized only once. For reference types, the reference pointer is immutable, but the internal state of the referenced object is still mutable unless designed defensively.</li>
+            <li><strong>Final Method:</strong> Cannot be overridden. Allows the JIT compiler to perform aggressive <em>method inlining</em> (bypassing vtable lookups entirely).</li>
+            <li><strong>Final Class:</strong> Cannot be extended (e.g., <code>java.lang.String</code>, <code>java.lang.Integer</code>).</li>
+            <li><strong>JMM Final Field Freeze Action:</strong> Under the Java Memory Model, once an object's constructor finishes initializing a <code>final</code> field, the JMM issues a memory barrier ("freeze action"). This guarantees that any thread reading a reference to that object will immediately observe the properly initialized final field without explicit synchronization.</li>
+          </ul>
+
+          <h3>3.3 <code>this</code> and <code>super</code></h3>
+          <ul>
+            <li><code>this</code> represents the current object instance reference. Inside constructor chaining, <code>this(...)</code> invokes an overloaded constructor on the same class and must be the first statement.</li>
+            <li><code>super</code> references the immediate parent class. In constructors, <code>super(...)</code> invokes the parent constructor. In bytecode, calling <code>super.method()</code> emits an <code>invokespecial</code> instruction to bypass polymorphic dynamic dispatch.</li>
+          </ul>
+
+          <h3>3.4 <code>transient</code> (Serialization Exclusion)</h3>
+          <p>
+            Indicates that a field should <strong>not</strong> be serialized when the object is converted into a byte stream using Java's native <code>ObjectOutputStream</code>.
+          </p>
+          <pre><code>public class UserSession implements Serializable {
+    private static final long serialVersionUID = 1L;
+    private String username;
+    
+    // Critical: Do NOT persist passwords or security tokens across networks
+    private transient String rawPassword;
+    private transient Socket activeSocket; // Non-serializable system resources
+}</code></pre>
+
+          <h3>3.5 <code>volatile</code> (Hardware Memory Barriers & Visibility)</h3>
+          <p>
+            In modern multi-core architectures, each CPU core has private L1/L2 caches. When Thread A writes to a regular variable, the update may stay trapped in Core 1's store buffer or L1 cache, invisible to Thread B executing on Core 2.
+          </p>
+          <p>
+            Marking a field <code>volatile</code> guarantees:
+          </p>
+          <ul>
+            <li><strong>Visibility:</strong> Writes to a volatile variable are immediately flushed to main memory (L3 / RAM). Reads always bypass CPU registers/L1 cache and read directly from coherent memory.</li>
+            <li><strong>Ordering (Happens-Before Relationship):</strong> The JVM instructs the compiler and CPU not to reorder read/write instructions around a volatile variable by injecting <strong>Memory Barriers</strong> (<code>LoadLoad</code>, <code>LoadStore</code>, <code>StoreStore</code>, <code>StoreLoad</code> / <code>mfence</code> or <code>lock</code> prefix on x86).</li>
+            <li><strong>Non-Atomicity:</strong> <code>volatile</code> does <strong>NOT</strong> make compound operations (like <code>count++</code>) thread-safe! <code>count++</code> consists of 3 distinct opcodes: read, increment, and write. Two threads can interleave, losing updates. Use <code>AtomicInteger</code> or <code>VarHandle</code> instead.</li>
+          </ul>
+
+          <h3>3.6 <code>synchronized</code> (Monitor Mechanics & Lock Escalation)</h3>
+          <p>
+            Every Java object can act as an intrinsic lock (monitor). In bytecode, a synchronized block is delineated by <code>monitorenter</code> and <code>monitorexit</code> opcodes.
+          </p>
+          <p>
+            HotSpot optimizes intrinsic locks through <strong>Lock Escalation / Inflation</strong>:
+          </p>
+          <pre><code>[Biased Lock] ----------(Contention by another thread)----------&gt; 
+  [Lightweight / Thin Lock (CAS on thread stack)] ------(Busy spin failure)------&gt; 
+    [Heavyweight Lock (OS Mutex / Thread Park)]</code></pre>
+          <ul>
+            <li><strong>Biased Locking:</strong> (Deprecated/disabled in modern JDKs) Assumes a single thread accesses the lock repeatedly; sets thread ID directly in the Mark Word with zero CAS overhead.</li>
+            <li><strong>Lightweight Lock:</strong> When multiple threads access the lock without overlapping contention, each thread uses atomic Compare-And-Swap (CAS) to copy the object's Mark Word into a <em>Displaced Mark Word</em> on its execution stack. No OS-level kernel context switch.</li>
+            <li><strong>Heavyweight Lock:</strong> When true contention occurs (CAS fails repeatedly), the lock inflates into a full OS monitor. Threads that fail to acquire the lock are placed in the kernel's wait queue and <em>parked</em> (blocked), incurring expensive user-to-kernel context switches.</li>
+          </ul>
+
+          <h3>3.7 <code>native</code></h3>
+          <p>
+            Specifies that a method is implemented in platform-native code (C, C++, Assembly) and linked dynamically through JNI. Examples include <code>System.currentTimeMillis()</code> and <code>Thread.currentThread()</code>.
+          </p>
+
+          <h3>3.8 <code>strictfp</code></h3>
+          <p>
+            Forces floating-point calculations (<code>float</code> and <code>double</code>) to adhere strictly to the IEEE 754 standard across different CPU architectures, preventing platform-specific extended exponent precision drift. Starting in <strong>Java 17</strong>, strict floating-point semantics became standard by default, rendering the keyword obsolete.
+          </p>
+        </section>
+
+        <!-- PART 4: REAL-TIME PRODUCTION ISSUES -->
+        <section>
+          <h2>4. Real-Time Production Issues & Post-Mortems</h2>
+
+          <!-- Incident 1 -->
+          <div class="callout callout-production">
+            <div class="callout-title">🚨 Incident 1: Double-Checked Locking Bug Due to Missing volatile</div>
+            <p><strong>Scenario:</strong> Under high concurrency in an e-commerce checkout engine, a Singleton cache initialization caused random <code>NullPointerException</code> crashes on 0.01% of requests, even though the singleton check was preceded by a <code>synchronized</code> block.</p>
+          </div>
+
+          <div class="callout callout-warning">
+            <div class="callout-title">🔍 Root Cause Analysis (RCA)</div>
+            <p>
+              The code implemented Double-Checked Locking without declaring the singleton reference <code>volatile</code>:
+            </p>
+            <pre><code>// BROKEN CODE:
+public class CacheManager {
+    private static CacheManager instance; // MISSING volatile!
+
+    public static CacheManager getInstance() {
+        if (instance == null) {
+            synchronized (CacheManager.class) {
+                if (instance == null) {
+                    instance = new CacheManager(); // Reordering occurs here!
+                }
+            }
+        }
+        return instance;
+    }
+}</code></pre>
+            <p>
+              Instantiating an object via <code>new CacheManager()</code> compiles to 3 steps:
+              <code>1. memory = allocate(); 2. ctor(memory); 3. instance = memory;</code>.
+              Without <code>volatile</code>, the JIT compiler and CPU reordered step 3 before step 2. Thread A assigned the non-null memory address to <code>instance</code> before the constructor finished running. Thread B arrived, observed <code>instance != null</code>, bypassed the lock, and accessed an <strong>uninitialized object</strong>, triggering NPEs!
+            </p>
+          </div>
+
+          <div class="callout callout-solution">
+            <div class="callout-title">💡 Production Resolution</div>
+            <p>Declaring <code>private static volatile CacheManager instance;</code> prevents instruction reordering by placing a <code>StoreStore</code> barrier before the assignment. Alternatively, use the <strong>Initialization-on-demand Holder idiom</strong> which leverages JVM class initialization guarantees:</p>
+            <pre><code>public class CacheManager {
+    private CacheManager() {}
+
+    private static class Holder {
+        static final CacheManager INSTANCE = new CacheManager();
+    }
+
+    public static CacheManager getInstance() {
+        return Holder.INSTANCE; // Lazy, thread-safe, zero lock overhead
+    }
+}</code></pre>
+          </div>
+
+          <!-- Incident 2 -->
+          <div class="callout callout-production">
+            <div class="callout-title">🚨 Incident 2: Session Clustering Outage via Missing transient on Spring Beans</div>
+            <p><strong>Scenario:</strong> During a Kubernetes rolling upgrade, user sessions replicated across Redis/Hazelcast nodes threw <code>java.io.NotSerializableException: org.springframework.web.client.RestTemplate</code>, causing thousands of active customer shopping carts to be wiped out.</p>
+          </div>
+
+          <div class="callout callout-warning">
+            <div class="callout-title">🔍 Root Cause Analysis (RCA)</div>
+            <p>
+              A junior engineer injected an autowired Spring service bean directly into an <code>HttpSession</code> attribute object:
+            </p>
+            <pre><code>public class ShoppingCart implements Serializable {
+    private List&lt;CartItem&gt; items;
+    private PaymentService paymentService; // Non-serializable bean holding socket pools!
+}</code></pre>
+            <p>
+              When the node cordoned during the upgrade, the distributed session manager attempted to serialize the <code>ShoppingCart</code> graph into Redis. Because <code>PaymentService</code> holds non-serializable HTTP connections, the entire serialization pipeline aborted.
+            </p>
+          </div>
+
+          <div class="callout callout-solution">
+            <div class="callout-title">💡 Production Resolution</div>
+            <p>Marked all non-stateful service handles as <code>transient</code>, or better, refactored data-transfer objects (DTOs) so they never hold references to service layer components:</p>
+            <pre><code>public class ShoppingCart implements Serializable {
+    private static final long serialVersionUID = 1L;
+    private List&lt;CartItem&gt; items;
+    private transient PaymentService paymentService; // Excluded from serialization
+}</code></pre>
+          </div>
+        </section>
+
+        <!-- PART 5: DIAGNOSTICS -->
+        <section>
+          <h2>5. Production Triage & Inspection Toolkit</h2>
+
+          <div class="code-header">
+            <span>Inspecting Bytecode Locks & Deadlocks</span>
+            <span>Bash</span>
+          </div>
+          <pre><code># 1. Disassemble class to inspect monitorenter and monitorexit instructions
+javap -c -v com/myapp/OrderService.class | grep -A 15 "monitorenter"
+
+# 2. Detect Live Deadlocks between Synchronized Monitors
+jstack -l &lt;PID&gt; | grep -A 25 "Found one Java-level deadlock:"
+
+# Example output indicating monitor circular dependency:
+# "Thread-1" prio=5 Id=12 BLOCKED on java.lang.Object@0x45a1f2 owned by "Thread-2"
+# "Thread-2" prio=5 Id=13 BLOCKED on java.lang.Object@0x45a1e8 owned by "Thread-1"
+
+# 3. Check Volatile and JIT Compilation Barriers using PrintAssembly (HotSpot)
+java -XX:+UnlockDiagnosticVMOptions -XX:+PrintAssembly -jar myapp.jar</code></pre>
+        </section>
+
+        <!-- PART 6: SENIOR INTERVIEW Q&A -->
+        <section>
+          <h2>6. Senior / Staff Technical Interview Q&A</h2>
+
+          <div class="callout callout-interview">
+            <div class="callout-title">🎯 Q1: Why does a synchronized static method not block a synchronized non-static method on the same class?</div>
+            <p><strong>Answer:</strong> They synchronize on completely different monitor objects. A <code>synchronized static</code> method acquires the lock on the <code>java.lang.Class</code> object instance residing in the Heap/Metaspace (<code>MyClass.class</code>). A <code>synchronized non-static</code> method acquires the monitor of the specific instance (<code>this</code>). Since the lock targets are distinct physical objects in memory, two threads can execute them simultaneously without blocking each other.</p>
+          </div>
+
+          <div class="callout callout-interview">
+            <div class="callout-title">🎯 Q2: Can you override a static method in Java? Why or why not?</div>
+            <p><strong>Answer:</strong> No, static methods cannot be overridden; they can only be <em>hidden</em>. Method overriding relies on dynamic method dispatch via the virtual method table (vtable) and the <code>invokevirtual</code> opcode, which checks the runtime object type in the heap. Static methods are invoked via <code>invokestatic</code>, which is bound statically at compile time based purely on the reference variable's declared type, not the runtime object instance.</p>
+          </div>
+
+          <div class="callout callout-interview">
+            <div class="callout-title">🎯 Q3: Does marking a 64-bit long or double as volatile have special memory semantics?</div>
+            <p><strong>Answer:</strong> Yes! In the Java Language Specification (JLS §17.7), writes to non-volatile 64-bit <code>long</code> and <code>double</code> values are treated as two separate 32-bit writes on 32-bit JVMs or specific hardware architectures. If multiple threads write concurrently without synchronization, a reader thread can observe a "torn read"—the higher 32 bits from one write and the lower 32 bits from another. Marking a <code>long</code> or <code>double</code> as <code>volatile</code> guarantees atomic 64-bit reads and writes even on 32-bit hardware.</p>
+          </div>
+
+          <div class="callout callout-interview">
+            <div class="callout-title">🎯 Q4: Explain the Fragile Base Class problem and how Composition solves it.</div>
+            <p><strong>Answer:</strong> The Fragile Base Class problem arises when a subclass inherits implementation details from a parent. If the parent class later modifies an internal method (e.g. changing <code>addAll()</code> to internally call <code>add()</code>), and the subclass had overridden both <code>add()</code> and <code>addAll()</code>, the subclass can silently produce duplicate counts or infinite recursion without any compiler warnings. Composition solves this by delegating to a private instance of the component rather than inheriting from it, preserving loose coupling and clean encapsulation boundaries.</p>
+          </div>
+        </section>
+
+      </main>
+    </div>
+  </div>
+
+  <footer>
+    <p>Interview A-Z Handbook &bull; Built for GitHub Pages &bull; Production Grade Interview Prep</p>
+  </footer>
+
+  <script src="../../assets/js/main.js"></script>
+</body>
+</html>

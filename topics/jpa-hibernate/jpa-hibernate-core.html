@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Module 5: JPA & Hibernate Internals, Performance & Locking | Interview A-Z</title>
+  <link rel="stylesheet" href="../../assets/css/style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+</head>
+<body>
+
+  <!-- Top Navigation -->
+  <nav class="navbar">
+    <div class="brand">
+      <span class="brand-badge">Interview A-Z</span>
+      <span>Engineering & Architecture Handbook</span>
+    </div>
+    <div class="nav-links">
+      <a href="../../index.html" class="nav-link">Home</a>
+      <a href="../../index.html#module-5" class="nav-link">Module Catalog</a>
+      <a href="https://github.com" target="_blank" class="nav-link">GitHub</a>
+    </div>
+  </nav>
+
+  <div class="container">
+    <div class="article-layout">
+      <!-- Sticky Sidebar Table of Contents -->
+      <aside class="sidebar-toc">
+        <h3>On This Page</h3>
+        <ul class="toc-links" id="dynamic-toc">
+          <!-- Dynamically populated via main.js -->
+        </ul>
+      </aside>
+
+      <!-- Main Article Content -->
+      <main class="article-content">
+        <!-- Breadcrumb -->
+        <nav class="breadcrumb">
+          <a href="../../index.html">Home</a>
+          <span>/</span>
+          <span>Module 5: JPA & Hibernate</span>
+          <span>/</span>
+          <span style="color: #fff;">JPA & Hibernate Core</span>
+        </nav>
+
+        <!-- Article Header -->
+        <header class="article-header">
+          <h1>Module 5: JPA & Hibernate Architecture, Performance & Concurrency</h1>
+          <div class="article-meta">
+            <span class="badge badge-spring">JPA / Hibernate</span>
+            <span class="badge badge-advanced">ORM Internals</span>
+            <span class="badge badge-prod">N+1 & Locking Post-Mortems</span>
+            <span>⏱️ 60 min deep dive</span>
+            <span>Target Roles: SDE-2, SDE-3, Database & Backend Architect</span>
+          </div>
+        </header>
+
+        <!-- SECTION 1: PERSISTENCE CONTEXT & ENTITY LIFECYCLE -->
+        <section>
+          <h2>1. Persistence Context & The 4 Entity Lifecycle States</h2>
+
+          <h3>1.1 What is the Persistence Context?</h3>
+          <p>
+            The <strong>Persistence Context</strong> is an in-memory cache and identity map managed by an <code>EntityManager</code> (Hibernate <code>Session</code>). It ensures that within a single database transaction, only <strong>one unique Java object instance</strong> exists on the heap for any given database row identifier.
+          </p>
+
+          <h3>1.2 The 4 States of an Entity</h3>
+          <pre><code>                     +----------------------------------------+
+                     |                NEW / TRANSIENT         |
+                     |  Entity created via 'new', has no DB   |
+                     |  identifier, not in Persistence Context|
+                     +-------------------+--------------------+
+                                         |
+                       em.persist(entity)|
+                                         v
+                     +----------------------------------------+
+                     |            MANAGED / PERSISTENT        |
+                     |  Associated with Persistence Context.  |
+                     |  Dirty checking active, auto-saved     |
+                     +-------+-------------------+------------+
+                             |                   |
+            em.detach(entity)|                   | em.remove(entity)
+            or session.close()|                   |
+                             v                   v
++------------------------------------+  +------------------------------------+
+|             DETACHED               |  |              REMOVED               |
+| Has DB ID, but no longer connected |  | Scheduled for SQL DELETE upon      |
+| to an active Persistence Context   |  | transaction commit                 |
++-----------------+------------------+  +------------------------------------+
+                  |
+  em.merge(entity)|
+                  v
+       (Back to MANAGED state)</code></pre>
+
+          <h3>1.3 Dirty Checking Mechanism</h3>
+          <p>
+            When an entity enters the <code>MANAGED</code> state, Hibernate takes an internal <strong>state snapshot</strong> of all its fields.
+          </p>
+          <p>
+            During transaction commit (or before executing a JPQL query), Hibernate automatically executes <strong>Dirty Checking</strong>: it compares the entity's current in-memory field values against the initial snapshot. If differences are detected, Hibernate automatically generates and executes an optimized SQL <code>UPDATE</code> statement!
+          </p>
+          <div class="callout callout-interview">
+            <div class="callout-title">🎯 Senior Interview Trap: Do you need to call repository.save() in a @Transactional method?</div>
+            <p>
+              <strong>NO.</strong> Calling <code>repository.save(entity)</code> on an entity fetched within a <code>@Transactional</code> method is completely redundant. Hibernate's Dirty Checking automatically synchronizes all field mutations with the database upon transaction commit. Calling <code>save()</code> invokes unnecessary <code>em.merge()</code> overhead.
+            </p>
+          </div>
+        </section>
+
+        <!-- SECTION 2: ENTITYMANAGER, REPOSITORIES & QUERIES -->
+        <section>
+          <h2>2. EntityManager, Spring Data Repositories, JPQL & Native Queries</h2>
+
+          <h3>2.1 <code>EntityManager</code> Core API Operations</h3>
+          <ul>
+            <li><code>persist(entity)</code>: Transitions a transient entity to managed state; queues an <code>INSERT</code> upon flush.</li>
+            <li><code>find(Class, id)</code>: Checks First-Level Cache first; if missing, issues a SQL <code>SELECT</code>.</li>
+            <li><code>merge(entity)</code>: Copies the state of a detached entity into a newly managed instance returned by the method.</li>
+            <li><code>remove(entity)</code>: Marks a managed entity for deletion, issuing a SQL <code>DELETE</code> upon flush.</li>
+            <li><code>flush()</code>: Synchronizes the in-memory persistence context with the underlying database immediately without committing the transaction.</li>
+            <li><code>clear()</code>: Clears the entire persistence context, detaching all managed entities.</li>
+          </ul>
+
+          <h3>2.2 JPQL vs. Native Queries</h3>
+          <table>
+            <thead>
+              <tr>
+                <th>Dimension</th>
+                <th>JPQL (Java Persistence Query Language)</th>
+                <th>Native SQL Query</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Query Target</strong></td>
+                <td>Queries <strong>Java Entities and field names</strong> (<code>SELECT o FROM Order o</code>)</td>
+                <td>Queries <strong>physical database tables and columns</strong> (<code>SELECT * FROM orders</code>)</td>
+              </tr>
+              <tr>
+                <td><strong>Database Portability</strong></td>
+                <td>Fully portable across PostgreSQL, MySQL, Oracle, SQL Server</td>
+                <td>Bound to specific database dialect, extensions, and syntax</td>
+              </tr>
+              <tr>
+                <td><strong>Result Mapping</strong></td>
+                <td>Automatically manages entities in the Persistence Context</td>
+                <td>Requires manual result-set mapping (<code>@SqlResultSetMapping</code> or Projections)</td>
+              </tr>
+              <tr>
+                <td><strong>Use Case</strong></td>
+                <td>Standard domain CRUD and relational traversals</td>
+                <td>Database-specific window functions (<code>ROW_NUMBER()</code>), CTEs, bulk analytics</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <div class="code-header">
+            <span>JPQL vs Native Query in Spring Data JPA</span>
+            <span>Java</span>
+          </div>
+          <pre><code>public interface OrderRepository extends JpaRepository&lt;Order, UUID&gt; {
+
+    // JPQL: Operates on Entity 'Order' and field 'status'
+    @Query("SELECT o FROM Order o WHERE o.status = :status AND o.totalAmount &gt; :minAmount")
+    List&lt;Order&gt; findHighValueOrders(@Param("status") OrderStatus status, @Param("minAmount") BigDecimal minAmount);
+
+    // Native SQL: Operates on physical table 'orders' and columns
+    @Query(value = "SELECT * FROM orders WHERE created_at &gt;= NOW() - INTERVAL '30 days'", nativeQuery = true)
+    List&lt;Order&gt; findRecentOrdersNative();
+}</code></pre>
+        </section>
+
+        <!-- SECTION 3: RELATIONSHIPS & FETCHING STRATEGIES -->
+        <section>
+          <h2>3. Relational Mappings, Cascades & The Fetching Strategy Matrix</h2>
+
+          <h3>3.1 The 4 Relational Mappings</h3>
+          <ul>
+            <li><strong><code>@ManyToOne</code> (The Foundation):</strong> The child table contains the foreign key column (owning side). <strong>Critical Production Rule:</strong> Always specify <code>fetch = FetchType.LAZY</code> because <code>@ManyToOne</code> defaults to <code>EAGER</code>!</li>
+            <li><strong><code>@OneToMany</code>:</strong> The parent entity points to a collection of children. Always use the <code>mappedBy</code> attribute to declare that the child's <code>@ManyToOne</code> owns the foreign key:
+              <pre><code>@OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
+private List&lt;OrderItem&gt; items = new ArrayList&lt;&gt;();</code></pre>
+            </li>
+            <li><strong><code>@OneToOne</code>:</strong> One-to-one relationship. Best mapped using <code>@MapsId</code> (sharing the primary key) to eliminate bidirectional join table penalties.</li>
+            <li><strong><code>@ManyToMany</code>:</strong> In production, <strong>never use raw @ManyToMany</strong>! Create an explicit intermediate join entity with an embedded composite key (<code>@EmbeddedId</code>) so you can track metadata like <code>assigned_at</code> or <code>status</code> on the junction row.</li>
+          </ul>
+
+          <h3>3.2 <code>CascadeType</code> vs. <code>orphanRemoval = true</code></h3>
+          <ul>
+            <li><strong><code>CascadeType.ALL</code>:</strong> Propagates lifecycle events (PERSIST, MERGE, REMOVE) from parent to child. If you delete the parent, all its children are deleted.</li>
+            <li><strong><code>orphanRemoval = true</code>:</strong> Specifically monitors the Java collection. If you remove a child from the parent's collection (e.g. <code>order.getItems().remove(item)</code>), Hibernate automatically issues a SQL <code>DELETE</code> statement for that orphaned child row!</li>
+          </ul>
+        </section>
+
+        <!-- SECTION 4: THE N+1 PROBLEM & FETCH JOINS -->
+        <section>
+          <h2>4. The N+1 Query Problem & Production Solutions</h2>
+
+          <h3>4.1 What Causes the N+1 Problem?</h3>
+          <p>
+            When an entity has a lazy or eager child association, querying for $N$ parents triggers <strong>1 query for the parents, plus $N$ individual queries</strong> to fetch each child!
+          </p>
+          <pre><code>// 1. Initial query fetches 100 orders:
+List&lt;Order&gt; orders = orderRepo.findAll(); // SQL: SELECT * FROM orders; (1 Query)
+
+// 2. Traversing items in a loop triggers 100 separate queries:
+for (Order order : orders) {
+    System.out.println(order.getCustomer().getName()); // SQL: SELECT * FROM customers WHERE id = ?; (100 Queries!)
+}
+// TOTAL: 1 + 100 = 101 queries executed for a single request!</code></pre>
+
+          <h3>4.2 The 3 Production Solutions to N+1</h3>
+
+          <h4>Solution 1: JPQL <code>JOIN FETCH</code> (Most Effective)</h4>
+          <p>
+            Instructs Hibernate to issue an inner/left join and populate both parent and child entities in a <strong>single SQL query</strong>:
+          </p>
+          <div class="code-header">
+            <span>JPQL JOIN FETCH</span>
+            <span>Java</span>
+          </div>
+          <pre><code>@Query("SELECT o FROM Order o JOIN FETCH o.customer JOIN FETCH o.items WHERE o.status = :status")
+List&lt;Order&gt; findAllOrdersWithCustomerAndItems(@Param("status") OrderStatus status);
+// SQL executed: SELECT o.*, c.*, i.* FROM orders o JOIN customers c ON ... JOIN order_items i ON ... (1 QUERY!)</code></pre>
+
+          <h4>Solution 2: <code>@EntityGraph</code></h4>
+          <p>
+            Overrides lazy-loading dynamically on a per-method basis without rewriting JPQL:
+          </p>
+          <pre><code>@EntityGraph(attributePaths = {"customer", "items"})
+List&lt;Order&gt; findByStatus(OrderStatus status);</code></pre>
+
+          <h4>Solution 3: Batch Fetching (<code>default_batch_fetch_size</code>)</h4>
+          <p>
+            Configured in <code>application.yml</code>, this converts $N$ individual queries into a few batch <code>IN (...)</code> queries:
+          </p>
+          <pre><code>spring:
+  jpa:
+    properties:
+      hibernate:
+        default_batch_fetch_size: 30 # Replaces 100 queries with: SELECT * FROM customers WHERE id IN (?, ?, ... 30 ids)</code></pre>
+        </section>
+
+        <!-- SECTION 5: TRANSACTIONS & LOCKING -->
+        <section>
+          <h2>5. Transaction Management, Optimistic & Pessimistic Locking</h2>
+
+          <h3>5.1 <code>@Transactional</code> Propagation Rules</h3>
+          <ul>
+            <li><strong><code>REQUIRED</code> (Default):</strong> Joins the existing transaction if one exists; creates a new transaction if none exists.</li>
+            <li><strong><code>REQUIRES_NEW</code>:</strong> Suspends the current outer transaction and starts a completely independent inner transaction. Useful for audit logs or billing attempts that must commit even if the outer transaction rolls back.</li>
+            <li><strong><code>MANDATORY</code>:</strong> Requires an existing transaction to be active; throws an exception if called without one.</li>
+            <li><strong><code>SUPPORTS</code>:</strong> Executes within an active transaction if one exists; executes non-transactionally otherwise.</li>
+          </ul>
+
+          <h3>5.2 Optimistic Locking (<code>@Version</code>)</h3>
+          <p>
+            Assumes conflicts are rare. Adds an integer or timestamp <code>@Version</code> column to the entity:
+          </p>
+          <div class="code-header">
+            <span>Optimistic Locking Entity Pattern</span>
+            <span>Java</span>
+          </div>
+          <pre><code>@Entity
+@Table(name = "products")
+public class Product {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    private String name;
+    private int stockCount;
+
+    @Version // Hibernate automatically manages and increments this field!
+    private Long version;
+}</code></pre>
+          <p>
+            When updating: <code>UPDATE products SET stock_count = 5, version = version + 1 WHERE id = 1 AND version = 0;</code>.
+            If another transaction updated the row first, the version is already <code>1</code>; the query updates 0 rows, and Hibernate throws <strong><code>OptimisticLockException</code></strong>. The application can catch this and retry.
+          </p>
+
+          <h3>5.3 Pessimistic Locking (Row-Level DB Locks)</h3>
+          <p>
+            Used when conflicts are frequent and transactions cannot afford rollback retries (e.g. inventory allocations):
+          </p>
+          <div class="code-header">
+            <span>Pessimistic Write Lock (SELECT FOR UPDATE)</span>
+            <span>Java</span>
+          </div>
+          <pre><code>public interface ProductRepository extends JpaRepository&lt;Product, Long&gt; {
+
+    @Lock(LockModeType.PESSIMISTIC_WRITE) // Generates: SELECT * FROM products WHERE id = ? FOR UPDATE;
+    @Query("SELECT p FROM Product p WHERE p.id = :id")
+    Optional&lt;Product&gt; findByIdForUpdate(@Param("id") Long id);
+}</code></pre>
+        </section>
+
+        <!-- SECTION 6: CACHING, SPECIFICATIONS & PROJECTIONS -->
+        <section>
+          <h2>6. Caching, Dynamic Specifications & DTO Projections</h2>
+
+          <h3>6.1 First-Level vs. Second-Level Cache</h3>
+          <table>
+            <thead>
+              <tr>
+                <th>Dimension</th>
+                <th>First-Level Cache (L1)</th>
+                <th>Second-Level Cache (L2)</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Scope</strong></td>
+                <td>Bound to a single <code>EntityManager</code> / <code>Session</code></td>
+                <td>Bound to the entire <code>EntityManagerFactory</code> (Shared by all sessions)</td>
+              </tr>
+              <tr>
+                <td><strong>Configuration</strong></td>
+                <td><strong>Always active</strong>; cannot be disabled</td>
+                <td>Optional; requires external provider (Redis, Hazelcast, Ehcache)</td>
+              </tr>
+              <tr>
+                <td><strong>Identity Guarantee</strong></td>
+                <td>Guarantees <code>objA == objB</code> (same heap memory reference)</td>
+                <td>Stores serialized data; returns different object instances across sessions</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <h3>6.2 Dynamic Filtering via Specifications</h3>
+          <div class="code-header">
+            <span>Composable Criteria API Specifications</span>
+            <span>Java</span>
+          </div>
+          <pre><code>public class OrderSpecifications {
+    public static Specification&lt;Order&gt; hasStatus(OrderStatus status) {
+        return (root, query, cb) -&gt; status == null ? null : cb.equal(root.get("status"), status);
+    }
+
+    public static Specification&lt;Order&gt; minAmount(BigDecimal amount) {
+        return (root, query, cb) -&gt; amount == null ? null : cb.greaterThanOrEqualTo(root.get("totalAmount"), amount);
+    }
+}
+
+// Controller usage:
+Specification&lt;Order&gt; spec = Specification.where(OrderSpecifications.hasStatus(status))
+                                         .and(OrderSpecifications.minAmount(minAmount));
+List&lt;Order&gt; results = orderRepository.findAll(spec);</code></pre>
+
+          <h3>6.3 High-Performance DTO Projections</h3>
+          <p>
+            Avoid fetching entire managed entities when you only need a few columns for display:
+          </p>
+          <div class="code-header">
+            <span>Constructor Expression DTO Projection</span>
+            <span>Java</span>
+          </div>
+          <pre><code>// 1. Immutable DTO Record
+public record OrderSummaryDto(UUID orderId, String customerName, BigDecimal totalAmount) {}
+
+// 2. Repository JPQL Constructor Expression:
+@Query("SELECT new com.myapp.dto.OrderSummaryDto(o.id, c.name, o.totalAmount) " +
+       "FROM Order o JOIN o.customer c WHERE o.status = 'COMPLETED'")
+List&lt;OrderSummaryDto&gt; findCompletedOrderSummaries();
+// Reads strictly 3 columns from disk, zero dirty-checking or entity hydration overhead!</code></pre>
+        </section>
+
+        <!-- SECTION 7: REAL-TIME PRODUCTION ISSUES -->
+        <section>
+          <h2>7. Real-Time Production Issues & Post-Mortems</h2>
+
+          <!-- Incident 1 -->
+          <div class="callout callout-production">
+            <div class="callout-title">🚨 Incident 1: 50,000 Extra Queries/sec via Default EAGER Fetching on @ManyToOne</div>
+            <p><strong>Scenario:</strong> During a prime shopping festival, an e-commerce catalog API service collapsed. PostgreSQL connection pools were maxed out, and p99 latency spiked from 12ms to 4,200ms.</p>
+          </div>
+
+          <div class="callout callout-warning">
+            <div class="callout-title">🔍 Root Cause Analysis (RCA)</div>
+            <p>
+              An entity was mapped as:
+              <code>@ManyToOne private Merchant merchant;</code> (defaulting to <code>FetchType.EAGER</code>).
+              When listing 100 products via <code>findAll()</code>, Hibernate executed 1 query for products, and then immediately issued 100 individual queries to eagerly load each merchant, multiplying 500 req/sec into 50,000 SQL queries/sec!
+            </p>
+          </div>
+
+          <div class="callout callout-solution">
+            <div class="callout-title">💡 Production Resolution</div>
+            <ul>
+              <li>Changed all <code>@ManyToOne</code> mappings across the codebase to explicit <code>fetch = FetchType.LAZY</code>.</li>
+              <li>Used <code>JOIN FETCH</code> on query methods where merchant details were genuinely required.</li>
+            </ul>
+          </div>
+
+          <!-- Incident 2 -->
+          <div class="callout callout-production">
+            <div class="callout-title">🚨 Incident 2: LazyInitializationException in Production View Serialization</div>
+            <p><strong>Scenario:</strong> After migrating to microservices, REST endpoints returning JSON randomly failed with: <code>org.hibernate.LazyInitializationException: could not initialize proxy [com.myapp.Customer#12] - no Session</code>.</p>
+          </div>
+
+          <div class="callout callout-warning">
+            <div class="callout-title">🔍 Root Cause Analysis (RCA)</div>
+            <p>
+              The Spring service method marked <code>@Transactional</code> completed, closing the database session and detaching the <code>Order</code> entity. When Jackson later attempted to serialize the uninitialized lazy <code>order.getCustomer()</code> proxy into JSON at the controller layer, no active Hibernate session was available to issue the SQL query, crashing the serializer.
+            </p>
+          </div>
+
+          <div class="callout callout-solution">
+            <div class="callout-title">💡 Production Resolution</div>
+            <ul>
+              <li><strong>Strict DTO Boundary:</strong> Mapped entities to DTO records <em>inside</em> the <code>@Transactional</code> service layer using MapStruct or constructor projections before returning to the controller.</li>
+              <li><strong>Disabled OSIV:</strong> Set <code>spring.jpa.open-in-view=false</code> to prevent holding database connections open through view rendering.</li>
+            </ul>
+          </div>
+        </section>
+
+        <!-- SECTION 8: SENIOR INTERVIEW Q&A -->
+        <section>
+          <h2>8. Senior / Staff Technical Interview Q&A</h2>
+
+          <div class="callout callout-interview">
+            <div class="callout-title">🎯 Q1: Why should spring.jpa.open-in-view (OSIV) be disabled in production?</div>
+            <p><strong>Answer:</strong> By default, Spring Boot enables <code>spring.jpa.open-in-view=true</code>, which binds a database session and physical JDBC connection to the entire HTTP request lifecycle (from controller entry through JSON rendering). If a response takes 500ms to serialize or wait for slow client network sockets, the physical database connection is held hostage and cannot be returned to the HikariCP pool, leading to rapid connection pool starvation.</p>
+          </div>
+
+          <div class="callout callout-interview">
+            <div class="callout-title">🎯 Q2: What is the difference between em.find() and em.getReference()?</div>
+            <p><strong>Answer:</strong> <code>em.find()</code> immediately issues a SQL <code>SELECT</code> query (if not already in L1 cache) and returns the fully initialized entity or <code>null</code>. <code>em.getReference()</code> returns a lazy CGLIB/ByteBuddy <strong>proxy object</strong> with only the primary key populated, without issuing any SQL query. The actual SQL query is deferred until a getter method other than <code>getId()</code> is invoked. This is ideal when assigning foreign key associations without needing to load the associated entity's row.</p>
+          </div>
+
+          <div class="callout callout-interview">
+            <div class="callout-title">🎯 Q3: How do you handle OptimisticLockException in enterprise microservices?</div>
+            <p><strong>Answer:</strong> An <code>OptimisticLockException</code> indicates a concurrent write collision. In high-concurrency systems (like seat reservations or checkout), the standard pattern is to catch the exception, refresh the entity's state (<code>em.refresh()</code>) to pull the newest version from the database, re-validate business invariants, and automatically retry the transaction using Spring Retry (<code>@Retryable(value = OptimisticLockingFailureException.class, maxAttempts = 3, backoff = @Backoff(delay = 100))</code>).</p>
+          </div>
+        </section>
+
+      </main>
+    </div>
+  </div>
+
+  <footer>
+    <p>Interview A-Z Handbook &bull; Built for GitHub Pages &bull; Production Grade Interview Prep</p>
+  </footer>
+
+  <script src="../../assets/js/main.js"></script>
+</body>
+</html>

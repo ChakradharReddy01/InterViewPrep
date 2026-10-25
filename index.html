@@ -1,0 +1,689 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Interview A-Z | Senior Engineering & Production Knowledge Base</title>
+  <link rel="stylesheet" href="assets/css/style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+</head>
+<body>
+
+  <!-- Top Navigation -->
+  <nav class="navbar">
+    <div class="brand">
+      <button id="mobile-sidebar-toggle" class="sidebar-mobile-toggle" aria-label="Toggle Navigation">
+        <span>☰</span> Modules
+      </button>
+      <span class="brand-badge">Interview A-Z</span>
+      <span>Engineering & Architecture Handbook</span>
+    </div>
+    <div class="nav-links">
+      <a href="index.html" class="nav-link active">Home</a>
+      <a href="#topics" class="nav-link">Topic Catalog</a>
+      <a href="https://github.com" target="_blank" class="nav-link">GitHub</a>
+    </div>
+  </nav>
+
+  <!-- Mobile Overlay Backdrop -->
+  <div id="sidebar-backdrop" class="sidebar-backdrop"></div>
+
+  <!-- Two-Column Layout: Left Sidebar + Main Content -->
+  <div class="home-layout">
+    
+    <!-- Left Navigation Sidebar: Accordion Style (Click module to show subtopics) -->
+    <aside class="home-sidebar">
+      <div class="sidebar-heading">Modules & Topics</div>
+      <ul class="module-tree">
+        
+        <!-- Module 1 Accordion Item -->
+        <li class="module-tree-item" data-module-target="module-1">
+          <div class="module-tree-header">
+            <span class="module-name"><span>☕</span> Module 1: Core Java</span>
+            <span class="toggle-icon">▶</span>
+          </div>
+          <ul class="module-subtopics">
+            <li><a href="topics/core-java/java-fundamentals.html">JVM & Fundamentals</a></li>
+            <li><a href="topics/core-java/oop-and-keywords.html">OOP & Java Keywords</a></li>
+            <li><a href="topics/core-java/strings-object-exceptions.html">Strings & Exceptions</a></li>
+            <li><a href="topics/core-java/collections-and-generics.html">Collections & Generics</a></li>
+            <li><a href="topics/core-java/java8-streams-and-lambdas.html">Java 8+ Streams & Lambdas</a></li>
+            <li><a href="topics/core-java/modern-java.html">Modern Java (11-21+)</a></li>
+          </ul>
+        </li>
+
+        <!-- Module 2 Accordion Item -->
+        <li class="module-tree-item" data-module-target="module-2">
+          <div class="module-tree-header">
+            <span class="module-name"><span>⚡</span> Module 2: Multithreading</span>
+            <span class="toggle-icon">▶</span>
+          </div>
+          <ul class="module-subtopics">
+            <li><a href="topics/multithreading/thread-fundamentals.html">Thread Fundamentals</a></li>
+            <li><a href="topics/multithreading/synchronization-and-locks.html">Synchronization & CAS</a></li>
+            <li><a href="topics/multithreading/locks-framework.html">Locks Framework</a></li>
+            <li><a href="topics/multithreading/executor-framework.html">Executor Framework</a></li>
+            <li><a href="topics/multithreading/concurrent-collections.html">Concurrent Collections</a></li>
+            <li><a href="topics/multithreading/synchronization-problems.html">Concurrency Hazards</a></li>
+            <li><a href="topics/multithreading/async-programming.html">Async Programming (CF)</a></li>
+            <li><a href="topics/multithreading/advanced-concurrency.html">Advanced Concurrency</a></li>
+          </ul>
+        </li>
+
+        <!-- Module 3 Accordion Item -->
+        <li class="module-tree-item" data-module-target="module-3">
+          <div class="module-tree-header">
+            <span class="module-name"><span>🍃</span> Module 3: Spring Framework</span>
+            <span class="toggle-icon">▶</span>
+          </div>
+          <ul class="module-subtopics">
+            <li><a href="topics/spring-framework/spring-core.html">Spring Core, IoC & AOP</a></li>
+          </ul>
+        </li>
+
+        <!-- Module 4 Accordion Item -->
+        <li class="module-tree-item" data-module-target="module-4">
+          <div class="module-tree-header">
+            <span class="module-name"><span>🚀</span> Module 4: Spring Boot</span>
+            <span class="toggle-icon">▶</span>
+          </div>
+          <ul class="module-subtopics">
+            <li><a href="topics/spring-boot/spring-boot-core.html">Spring Boot Core & REST APIs</a></li>
+          </ul>
+        </li>
+
+        <!-- Module 5 Accordion Item -->
+        <li class="module-tree-item" data-module-target="module-5">
+          <div class="module-tree-header">
+            <span class="module-name"><span>🗄️</span> Module 5: JPA / Hibernate</span>
+            <span class="toggle-icon">▶</span>
+          </div>
+          <ul class="module-subtopics">
+            <li><a href="topics/jpa-hibernate/jpa-hibernate-core.html">JPA & Hibernate Core</a></li>
+          </ul>
+        </li>
+
+        <!-- Module 6 Accordion Item -->
+        <li class="module-tree-item expanded" data-module-target="module-6">
+          <div class="module-tree-header">
+            <span class="module-name"><span>🛡️</span> Module 6: Spring Security</span>
+            <span class="toggle-icon">▶</span>
+          </div>
+          <ul class="module-subtopics">
+            <li><a href="topics/spring-security/spring-security-core.html">Spring Security Core & Defense</a></li>
+          </ul>
+        </li>
+      </ul>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="home-main">
+      <!-- Hero Section -->
+      <header class="hero">
+        <h1>In-Depth Interview & Production Guide</h1>
+        <p>A comprehensive, battle-tested handbook designed for senior engineering interviews — covering deep architectural mechanisms, production post-mortems, real-time war stories, and code walk-throughs.</p>
+        
+        <!-- Search Input -->
+        <div class="search-box-container">
+          <span class="search-icon">🔍</span>
+          <input type="text" id="topic-search" class="search-input" placeholder="Search topics, Spring Security, JWT, OAuth2, BCrypt, JPA, Hibernate, Spring Boot, Multithreading, RCA...">
+        </div>
+
+        <!-- Quick Category Filters -->
+        <div class="filter-tags">
+          <button class="tag-btn active" data-filter="all">All Topics</button>
+          <button class="tag-btn" data-filter="security">Spring Security</button>
+          <button class="tag-btn" data-filter="jpa">JPA & Hibernate</button>
+          <button class="tag-btn" data-filter="spring-boot">Spring Boot</button>
+          <button class="tag-btn" data-filter="spring">Spring Framework</button>
+          <button class="tag-btn" data-filter="multithreading">Multithreading</button>
+          <button class="tag-btn" data-filter="core-java">Core Java</button>
+          <button class="tag-btn" data-filter="modern-java">Modern Java (11-21+)</button>
+          <button class="tag-btn" data-filter="java8">Java 8+ Streams</button>
+          <button class="tag-btn" data-filter="collections">Collections</button>
+          <button class="tag-btn" data-filter="production">Production War Stories</button>
+        </div>
+      </header>
+
+      <!-- Topic Catalog Container -->
+      <div id="topics">
+
+        <!-- ============================================== -->
+        <!-- MODULE 6: SPRING SECURITY -->
+        <!-- ============================================== -->
+        <section class="topic-group-section" id="module-6">
+          <div class="topic-group-header">
+            <div class="topic-group-title">
+              <span>🛡️ Module 6: Spring Security</span>
+            </div>
+            <span class="topic-count">1 Comprehensive Master Module Active</span>
+          </div>
+
+          <div class="cards-grid">
+            <!-- Card 1: Spring Security Core & Zero-Trust Defense -->
+            <div class="card" data-tags="security spring-security spring production">
+              <div class="card-top">
+                <span class="badge badge-spring">Spring Security 6.x</span>
+                <span class="badge badge-prod">Zero-Trust & JWT</span>
+              </div>
+              <h2 class="card-title">Spring Security Architecture, JWT, OAuth2 & Zero-Trust Defense</h2>
+              <p class="card-desc">Comprehensive deep dive into Spring Security 6.x architecture: SecurityFilterChain & DelegatingFilterProxy, SecurityContext & ThreadLocal, UserDetails & DaoAuthenticationProvider, BCrypt work factor math, JWT access/refresh token rotation, RBAC, OAuth2/OIDC PKCE flows, CORS preflights, CSRF defense, and session fixation.</p>
+              
+              <ul class="subtopics-list">
+                <li class="subtopic-item"><strong>Authentication & Authorization:</strong> Core architectural differences, AuthenticationManager, ProviderManager, AuthenticationProvider chain</li>
+                <li class="subtopic-item"><strong>Filter Chain Architecture:</strong> DelegatingFilterProxy, FilterChainProxy, exact canonical filter sequence, modern Lambda DSL SecurityFilterChain</li>
+                <li class="subtopic-item"><strong>SecurityContext Internals:</strong> ThreadLocal storage, MODE_INHERITABLETHREADLOCAL hazards, async thread context propagation via DelegatingSecurityContextAsyncTaskExecutor</li>
+                <li class="subtopic-item"><strong>Identity & Credentials:</strong> UserDetails & UserDetailsService decoupling, BCrypt adaptive Blowfish cost factor ($2a$12$), constant-time comparison</li>
+                <li class="subtopic-item"><strong>Tokens & JWT:</strong> Anatomy of RFC 7519, HS256 vs RS256 JWKS verification, short-lived Access Tokens + Redis Refresh Token rotation and breach detection</li>
+                <li class="subtopic-item"><strong>Access Control & Method Security:</strong> hasRole() (ROLE_ prefix) vs hasAuthority(), @PreAuthorize SpEL expressions (#id == authentication.principal.id)</li>
+                <li class="subtopic-item"><strong>Federated Identity:</strong> OAuth 2.0 vs OIDC, 4 core roles, Authorization Code Flow with PKCE, ID Token vs Access Token</li>
+                <li class="subtopic-item"><strong>Web Protections:</strong> CORS preflight OPTIONS headers, CSRF synchronizer tokens (why stateless JWT APIs disable it), session fixation migrateSession()</li>
+                <li class="subtopic-item"><strong>Real Production Post-Mortems:</strong> CORS preflight 401 outage, 100% CPU thread starvation via cost=15 BCrypt, async SecurityContext tenant data leak</li>
+              </ul>
+
+              <div class="card-footer">
+                <span style="font-size: 0.82rem; color: var(--text-muted);">18 Core Subtopics Covered</span>
+                <a href="topics/spring-security/spring-security-core.html" class="card-link">Explore Deep Dive &rarr;</a>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ============================================== -->
+        <!-- MODULE 5: JPA / HIBERNATE -->
+        <!-- ============================================== -->
+        <section class="topic-group-section" id="module-5">
+          <div class="topic-group-header">
+            <div class="topic-group-title">
+              <span>🗄️ Module 5: JPA & Hibernate</span>
+            </div>
+            <span class="topic-count">1 Comprehensive Master Module Active</span>
+          </div>
+
+          <div class="cards-grid">
+            <!-- Card 1: JPA / Hibernate Core -->
+            <div class="card" data-tags="jpa hibernate spring production">
+              <div class="card-top">
+                <span class="badge badge-spring">JPA / Hibernate</span>
+                <span class="badge badge-prod">N+1 & Locking</span>
+              </div>
+              <h2 class="card-title">JPA & Hibernate Architecture, Performance & Locking</h2>
+              <p class="card-desc">Persistence Context & 4 Entity states, EntityManager, JPQL vs Native SQL, Relational mappings (@OneToMany, @ManyToOne), Lazy vs Eager loading, Cascades & orphanRemoval, N+1 problem & JOIN FETCH, Transaction propagation, Optimistic (@Version) vs Pessimistic (FOR UPDATE) locking, Dirty Checking, First/Second Level Cache, Specifications, and DTO Projections.</p>
+              
+              <ul class="subtopics-list">
+                <li class="subtopic-item"><strong>Persistence Context & Lifecycle:</strong> 4 Entity states (Transient, Managed, Detached, Removed), EntityManager methods, Dirty Checking mechanics (snapshot comparison)</li>
+                <li class="subtopic-item"><strong>Queries & Repositories:</strong> JpaRepository, JPQL entity queries vs Native database SQL, type-safe Specifications (Criteria API)</li>
+                <li class="subtopic-item"><strong>Relational Mappings:</strong> @ManyToOne (why lazy is mandatory), @OneToMany (mappedBy owning side), @OneToOne, Cascades vs orphanRemoval</li>
+                <li class="subtopic-item"><strong>The N+1 Problem:</strong> Root cause, JOIN FETCH single-query solution, @EntityGraph, and default_batch_fetch_size</li>
+                <li class="subtopic-item"><strong>Transactions & Locking:</strong> @Transactional propagation (REQUIRED vs REQUIRES_NEW), Optimistic Locking (@Version column), Pessimistic Locking (SELECT FOR UPDATE)</li>
+                <li class="subtopic-item"><strong>Caching & Projections:</strong> First Level Cache (L1 session identity) vs Second Level Cache (L2 shared Redis/Hazelcast), Constructor DTO Projections</li>
+                <li class="subtopic-item"><strong>Real Production Incidents:</strong> 50k extra queries/sec via EAGER @ManyToOne, LazyInitializationException in view rendering</li>
+              </ul>
+
+              <div class="card-footer">
+                <span style="font-size: 0.82rem; color: var(--text-muted);">26 Core Subtopics Covered</span>
+                <a href="topics/jpa-hibernate/jpa-hibernate-core.html" class="card-link">Explore Deep Dive &rarr;</a>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ============================================== -->
+        <!-- MODULE 4: SPRING BOOT -->
+        <!-- ============================================== -->
+        <section class="topic-group-section" id="module-4">
+          <div class="topic-group-header">
+            <div class="topic-group-title">
+              <span>🚀 Module 4: Spring Boot</span>
+            </div>
+            <span class="topic-count">1 Comprehensive Master Module Active</span>
+          </div>
+
+          <div class="cards-grid">
+            <!-- Card 1: Spring Boot Architecture & REST APIs -->
+            <div class="card" data-tags="spring-boot spring core-java production">
+              <div class="card-top">
+                <span class="badge badge-spring">Spring Boot 3.x</span>
+                <span class="badge badge-prod">Enterprise REST</span>
+              </div>
+              <h2 class="card-title">Spring Boot Architecture, REST APIs & Enterprise Patterns</h2>
+              <p class="card-desc">Auto-Configuration internals, @SpringBootApplication, Starter dependencies, Type-safe properties, Actuator security, Embedded Tomcat tuning, Jakarta validation DTOs, RFC 7807 ProblemDetail error handling, Slice pagination, API versioning, Distributed Idempotency (Redis SETNX), and Kubernetes probes.</p>
+              
+              <ul class="subtopics-list">
+                <li class="subtopic-item"><strong>Core Architecture:</strong> Starters, Auto-Configuration (<code>@ConditionalOnClass</code> / <code>@ConditionalOnMissingBean</code>), <code>@SpringBootApplication</code></li>
+                <li class="subtopic-item"><strong>Configuration:</strong> Profiles, YAML vs Properties, <code>@ConfigurationProperties</code> Record validation</li>
+                <li class="subtopic-item"><strong>Operations:</strong> Actuator endpoints security (sanitizing <code>/actuator/env</code>), Structured JSON Logging with MDC Trace IDs, Embedded Tomcat thread pool tuning</li>
+                <li class="subtopic-item"><strong>REST API Design:</strong> HTTP status code standards, DTO pattern, Jakarta Bean Validation (<code>@Valid</code>, custom validators)</li>
+                <li class="subtopic-item"><strong>Error Handling:</strong> <code>@RestControllerAdvice</code>, <code>@ExceptionHandler</code>, RFC 7807 <code>ProblemDetail</code> specification</li>
+                <li class="subtopic-item"><strong>Pagination & Performance:</strong> <code>Page&lt;T&gt;</code> vs <code>Slice&lt;T&gt;</code> (avoiding count(*) full scans), Keyset cursor pagination</li>
+                <li class="subtopic-item"><strong>Enterprise Patterns:</strong> API Versioning (URI, Header, Accept), Distributed Idempotency via Redis SETNX, Kubernetes Liveness & Readiness probes</li>
+                <li class="subtopic-item"><strong>Real Production Incidents:</strong> Actuator /env credential leak, Database CPU 100% via Page count(*) queries</li>
+              </ul>
+
+              <div class="card-footer">
+                <span style="font-size: 0.82rem; color: var(--text-muted);">24 Core Subtopics Covered</span>
+                <a href="topics/spring-boot/spring-boot-core.html" class="card-link">Explore Deep Dive &rarr;</a>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ============================================== -->
+        <!-- MODULE 3: SPRING FRAMEWORK -->
+        <!-- ============================================== -->
+        <section class="topic-group-section" id="module-3">
+          <div class="topic-group-header">
+            <div class="topic-group-title">
+              <span>🍃 Module 3: Spring Framework</span>
+            </div>
+            <span class="topic-count">1 Comprehensive Master Module Active</span>
+          </div>
+
+          <div class="cards-grid">
+            <!-- Card 1: Spring Core, IoC, Lifecycle & AOP -->
+            <div class="card" data-tags="spring core-java production">
+              <div class="card-top">
+                <span class="badge badge-spring">Spring Core</span>
+                <span class="badge badge-prod">IoC & AOP Proxies</span>
+              </div>
+              <h2 class="card-title">Spring Core, IoC Container, Bean Lifecycle & AOP</h2>
+              <p class="card-desc">Deep architectural tour of Spring's IoC container, BeanFactory vs ApplicationContext, 12-step Bean Lifecycle, Scopes & prototype hazards, Constructor vs Field injection, and Spring AOP proxy internals (CGLIB vs JDK Dynamic).</p>
+              
+              <ul class="subtopics-list">
+                <li class="subtopic-item"><strong>IoC & Container Architecture:</strong> Hollywood principle, BeanFactory lazy loading vs ApplicationContext eager pre-instantiation, ASM component scanning</li>
+                <li class="subtopic-item"><strong>12-Step Bean Lifecycle:</strong> Instantiation &rarr; Populate &rarr; Aware callbacks &rarr; BeanPostProcessor before &rarr; @PostConstruct &rarr; InitializingBean &rarr; BeanPostProcessor after (AOP proxying) &rarr; @PreDestroy</li>
+                <li class="subtopic-item"><strong>Bean Scopes:</strong> Singleton, Prototype, Request, Session; the <em>Prototype-injected-into-Singleton hazard</em> (ObjectProvider & Scoped Proxies)</li>
+                <li class="subtopic-item"><strong>Stereotypes & DI:</strong> Why Field Injection is an anti-pattern vs Constructor injection, @Component, @Service, @Repository (Exception translation), @Configuration (CGLIB proxyBeanMethods)</li>
+                <li class="subtopic-item"><strong>Configuration:</strong> Profiles (@Profile), Properties (@ConfigurationProperties), Environment hierarchy</li>
+                <li class="subtopic-item"><strong>AOP Internals:</strong> Aspect, Pointcut expressions, 5 Advice types, JDK Dynamic vs CGLIB bytecode proxies</li>
+                <li class="subtopic-item"><strong>Real Production Incidents:</strong> Silent @Transactional failure via self-invocation proxy bypass, Circular dependency startup crash (BeanCurrentlyInCreationException)</li>
+              </ul>
+
+              <div class="card-footer">
+                <span style="font-size: 0.82rem; color: var(--text-muted);">29 Core Subtopics Covered</span>
+                <a href="topics/spring-framework/spring-core.html" class="card-link">Explore Deep Dive &rarr;</a>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ============================================== -->
+        <!-- MODULE 2: ADVANCED JAVA & MULTITHREADING -->
+        <!-- ============================================== -->
+        <section class="topic-group-section" id="module-2">
+          <div class="topic-group-header">
+            <div class="topic-group-title">
+              <span>⚡ Module 2: Advanced Java & Multithreading</span>
+            </div>
+            <span class="topic-count">8 Master Modules Active</span>
+          </div>
+
+          <div class="cards-grid">
+            <!-- Card 1: Thread Fundamentals -->
+            <div class="card" data-tags="multithreading core-java production">
+              <div class="card-top">
+                <span class="badge badge-multithread">Thread Fundamentals</span>
+                <span class="badge badge-prod">OS & Concurrency</span>
+              </div>
+              <h2 class="card-title">Thread Fundamentals, OS Scheduling & Futures</h2>
+              <p class="card-desc">Hardware context switching costs, Process vs Thread isolation, the 6 JVM thread states, thread creation mechanisms (Thread vs Runnable vs Callable), FutureTask execution, and production thread dump triage.</p>
+              
+              <ul class="subtopics-list">
+                <li class="subtopic-item"><strong>OS Architecture:</strong> Process memory isolation vs Thread shared Heap/Metaspace, PCB vs TCB, CPU register swapping</li>
+                <li class="subtopic-item"><strong>The 6 JVM Thread States:</strong> NEW, RUNNABLE, BLOCKED (monitor lock), WAITING, TIMED_WAITING, TERMINATED</li>
+                <li class="subtopic-item"><strong>Thread Creation:</strong> Extending Thread, implementing Runnable, Callable&lt;V&gt; (typed return & checked exceptions)</li>
+                <li class="subtopic-item"><strong>Future Architecture:</strong> <code>Future&lt;V&gt;</code> lifecycle states, cancellation interruption, why untimed <code>future.get()</code> is an anti-pattern</li>
+                <li class="subtopic-item"><strong>Real Production Incidents:</strong> <code>OutOfMemoryError: unable to create new native thread</code> via unthrottled thread creation, Tomcat thread pool starvation</li>
+                <li class="subtopic-item"><strong>Production Triage:</strong> Mapping high-CPU threads from Linux <code>top -H -p</code> to hexadecimal JVM thread dump <code>nid</code></li>
+              </ul>
+
+              <div class="card-footer">
+                <span style="font-size: 0.82rem; color: var(--text-muted);">9 Core Subtopics Covered</span>
+                <a href="topics/multithreading/thread-fundamentals.html" class="card-link">Explore Deep Dive &rarr;</a>
+              </div>
+            </div>
+
+            <!-- Card 2: Synchronization, Atomic Variables & CAS -->
+            <div class="card" data-tags="multithreading core-java production">
+              <div class="card-top">
+                <span class="badge badge-multithread">Synchronization</span>
+                <span class="badge badge-advanced">Lock-Free CAS</span>
+              </div>
+              <h2 class="card-title">Synchronization, Monitors, Volatile & Hardware CAS</h2>
+              <p class="card-desc">Race conditions (Read-Modify-Write vs Check-Then-Act), Critical Sections, JVM intrinsic monitors (Entry Set vs Wait Set), <code>volatile</code> memory barriers, Lock Inflation, Atomic variables, and hardware CAS (CMPXCHG & ABA problem).</p>
+              
+              <ul class="subtopics-list">
+                <li class="subtopic-item"><strong>Concurrency Hazards:</strong> Race conditions, Critical sections, mutual exclusion, progress, bounded waiting</li>
+                <li class="subtopic-item"><strong>Intrinsic Locks & Monitors:</strong> Synchronized methods vs blocks, lock acquisition counter reentrancy, Entry Set vs Wait Set (Mesa model)</li>
+                <li class="subtopic-item"><strong>Memory Model (JMM):</strong> <code>volatile</code> cache coherence, MESI protocol, hardware Memory Barriers, why volatile is not atomic</li>
+                <li class="subtopic-item"><strong>Lock-Free Computing:</strong> Hardware Compare-And-Swap (<code>CMPXCHG</code>), <code>AtomicInteger</code>, <code>AtomicLong</code> vs <code>LongAdder</code> (Striped64)</li>
+                <li class="subtopic-item"><strong>The ABA Problem:</strong> Memory corruption in lock-free pointer reuse; resolution via <code>AtomicStampedReference</code></li>
+                <li class="subtopic-item"><strong>Real Production Incidents:</strong> Over-draft race condition in multi-node wallet, high CPU spin contention on AtomicLong</li>
+              </ul>
+
+              <div class="card-footer">
+                <span style="font-size: 0.82rem; color: var(--text-muted);">10 Core Subtopics Covered</span>
+                <a href="topics/multithreading/synchronization-and-locks.html" class="card-link">Explore Deep Dive &rarr;</a>
+              </div>
+            </div>
+
+            <!-- Card 3: Locks Framework (ReentrantLock, StampedLock & Condition) -->
+            <div class="card" data-tags="multithreading core-java production">
+              <div class="card-top">
+                <span class="badge badge-multithread">Locks Framework</span>
+                <span class="badge badge-advanced">AQS Internals</span>
+              </div>
+              <h2 class="card-title">Locks: ReentrantLock, StampedLock & Condition</h2>
+              <p class="card-desc">AQS synchronizer internals, ReentrantLock fair vs non-fair modes, ReentrantReadWriteLock shared read/exclusive write semantics, StampedLock optimistic reads, and Condition producer-consumer wait sets.</p>
+              
+              <ul class="subtopics-list">
+                <li class="subtopic-item"><strong>ReentrantLock:</strong> AbstractQueuedSynchronizer (AQS) state, fair vs non-fair queueing, <code>tryLock()</code>, <code>lockInterruptibly()</code></li>
+                <li class="subtopic-item"><strong>ReadWriteLock:</strong> Shared read vs Exclusive write locks, lock downgrading rules, write starvation hazards</li>
+                <li class="subtopic-item"><strong>StampedLock:</strong> Optimistic reads without synchronization overhead, stamp validation, why it is NOT reentrant</li>
+                <li class="subtopic-item"><strong>Condition Interface:</strong> Multiple independent wait-sets per lock, <code>await()</code> and <code>signal()</code>, bounded buffer design</li>
+                <li class="subtopic-item"><strong>Real Production Incidents:</strong> Stock price tick writer starvation under 100k readers, permanent thread freeze from missing finally block</li>
+              </ul>
+
+              <div class="card-footer">
+                <span style="font-size: 0.82rem; color: var(--text-muted);">8 Core Subtopics Covered</span>
+                <a href="topics/multithreading/locks-framework.html" class="card-link">Explore Deep Dive &rarr;</a>
+              </div>
+            </div>
+
+            <!-- Card 4: Executor Framework & ThreadPoolExecutor -->
+            <div class="card" data-tags="multithreading core-java production">
+              <div class="card-top">
+                <span class="badge badge-multithread">Executor Framework</span>
+                <span class="badge badge-advanced">Sizing & Tuning</span>
+              </div>
+              <h2 class="card-title">Executor Framework, ThreadPools & Rejections</h2>
+              <p class="card-desc">ThreadPoolExecutor 7 core parameters, task queueing vs max thread scaling order, CPU-bound vs I/O-bound sizing formulas, dangerous factory method pitfalls (newFixedThreadPool OOM), and rejection backpressure.</p>
+              
+              <ul class="subtopics-list">
+                <li class="subtopic-item"><strong>Core Architecture:</strong> Executor, ExecutorService, AbstractExecutorService, ScheduledExecutorService</li>
+                <li class="subtopic-item"><strong>ThreadPoolExecutor:</strong> corePoolSize, maximumPoolSize, keepAliveTime, workQueue, ThreadFactory, RejectedExecutionHandler</li>
+                <li class="subtopic-item"><strong>Sizing Formulas:</strong> CPU-bound ($N_{cpu}+1$) vs I/O-bound ($N_{cpu} \times (1 + W/C)$), Little's Law</li>
+                <li class="subtopic-item"><strong>Queue & Rejection:</strong> ArrayBlockingQueue vs SynchronousQueue; AbortPolicy vs CallerRunsPolicy backpressure</li>
+                <li class="subtopic-item"><strong>Real Production Incidents:</strong> 8GB heap exhaustion via newFixedThreadPool unbounded queue, ScheduledExecutor silent death</li>
+              </ul>
+
+              <div class="card-footer">
+                <span style="font-size: 0.82rem; color: var(--text-muted);">10 Core Subtopics Covered</span>
+                <a href="topics/multithreading/executor-framework.html" class="card-link">Explore Deep Dive &rarr;</a>
+              </div>
+            </div>
+
+            <!-- Card 5: Concurrent Collections -->
+            <div class="card" data-tags="multithreading collections production">
+              <div class="card-top">
+                <span class="badge badge-multithread">Concurrent Collections</span>
+                <span class="badge badge-advanced">Lock-Free Data</span>
+              </div>
+              <h2 class="card-title">Concurrent Collections & High-Throughput Queues</h2>
+              <p class="card-desc">ConcurrentHashMap lock-free reads and bin-head synchronization, CopyOnWriteArrayList snapshot semantics, ArrayBlockingQueue vs LinkedBlockingQueue (two-lock queue), and ConcurrentLinkedQueue CAS mechanics.</p>
+              
+              <ul class="subtopics-list">
+                <li class="subtopic-item"><strong>ConcurrentHashMap:</strong> Volatile node pointers, CAS bin initialization, synchronized bin-head locks, TreeBin conversion</li>
+                <li class="subtopic-item"><strong>CopyOnWriteArrayList:</strong> Lock-free snapshot reads, O(N) mutation overhead, write-heavy GC hazards</li>
+                <li class="subtopic-item"><strong>BlockingQueues:</strong> ArrayBlockingQueue (single lock) vs LinkedBlockingQueue (independent putLock & takeLock)</li>
+                <li class="subtopic-item"><strong>ConcurrentLinkedQueue:</strong> Michael & Scott non-blocking lock-free queue algorithm using CAS</li>
+                <li class="subtopic-item"><strong>Real Production Incidents:</strong> 15-second GC pause storm in CopyOnWriteArrayList, single-lock thrashing in ArrayBlockingQueue</li>
+              </ul>
+
+              <div class="card-footer">
+                <span style="font-size: 0.82rem; color: var(--text-muted);">8 Core Subtopics Covered</span>
+                <a href="topics/multithreading/concurrent-collections.html" class="card-link">Explore Deep Dive &rarr;</a>
+              </div>
+            </div>
+
+            <!-- Card 6: Synchronization Problems & Anti-Patterns -->
+            <div class="card" data-tags="multithreading core-java production">
+              <div class="card-top">
+                <span class="badge badge-multithread">Concurrency Hazards</span>
+                <span class="badge badge-prod">Deadlock & Livelock</span>
+              </div>
+              <h2 class="card-title">Deadlock, Starvation, Livelock & Contention</h2>
+              <p class="card-desc">The 4 Coffman conditions, breaking Circular Wait via global resource ordering, thread starvation mitigations, active livelock desynchronization with exponential backoff and jitter, and automated deadlock detection.</p>
+              
+              <ul class="subtopics-list">
+                <li class="subtopic-item"><strong>Deadlock:</strong> 4 Coffman conditions (Mutual exclusion, Hold & wait, No preemption, Circular wait)</li>
+                <li class="subtopic-item"><strong>Prevention:</strong> Global resource ordering, breaking Hold & Wait via <code>tryLock(timeout)</code></li>
+                <li class="subtopic-item"><strong>Starvation & Livelock:</strong> Unfair thread priorities vs live CPU-burning collision loops; exponential backoff + jitter</li>
+                <li class="subtopic-item"><strong>Thread Contention:</strong> Lock hold time reduction, lock striping, read-write splitting</li>
+                <li class="subtopic-item"><strong>Real Production Incidents:</strong> Peer-to-peer account transfer deadlock, distributed lock lease renewal livelock</li>
+                <li class="subtopic-item"><strong>Diagnostics:</strong> Automated deadlock reports in <code>jstack</code>, programmatic ThreadMXBean detection</li>
+              </ul>
+
+              <div class="card-footer">
+                <span style="font-size: 0.82rem; color: var(--text-muted);">9 Core Subtopics Covered</span>
+                <a href="topics/multithreading/synchronization-problems.html" class="card-link">Explore Deep Dive &rarr;</a>
+              </div>
+            </div>
+
+            <!-- Card 7: Asynchronous Programming (CompletableFuture) -->
+            <div class="card" data-tags="multithreading async production">
+              <div class="card-top">
+                <span class="badge badge-multithread">Async Programming</span>
+                <span class="badge badge-advanced">CompletableFuture</span>
+              </div>
+              <h2 class="card-title">CompletableFuture & Asynchronous Pipelines</h2>
+              <p class="card-desc">Non-blocking asynchronous pipelines, thenApply vs thenCompose (map vs flatMap), thenCombine parallel merging, declarative error handling (exceptionally vs handle), allOf/anyOf orchestration, and thread-pool handover pitfalls.</p>
+              
+              <ul class="subtopics-list">
+                <li class="subtopic-item"><strong>Architecture:</strong> CompletableFuture & CompletionStage interface, non-blocking execution vs legacy blocking Future</li>
+                <li class="subtopic-item"><strong>Transformations:</strong> <code>thenApply</code> (synchronous map), <code>thenCompose</code> (flatMap dependency chaining), <code>thenCombine</code> (parallel merge)</li>
+                <li class="subtopic-item"><strong>Error Recovery:</strong> <code>exceptionally</code> fallback values, <code>handle</code> BiFunction execution, swallowed exception risks</li>
+                <li class="subtopic-item"><strong>Multi-Future Orchestration:</strong> <code>CompletableFuture.allOf()</code> result aggregation, <code>anyOf()</code> fastest responder</li>
+                <li class="subtopic-item"><strong>Real Production Incidents:</strong> Common ForkJoinPool gridlock via missing custom executor, silent task failures</li>
+              </ul>
+
+              <div class="card-footer">
+                <span style="font-size: 0.82rem; color: var(--text-muted);">8 Core Subtopics Covered</span>
+                <a href="topics/multithreading/async-programming.html" class="card-link">Explore Deep Dive &rarr;</a>
+              </div>
+            </div>
+
+            <!-- Card 8: Advanced Concurrency (ForkJoinPool & ThreadLocal) -->
+            <div class="card" data-tags="multithreading core-java production">
+              <div class="card-top">
+                <span class="badge badge-multithread">Advanced Concurrency</span>
+                <span class="badge badge-advanced">Work Stealing</span>
+              </div>
+              <h2 class="card-title">ForkJoinPool, Work Stealing & ThreadLocal</h2>
+              <p class="card-desc">Divide-and-conquer parallelism via RecursiveTask, Work Stealing deque mechanics (LIFO head vs FIFO tail), ThreadLocal internal ThreadLocalMap WeakReference leak mechanics, and CPU-bound vs IO-bound architectural choices.</p>
+              
+              <ul class="subtopics-list">
+                <li class="subtopic-item"><strong>ForkJoinPool:</strong> RecursiveTask&lt;V&gt;, RecursiveAction, fork() and join() task scheduling</li>
+                <li class="subtopic-item"><strong>Work Stealing:</strong> Worker deques, LIFO local pop (CPU cache warmth) vs FIFO tail stealing (minimal lock collisions)</li>
+                <li class="subtopic-item"><strong>ThreadLocal Internals:</strong> Thread.threadLocals map, WeakReference keys vs strong value references, memory leak anatomy</li>
+                <li class="subtopic-item"><strong>Workload Tuning:</strong> CPU-bound ($N_{cpu}+1$) vs IO-bound tasks (Virtual Threads & Project Loom), Producer-Consumer backpressure</li>
+                <li class="subtopic-item"><strong>Real Production Incidents:</strong> 12GB heap OOM via uncleaned ThreadLocal in Tomcat filters, ForkJoin recursive task deadlock</li>
+              </ul>
+
+              <div class="card-footer">
+                <span style="font-size: 0.82rem; color: var(--text-muted);">8 Core Subtopics Covered</span>
+                <a href="topics/multithreading/advanced-concurrency.html" class="card-link">Explore Deep Dive &rarr;</a>
+              </div>
+            </div>
+
+          </div>
+        </section>
+
+
+        <!-- ============================================== -->
+        <!-- MODULE 1: CORE JAVA -->
+        <!-- ============================================== -->
+        <section class="topic-group-section" id="module-1">
+          <div class="topic-group-header">
+            <div class="topic-group-title">
+              <span>☕ Module 1: Core Java</span>
+            </div>
+            <span class="topic-count">6 Master Modules</span>
+          </div>
+
+          <div class="cards-grid">
+            <!-- Card 1: Java Fundamentals & JVM Internals -->
+            <div class="card" data-tags="core-java jvm production">
+              <div class="card-top">
+                <span class="badge badge-core">Core Java</span>
+                <span class="badge badge-prod">Production Incidents</span>
+              </div>
+              <h2 class="card-title">Java Fundamentals & JVM Internals</h2>
+              <p class="card-desc">Deep architectural tour of JDK/JRE/JVM, classloader delegation hierarchy, runtime memory breakdown (Stack, Heap, Metaspace, PC), object layout (Mark Word, Klass Word, Compressed OOPs), generational GC, and reference types.</p>
+              
+              <ul class="subtopics-list">
+                <li class="subtopic-item"><strong>Execution Pipeline:</strong> JDK, JRE, JVM, Bytecode & Tiered JIT Compilation (C1/C2)</li>
+                <li class="subtopic-item"><strong>ClassLoader Subsystem:</strong> Bootstrap, Platform, Application, Custom Loaders & Delegation</li>
+                <li class="subtopic-item"><strong>Runtime Data Areas:</strong> JVM Stack, Heap (Eden, S0/S1, Tenured, TLAB), Metaspace vs PermGen, PC Register, Native Stack</li>
+                <li class="subtopic-item"><strong>Object Creation & Layout:</strong> 5-step lifecycle, Mark Word, Klass Word, Compressed OOPs (32GB boundary)</li>
+                <li class="subtopic-item"><strong>Garbage Collection:</strong> Generational hypothesis, Minor vs Full GC, G1, ZGC</li>
+                <li class="subtopic-item"><strong>Reference Types:</strong> Strong, Soft (caching), Weak (ThreadLocal gotchas), Phantom (native cleanups)</li>
+                <li class="subtopic-item"><strong>Real Production Incidents:</strong> Metaspace OOM, ThreadLocal leaks in thread pools</li>
+              </ul>
+
+              <div class="card-footer">
+                <span style="font-size: 0.82rem; color: var(--text-muted);">23 Subtopics Covered</span>
+                <a href="topics/core-java/java-fundamentals.html" class="card-link">Explore Deep Dive &rarr;</a>
+              </div>
+            </div>
+
+            <!-- Card 2: OOP Principles & Java Keywords Internals -->
+            <div class="card" data-tags="core-java oop production">
+              <div class="card-top">
+                <span class="badge badge-core">OOP & Keywords</span>
+                <span class="badge badge-advanced">JMM & Concurrency</span>
+              </div>
+              <h2 class="card-title">OOP Principles & Java Keywords Internals</h2>
+              <p class="card-desc">Object-oriented architecture under the hood: Dynamic Method Dispatch via vtables, Composition over Inheritance (IS-A vs HAS-A), Interface vs Abstract class, and hardware-level memory semantics of Java keywords.</p>
+              
+              <ul class="subtopics-list">
+                <li class="subtopic-item"><strong>OOP Core Pillars:</strong> Class vs Object in Metaspace/Heap, Encapsulation & Invariants, Abstraction, Inheritance</li>
+                <li class="subtopic-item"><strong>Dynamic Method Dispatch:</strong> Virtual Method Table (vtable), itable, <code>invokevirtual</code> vs <code>invokestatic</code> vs <code>invokespecial</code></li>
+                <li class="subtopic-item"><strong>Relationships & Architecture:</strong> Composition vs Aggregation vs Association, IS-A vs HAS-A, Fragile Base Class problem</li>
+                <li class="subtopic-item"><strong>Memory & Concurrency Keywords:</strong> <code>volatile</code> (visibility, memory barriers, non-atomicity), <code>synchronized</code> (lock inflation: biased &rarr; thin &rarr; heavy)</li>
+                <li class="subtopic-item"><strong>Core Language Keywords:</strong> <code>static</code> (&lt;clinit&gt; lock), <code>final</code> (JMM freeze action), <code>this</code>, <code>super</code>, <code>transient</code>, <code>native</code>, <code>strictfp</code></li>
+                <li class="subtopic-item"><strong>Real Production Incidents:</strong> Double-Checked Locking NPE without volatile, Distributed Session crash via missing transient</li>
+              </ul>
+
+              <div class="card-footer">
+                <span style="font-size: 0.82rem; color: var(--text-muted);">25 Subtopics Covered</span>
+                <a href="topics/core-java/oop-and-keywords.html" class="card-link">Explore Deep Dive &rarr;</a>
+              </div>
+            </div>
+
+            <!-- Card 3: Strings, Object Class & Exception Handling -->
+            <div class="card" data-tags="core-java strings exceptions production">
+              <div class="card-top">
+                <span class="badge badge-core">Strings & Objects</span>
+                <span class="badge badge-advanced">Exceptions</span>
+              </div>
+              <h2 class="card-title">Strings, Object Class & Exception Architecture</h2>
+              <p class="card-desc">Deep dive into String immutability, String Constant Pool (SCP) relocation, String vs StringBuilder vs StringBuffer, Object contracts (equals, hashCode & multiplier 31, clone vs copy constructor, finalize flaws), and robust Exception handling architectures.</p>
+              
+              <ul class="subtopics-list">
+                <li class="subtopic-item"><strong>String Deep Dive:</strong> Immutability security, Compact Strings (byte[] + coder), String Constant Pool, invokedynamic StringConcatFactory</li>
+                <li class="subtopic-item"><strong>String vs StringBuilder vs StringBuffer:</strong> Thread safety, synchronization overhead, capacity expansion</li>
+                <li class="subtopic-item"><strong>Object Class Contracts:</strong> Mathematical 5-rule <code>equals()</code> contract, <code>hashCode()</code> with prime multiplier 31 bit-shift optimization</li>
+                <li class="subtopic-item"><strong>Object Lifecycle:</strong> Shallow vs Deep <code>clone()</code>, deprecation of <code>finalize()</code> and resurrection risks vs Cleaner API</li>
+                <li class="subtopic-item"><strong>Exception Architecture:</strong> Throwable hierarchy, Error vs Exception, Checked vs RuntimeException design rules</li>
+                <li class="subtopic-item"><strong>Control Flow & Mechanics:</strong> <code>try-catch-finally</code> (when finally does not run), <code>throw</code>, <code>throws</code>, Try-with-resources & Suppressed Exceptions</li>
+                <li class="subtopic-item"><strong>Real Production Incidents:</strong> String.intern() native StringTable memory exhaustion, silent HashMap data loss from broken equals/hashCode</li>
+              </ul>
+
+              <div class="card-footer">
+                <span style="font-size: 0.82rem; color: var(--text-muted);">28 Subtopics Covered</span>
+                <a href="topics/core-java/strings-object-exceptions.html" class="card-link">Explore Deep Dive &rarr;</a>
+              </div>
+            </div>
+
+            <!-- Card 4: Collections Framework & Generics -->
+            <div class="card" data-tags="core-java collections generics production">
+              <div class="card-top">
+                <span class="badge badge-core">Collections & Generics</span>
+                <span class="badge badge-advanced">ConcurrentHashMap</span>
+              </div>
+              <h2 class="card-title">Collections Framework & Generics Internals</h2>
+              <p class="card-desc">Complete tour of Java Collections hierarchy (List, Set, Queue, Deque, Map), ArrayList arraycopy growth, HashMap treeification & bitmasking, ConcurrentHashMap lock-free reads and CAS updates, and Generics PECS principle & Type Erasure.</p>
+              
+              <ul class="subtopics-list">
+                <li class="subtopic-item"><strong>List & Queue Structures:</strong> ArrayList (1.5x growth), LinkedList (cache miss overhead), ArrayDeque vs Stack, PriorityQueue (Binary Min-Heap)</li>
+                <li class="subtopic-item"><strong>Set Structures:</strong> HashSet (backed by HashMap), LinkedHashSet (insertion order), TreeSet (Red-Black tree)</li>
+                <li class="subtopic-item"><strong>Map Deep Dive:</strong> HashMap treeification (threshold 8, Red-Black TreeNode), perturbation function, power-of-two bitmask <code>(n-1) & hash</code>, LinkedHashMap (LRU cache)</li>
+                <li class="subtopic-item"><strong>ConcurrentHashMap:</strong> Java 7 Segment locks vs Java 8+ Node-level CAS + bin-head locks, CounterCell sizing striping</li>
+                <li class="subtopic-item"><strong>Generics Architecture:</strong> Bounded types, Wildcards (<code>? extends</code>, <code>? super</code>), PECS Principle (Producer Extends, Consumer Super)</li>
+                <li class="subtopic-item"><strong>Bytecode Mechanisms:</strong> Type Erasure, Bridge Methods, heap pollution constraints</li>
+                <li class="subtopic-item"><strong>Real Production Incidents:</strong> 100% CPU infinite loop in Java 7 HashMap resize, Check-Then-Act race condition in ConcurrentHashMap</li>
+              </ul>
+
+              <div class="card-footer">
+                <span style="font-size: 0.82rem; color: var(--text-muted);">30 Subtopics Covered</span>
+                <a href="topics/core-java/collections-and-generics.html" class="card-link">Explore Deep Dive &rarr;</a>
+              </div>
+            </div>
+
+            <!-- Card 5: Java 8+ Streams, Lambdas & Functional Programming -->
+            <div class="card" data-tags="core-java java8 streams lambdas production">
+              <div class="card-top">
+                <span class="badge badge-core">Java 8+ High Priority</span>
+                <span class="badge badge-prod">10 Interview Problems</span>
+              </div>
+              <h2 class="card-title">Java 8+ Lambdas, Functional Interfaces & Streams</h2>
+              <p class="card-desc">Architectural mechanics of Lambdas via invokedynamic and LambdaMetafactory, Functional Interfaces, deep Stream pipeline execution (lazy evaluation, loop fusion, collectors, groupingBy), Optional best practices, and 10 production-tested interview coding problems.</p>
+              
+              <ul class="subtopics-list">
+                <li class="subtopic-item"><strong>Functional Foundations:</strong> Lambdas under the hood (<code>invokedynamic</code>), Effectively Final capture, SAM, <code>@FunctionalInterface</code></li>
+                <li class="subtopic-item"><strong>Core Interfaces:</strong> Predicate, Function, Consumer, Supplier, UnaryOperator, BinaryOperator, 4 Method Reference types</li>
+                <li class="subtopic-item"><strong>Interface Enhancements:</strong> Default methods (conflict resolution rules), Static interface methods</li>
+                <li class="subtopic-item"><strong>Stream Pipeline:</strong> Lazy evaluation, Loop Fusion, stateless vs stateful intermediate operations</li>
+                <li class="subtopic-item"><strong>Core Operations:</strong> <code>map</code>, <code>filter</code>, <code>reduce</code>, <code>collect</code>, <code>groupingBy</code>, <code>partitioningBy</code>, <code>flatMap</code>, <code>sorted</code>, <code>distinct</code>, <code>limit</code>, <code>skip</code></li>
+                <li class="subtopic-item"><strong>Optional&lt;T&gt;:</strong> <code>orElse</code> vs <code>orElseGet</code> eager pitfall, serialization anti-patterns</li>
+                <li class="subtopic-item"><strong>10 Coding Problems:</strong> Second highest salary, grouping by dept with max salary, character frequency, prime partition, flatMap orders, duplicate detection</li>
+                <li class="subtopic-item"><strong>Real Production Incidents:</strong> Common ForkJoinPool starvation via blocking I/O in parallelStream, database spikes via eager orElse</li>
+              </ul>
+
+              <div class="card-footer">
+                <span style="font-size: 0.82rem; color: var(--text-muted);">26 Subtopics + 10 Coding Solutions</span>
+                <a href="topics/core-java/java8-streams-and-lambdas.html" class="card-link">Explore Deep Dive &rarr;</a>
+              </div>
+            </div>
+
+            <!-- Card 6: Modern Java Features (11 - 21+ LTS) -->
+            <div class="card" data-tags="core-java modern-java virtual-threads production">
+              <div class="card-top">
+                <span class="badge badge-core">Modern Java (11-21+)</span>
+                <span class="badge badge-advanced">Project Loom</span>
+              </div>
+              <h2 class="card-title">Modern Java Features (Java 11 - 21+ LTS)</h2>
+              <p class="card-desc">Architectural leap of modern Java: Records serialization security, Sealed Classes algebraic domain modeling, Pattern Matching for switch with 'when' guards, Text Blocks indentation stripping, <code>var</code> inference rules, and Virtual Threads (M:N scheduling & carrier pinning).</p>
+              
+              <ul class="subtopics-list">
+                <li class="subtopic-item"><strong>Records (Java 16):</strong> Shallow immutability, compact constructors, serialization security (bypassing reflection exploits)</li>
+                <li class="subtopic-item"><strong>Sealed Classes (Java 17):</strong> <code>sealed</code>, <code>permits</code>, <code>final</code>, <code>non-sealed</code>, exhaustive domain modeling</li>
+                <li class="subtopic-item"><strong>Pattern Matching (Java 16 - 21):</strong> <code>instanceof</code> patterns, Switch Expressions with <code>yield</code>, Guarded patterns (<code>when</code>), Record deconstruction</li>
+                <li class="subtopic-item"><strong>Syntax Improvements:</strong> Text Blocks (incidental vs essential whitespace), Local Variable Type Inference (<code>var</code> rules & forbidden contexts)</li>
+                <li class="subtopic-item"><strong>Virtual Threads (Project Loom - Java 21):</strong> 1:1 OS Platform Threads vs M:N User-mode Virtual Threads, Carrier mounting/unmounting, Continuation stacks on Heap</li>
+                <li class="subtopic-item"><strong>The Pinning Problem:</strong> Carrier thread pinning via <code>synchronized</code> and native calls vs <code>ReentrantLock</code></li>
+                <li class="subtopic-item"><strong>Real Production Incidents:</strong> Carrier starvation in 100k Virtual Threads due to legacy synchronized JDBC drivers, ThreadLocal OOM</li>
+              </ul>
+
+              <div class="card-footer">
+                <span style="font-size: 0.82rem; color: var(--text-muted);">20 Subtopics Covered</span>
+                <a href="topics/core-java/modern-java.html" class="card-link">Explore Deep Dive &rarr;</a>
+              </div>
+            </div>
+          </div>
+        </section>
+
+      </div>
+    </main>
+  </div>
+
+  <footer>
+    <p>Interview A-Z Handbook &bull; Built for GitHub Pages &bull; Production Grade Interview Prep</p>
+  </footer>
+
+  <script src="assets/js/main.js"></script>
+</body>
+</html>

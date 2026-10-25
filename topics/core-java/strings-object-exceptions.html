@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Module 1: Strings, Object Class & Exception Handling | Interview A-Z</title>
+  <link rel="stylesheet" href="../../assets/css/style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+</head>
+<body>
+
+  <!-- Top Navigation -->
+  <nav class="navbar">
+    <div class="brand">
+      <span class="brand-badge">Interview A-Z</span>
+      <span>Engineering & Architecture Handbook</span>
+    </div>
+    <div class="nav-links">
+      <a href="../../index.html" class="nav-link">Home</a>
+      <a href="../../index.html#topics" class="nav-link">Topic Catalog</a>
+      <a href="https://github.com" target="_blank" class="nav-link">GitHub</a>
+    </div>
+  </nav>
+
+  <div class="container">
+    <div class="article-layout">
+      <!-- Sticky Sidebar Table of Contents -->
+      <aside class="sidebar-toc">
+        <h3>On This Page</h3>
+        <ul class="toc-links" id="dynamic-toc">
+          <!-- Dynamically populated via main.js -->
+        </ul>
+      </aside>
+
+      <!-- Main Article Content -->
+      <main class="article-content">
+        <!-- Breadcrumb -->
+        <nav class="breadcrumb">
+          <a href="../../index.html">Home</a>
+          <span>/</span>
+          <span>Core Java</span>
+          <span>/</span>
+          <span style="color: #fff;">Strings, Object Class & Exceptions</span>
+        </nav>
+
+        <!-- Article Header -->
+        <header class="article-header">
+          <h1>Module 1: Strings, Object Class Internals & Exception Architecture</h1>
+          <div class="article-meta">
+            <span class="badge badge-core">Core Java</span>
+            <span class="badge badge-advanced">Deep Internals</span>
+            <span class="badge badge-prod">Production Incidents</span>
+            <span>⏱️ 45 min deep dive</span>
+            <span>Target Roles: SDE-2, SDE-3, Senior Backend Engineer</span>
+          </div>
+        </header>
+
+        <!-- SECTION 1: STRING ARCHITECTURE & INTERNALS -->
+        <section>
+          <h2>1. String Architecture, Immutability & Memory Pooling</h2>
+
+          <h3>1.1 Why String is Immutable in Java</h3>
+          <p>
+            In Java, <code>String</code> is declared <code>public final class String</code> and encapsulates a private, final byte array (<code>private final byte[] value</code> since Java 9's Compact Strings, previously <code>char[]</code>).
+          </p>
+          <ul>
+            <li><strong>Security & Network Safety:</strong> Strings carry database connection URLs, file paths, and socket ports. If strings were mutable, an attacker could pass a valid file path, pass authentication checks, and mutate the underlying string concurrently in another thread (TOCTOU: Time-Of-Check to Time-Of-Use vulnerability).</li>
+            <li><strong>Thread Safety without Synchronization:</strong> Because state cannot be modified after construction, Strings are inherently thread-safe and can be shared freely across threads without locks.</li>
+            <li><strong>String Constant Pool (SCP) Viability:</strong> String caching would be impossible if strings were mutable; changing one reference would silently corrupt all other references pointing to the same pooled literal.</li>
+            <li><strong>HashCode Caching:</strong> The hashcode of a String is computed eagerly or lazily once and cached in a private field <code>private int hash;</code>. Because strings are immutable, the hash will never change, allowing constant-time lookups in hash-based collections (<code>HashMap</code>, <code>HashSet</code>).</li>
+          </ul>
+
+          <h3>1.2 String Constant Pool (SCP) Internals</h3>
+          <p>
+            The String Constant Pool is a native C++ hashtable (<code>StringTable</code>) maintained by HotSpot.
+          </p>
+          <pre><code>String s1 = "Java";               // Allocated in String Constant Pool (Heap)
+String s2 = "Java";               // Reuses existing reference from SCP
+String s3 = new String("Java");   // Creates a new Object explicitly on the regular Heap
+
+System.out.println(s1 == s2);      // true  (Both point to identical SCP memory address)
+System.out.println(s1 == s3);      // false (s3 points to normal heap instance)
+System.out.println(s1.equals(s3)); // true  (Character-by-character comparison)
+System.out.println(s1 == s3.intern()); // true (intern() pulls reference from SCP)</code></pre>
+
+          <div class="callout callout-warning">
+            <div class="callout-title">⚠️ Historical Evolution of the String Pool</div>
+            <p>
+              In <strong>Java 6 and earlier</strong>, the String Pool was located in the fixed-size <strong>PermGen</strong>. Invoking <code>String.intern()</code> on high volumes of dynamic strings caused fatal <code>OutOfMemoryError: PermGen space</code> crashes. Starting in <strong>Java 7+</strong>, the String Pool was relocated to the <strong>Main Java Heap</strong>, allowing unreferenced interned strings to be garbage collected during normal GC cycles.
+            </p>
+          </div>
+
+          <h3>1.3 String Concatenation Under the Hood</h3>
+          <ul>
+            <li><strong>In Java 8 and earlier:</strong> The compiler transformed the <code>+</code> operator into <code>new StringBuilder().append(...).toString()</code>. However, using <code>+</code> inside a loop created a new <code>StringBuilder</code> instance on <em>every single iteration</em>, leading to massive heap allocation pressure and quadratic time complexity $O(N^2)$.</li>
+            <li><strong>In Java 9+ (JEP 280):</strong> String concatenation bytecode changed from static <code>StringBuilder</code> generation to the <code>invokedynamic</code> opcode using <code>StringConcatFactory.makeConcatWithConstants()</code>. This allows the JVM runtime to choose the most efficient allocation strategy (e.g. pre-sizing byte arrays directly via Unsafe) without hardcoding bytecode.</li>
+          </ul>
+
+          <h3>1.4 String vs. StringBuilder vs. StringBuffer</h3>
+          <table>
+            <thead>
+              <tr>
+                <th>Feature</th>
+                <th><code>String</code></th>
+                <th><code>StringBuilder</code></th>
+                <th><code>StringBuffer</code></th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Mutability</strong></td>
+                <td>Immutable</td>
+                <td>Mutable</td>
+                <td>Mutable</td>
+              </tr>
+              <tr>
+                <td><strong>Thread Safety</strong></td>
+                <td>Thread-safe (immutable)</td>
+                <td>Not Thread-safe (unsynchronized)</td>
+                <td>Thread-safe (all methods <code>synchronized</code>)</td>
+              </tr>
+              <tr>
+                <td><strong>Performance</strong></td>
+                <td>Slow for frequent modifications (creates new objects)</td>
+                <td>Fastest for single-threaded string construction</td>
+                <td>Slower due to monitor lock acquisition overhead</td>
+              </tr>
+              <tr>
+                <td><strong>Introduced</strong></td>
+                <td>JDK 1.0</td>
+                <td>JDK 1.5</td>
+                <td>JDK 1.0</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <h3>1.5 <code>==</code> vs. <code>equals()</code> vs. <code>hashCode()</code></h3>
+          <ul>
+            <li><code>==</code>: Compares <strong>memory addresses (reference equality)</strong>. Returns <code>true</code> only if both pointers point to the exact same physical byte address on the heap.</li>
+            <li><code>equals()</code>: Evaluates <strong>logical value equality</strong>. In <code>String</code>, it checks if the length matches and verifies every character in the underlying byte/char array.</li>
+            <li><code>hashCode()</code>: Generates a 32-bit integer representation using the formula: $s[0]*31^{(n-1)} + s[1]*31^{(n-2)} + ... + s[n-1]$.</li>
+          </ul>
+        </section>
+
+        <!-- SECTION 2: OBJECT CLASS INTERNALS -->
+        <section>
+          <h2>2. The Object Class: Fundamental Contracts & Methods</h2>
+          <p>
+            <code>java.lang.Object</code> is the root of the class hierarchy in Java. Every class directly or indirectly inherits its core methods.
+          </p>
+
+          <h3>2.1 The <code>equals()</code> Contract (JLS Specification)</h3>
+          <p>
+            If you override <code>equals()</code>, you MUST satisfy 5 mathematical invariants:
+          </p>
+          <ol>
+            <li><strong>Reflexive:</strong> <code>x.equals(x)</code> must always return <code>true</code>.</li>
+            <li><strong>Symmetric:</strong> If <code>x.equals(y)</code> is <code>true</code>, then <code>y.equals(x)</code> must be <code>true</code>.</li>
+            <li><strong>Transitive:</strong> If <code>x.equals(y)</code> is <code>true</code> and <code>y.equals(z)</code> is <code>true</code>, then <code>x.equals(z)</code> must be <code>true</code>.</li>
+            <li><strong>Consistent:</strong> Multiple invocations of <code>x.equals(y)</code> must consistently return the same result unless state is mutated.</li>
+            <li><strong>Non-nullity:</strong> <code>x.equals(null)</code> must return <code>false</code> (never throw a <code>NullPointerException</code>).</li>
+          </ol>
+
+          <h3>2.2 The <code>hashCode()</code> Contract & The Multiplier 31</h3>
+          <p>
+            Whenever <code>equals()</code> is overridden, <code>hashCode()</code> <strong>MUST</strong> be overridden.
+          </p>
+          <ul>
+            <li><strong>Rule 1:</strong> If two objects are equal according to <code>equals()</code>, their <code>hashCode()</code> <strong>MUST</strong> produce the exact same integer value.</li>
+            <li><strong>Rule 2:</strong> If two objects have the same <code>hashCode()</code>, they are <strong>NOT</strong> required to be equal (this is known as a <em>hash collision</em>).</li>
+            <li><strong>Why use 31 as the hash multiplier?</strong>
+              <ol>
+                <li>31 is an odd prime. Multiplying by an even number (like 2) would shift bits left, causing rapid data loss and hash collisions in lower bits.</li>
+                <li>The modern JVM optimizes multiplication by 31 using bit shifts and subtractions: <code>31 * i == (i &lt;&lt; 5) - i</code>, which executes in a single CPU cycle.</li>
+              </ol>
+            </li>
+          </ul>
+
+          <h3>2.3 <code>clone()</code>: Shallow vs. Deep Copy</h3>
+          <p>
+            The <code>clone()</code> method in <code>Object</code> is protected and requires the class to implement the marker interface <code>Cloneable</code>, otherwise throwing <code>CloneNotSupportedException</code>.
+          </p>
+          <ul>
+            <li><strong>Shallow Copy (Default):</strong> Creates a new instance of the object, copies all primitive fields, but copies <em>only the memory references</em> for nested objects. Modifying a nested object inside the clone mutates the original object!</li>
+            <li><strong>Deep Copy:</strong> Recursively creates new copies of all nested objects.</li>
+          </ul>
+          <div class="callout callout-warning">
+            <div class="callout-title">⚠️ Enterprise Best Practice: Avoid clone()</div>
+            <p>
+              As famously noted by Joshua Bloch in <em>Effective Java</em>, <code>clone()</code> is architecturally broken: it bypasses constructors to create objects via JVM intrinsics. Prefer <strong>Copy Constructors</strong> (e.g. <code>public User(User other)</code>) or <strong>Static Factory Methods</strong> (e.g. <code>User.copyOf(other)</code>).
+            </p>
+          </div>
+
+          <h3>2.4 <code>finalize()</code>: Why It Was Deprecated & Replaced</h3>
+          <p>
+            Historically, <code>finalize()</code> was called by the GC before freeing an object. It was deprecated in Java 9 and marked for removal because:
+          </p>
+          <ul>
+            <li><strong>No Guarantee of Execution:</strong> The JVM does not guarantee when or if <code>finalize()</code> will run. If an application exits or memory remains sufficient, it may never trigger.</li>
+            <li><strong>Object Resurrection:</strong> A dead object could resurrect itself inside <code>finalize()</code> by assigning <code>this</code> to a static variable, confusing the garbage collector.</li>
+            <li><strong>Severe Latency & GC Stalls:</strong> Finalizable objects require at least two separate GC cycles to be collected, overwhelming finalizer threads.</li>
+            <li><strong>Modern Replacement:</strong> Use <code>java.lang.ref.Cleaner</code> or implement <code>AutoCloseable</code> with <code>try-with-resources</code>.</li>
+          </ul>
+        </section>
+
+        <!-- SECTION 3: EXCEPTION HANDLING ARCHITECTURE -->
+        <section>
+          <h2>3. Exception Handling Architecture & Mechanics</h2>
+
+          <h3>3.1 The Throwable Class Hierarchy</h3>
+          <pre><code>                         +-------------------------+
+                         |   java.lang.Throwable   |
+                         +------------+------------+
+                                      |
+                 +--------------------+--------------------+
+                 |                                         |
+     +-----------v-----------+                 +-----------v-----------+
+     |   java.lang.Error     |                 |  java.lang.Exception  |
+     +-----------+-----------+                 +-----------+-----------+
+                 |                                         |
+   (Fatal JVM System Failures)             +---------------+---------------+
+   - OutOfMemoryError                      |                               |
+   - StackOverflowError        +-----------v-----------+       +-----------v-----------+
+   - InternalError             | Checked Exceptions    |       | RuntimeException      |
+                               | (Compile-time)        |       | (Unchecked Exceptions)|
+                               | - IOException         |       | - NullPointerException|
+                               | - SQLException        |       | - IllegalArgumentEx   |
+                               | - ClassNotFoundEx     |       | - IndexOutOfBoundsEx  |
+                               +-----------------------+       +-----------------------+</code></pre>
+
+          <h3>3.2 Checked vs. Unchecked Exceptions</h3>
+          <ul>
+            <li><strong>Checked Exceptions (Subclasses of <code>Exception</code> excluding <code>RuntimeException</code>):</strong> Enforced at compile time. Methods must declare them via <code>throws</code> or catch them with <code>try-catch</code>. Intended for recoverable conditions (e.g., file not found, network socket disconnect).</li>
+            <li><strong>Unchecked Exceptions (Subclasses of <code>RuntimeException</code>):</strong> Not enforced at compile-time. Indicate programming errors or invalid method usage (e.g., null pointers, illegal arguments). Modern frameworks (Spring, Hibernate) wrap all lower-level checked exceptions into unchecked runtime exceptions.</li>
+            <li><strong>Errors (Subclasses of <code>Error</code>):</strong> Severe environmental failures from which applications should generally not attempt to recover (e.g., <code>OutOfMemoryError</code>, <code>StackOverflowError</code>).</li>
+          </ul>
+
+          <h3>3.3 Control Flow: <code>try</code>, <code>catch</code>, <code>finally</code>, <code>throw</code>, <code>throws</code></h3>
+          <ul>
+            <li><code>throw</code>: Explicitly triggers an exception instance (<code>throw new IllegalArgumentException("...")</code>).</li>
+            <li><code>throws</code>: Method signature clause declaring the checked exceptions that the method might propagate.</li>
+            <li><strong>Does <code>finally</code> ALWAYS execute?</strong>
+              <p>Almost always, with three critical production exceptions:</p>
+              <ol>
+                <li>If <code>System.exit(status)</code> is invoked inside <code>try</code> or <code>catch</code>.</li>
+                <li>If the JVM crashes due to an OS-level <code>SIGKILL</code> (e.g. Linux OOM killer terminating the container) or a native memory corruption.</li>
+                <li>If the thread executing the <code>try</code> block enters an infinite loop or gets killed by deadlocked daemon threads.</li>
+              </ol>
+            </li>
+          </ul>
+
+          <h3>3.4 Multi-Catch & Try-with-Resources (Java 7+)</h3>
+          <p>
+            Any class that implements <code>java.lang.AutoCloseable</code> (or <code>java.io.Closeable</code>) can be declared inside the parenthesis of a <code>try (...)</code> block. The JVM guarantees that <code>close()</code> will be called automatically in reverse declaration order, even if an exception occurs.
+          </p>
+          <div class="code-header">
+            <span>Try-With-Resources with Suppressed Exceptions</span>
+            <span>Java</span>
+          </div>
+          <pre><code>// Both Connection and PreparedStatement implement AutoCloseable
+public void executeQuery(String sql) throws SQLException {
+    try (Connection conn = dataSource.getConnection();
+         PreparedStatement ps = conn.prepareStatement(sql);
+         ResultSet rs = ps.executeQuery()) {
+        
+        while (rs.next()) {
+            // Process row data
+        }
+    } catch (SQLException | TimeoutException ex) { // Multi-catch (disjoint types)
+        logger.error("Database query failed: {}", ex.getMessage(), ex);
+        throw new DataAccessException("Failed executing SQL query", ex); // Exception Chaining
+    }
+}</code></pre>
+          <p>
+            <strong>Suppressed Exceptions:</strong> If an exception is thrown inside the <code>try</code> block AND another exception is thrown while automatically closing the resource in <code>close()</code>, the primary exception is propagated to the caller, while the secondary exception is attached as a <em>suppressed exception</em> (retrievable via <code>ex.getSuppressed()</code>).
+          </p>
+        </section>
+
+        <!-- SECTION 4: REAL-TIME PRODUCTION ISSUES -->
+        <section>
+          <h2>4. Real-Time Production Issues & Post-Mortems</h2>
+
+          <!-- Incident 1 -->
+          <div class="callout callout-production">
+            <div class="callout-title">🚨 Incident 1: Native Heap Starvation via String.intern() on User Input</div>
+            <p><strong>Scenario:</strong> A fraud detection API service running on an 8GB JVM experienced frequent 10-second GC pauses, and physical container memory spiked until the Kubernetes cgroup OOM Killer terminated the container with exit code 137.</p>
+          </div>
+
+          <div class="callout callout-warning">
+            <div class="callout-title">🔍 Root Cause Analysis (RCA)</div>
+            <p>
+              To deduplicate repeated customer identifiers arriving in JSON payloads, a developer executed:
+              <code>String internedId = payload.getUserId().intern();</code>.
+              Because the service processed millions of unique, high-cardinality external UUIDs, each unique ID was inserted into the JVM's native <code>StringTable</code>. The internal hashtable buckets overflowed, hash collision lists degraded to length thousands, and garbage collecting the <code>StringTable</code> consumed up to 80% of CPU time during GC cycles.
+            </p>
+          </div>
+
+          <div class="callout callout-solution">
+            <div class="callout-title">💡 Production Resolution</div>
+            <ul>
+              <li><strong>Removed <code>String.intern()</code>:</strong> Replaced with a bounded, size-limited cache (e.g. Caffeine Cache with maximum size of 100,000 entries and LRU eviction).</li>
+              <li><strong>JVM Deduplication:</strong> For heaps using G1 GC, enabled automatic background string deduplication without native StringTable pollution: <code>-XX:+UseStringDeduplication</code>.</li>
+            </ul>
+          </div>
+
+          <!-- Incident 2 -->
+          <div class="callout callout-production">
+            <div class="callout-title">🚨 Incident 2: Silent Data Loss in HashMap via Broken equals/hashCode Contract</div>
+            <p><strong>Scenario:</strong> A financial reconciliation engine showed mismatched balances between payments and ledger transactions. Queries for existing orders in a <code>HashMap&lt;OrderKey, Order&gt;</code> returned <code>null</code>, even though logs proved the orders were inserted minutes prior.</p>
+          </div>
+
+          <div class="callout callout-warning">
+            <div class="callout-title">🔍 Root Cause Analysis (RCA)</div>
+            <p>
+              The composite key <code>OrderKey</code> contained mutable fields (<code>orderId</code>, <code>status</code>) and had an <code>equals()</code> method implemented without overriding <code>hashCode()</code>:
+            </p>
+            <pre><code>// BROKEN CODE:
+public class OrderKey {
+    private String orderId;
+    private String status;
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof OrderKey)) return false;
+        OrderKey that = (OrderKey) o;
+        return Objects.equals(orderId, that.orderId) &amp;&amp; Objects.equals(status, that.status);
+    }
+    // MISSING: hashCode() not implemented! Inherited default identity hashCode from Object!
+}</code></pre>
+            <p>
+              When <code>map.put(key, order)</code> was called, it calculated bucket index using <code>System.identityHashCode()</code>. Later, when creating another <code>new OrderKey("ORD-1", "PENDING")</code> to look up the order, the second object produced a completely different hashcode, searching a different hash bucket and returning <code>null</code>!
+            </p>
+          </div>
+
+          <div class="callout callout-solution">
+            <div class="callout-title">💡 Production Resolution</div>
+            <p>Made the Map key completely <strong>immutable</strong> and generated consistent <code>equals()</code> and <code>hashCode()</code> pairs using primitive hashing:</p>
+            <pre><code>public final class OrderKey {
+    private final String orderId;
+    private final String status;
+
+    public OrderKey(String orderId, String status) {
+        this.orderId = Objects.requireNonNull(orderId);
+        this.status = Objects.requireNonNull(status);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof OrderKey that)) return false; // Pattern matching for instanceof (Java 16+)
+        return orderId.equals(that.orderId) &amp;&amp; status.equals(that.status);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(orderId, status);
+    }
+}</code></pre>
+          </div>
+        </section>
+
+        <!-- SECTION 5: PRODUCTION DIAGNOSTICS TOOLKIT -->
+        <section>
+          <h2>5. Production Triage & Inspection Toolkit</h2>
+
+          <div class="code-header">
+            <span>Diagnosing StringTable & Exception Overhead</span>
+            <span>Bash</span>
+          </div>
+          <pre><code># 1. Inspect StringTable statistics & bucket collision depth in live JVM
+jcmd &lt;PID&gt; VM.stringtable -verbose
+
+# Example healthy vs unhealthy output:
+# Number of buckets       : 65536
+# Number of entries       : 42150 (healthy)
+# Average bucket size     : 0.64
+# Variance of bucket size : 0.65
+
+# 2. Check if -XX:+UseStringDeduplication is actively freeing heap memory in G1
+jcmd &lt;PID&gt; GC.string_deduplication -stats
+
+# 3. Profile high-frequency Exception creation overhead (Throwable.fillInStackTrace)
+# Using async-profiler to detect hidden CPU stalls caused by exception throwing:
+./asprof -d 30 -e java.lang.Throwable.fillInStackTrace -f exceptions.html &lt;PID&gt;</code></pre>
+        </section>
+
+        <!-- SECTION 6: SENIOR INTERVIEW Q&A -->
+        <section>
+          <h2>6. Senior / Staff Technical Interview Q&A</h2>
+
+          <div class="callout callout-interview">
+            <div class="callout-title">🎯 Q1: Why is throwing exceptions in hot loops considered an anti-pattern in high-throughput microservices?</div>
+            <p><strong>Answer:</strong> The dominant performance cost of throwing an exception in Java is not the throw/catch jump, but the JVM executing the native method <code>Throwable.fillInStackTrace()</code>. This walks the physical thread execution stack frame by frame, resolving symbol names and line numbers. When exceptions are thrown repeatedly in high-concurrency microservices, CPU utilization spikes to 100% purely collecting stack traces. For business validation flows, return typed result wrappers (e.g. <code>Optional&lt;T&gt;</code> or <code>Result&lt;T, Error&gt;</code>) or disable stack traces via custom exceptions overriding <code>fillInStackTrace()</code>.</p>
+          </div>
+
+          <div class="callout callout-interview">
+            <div class="callout-title">🎯 Q2: What happens if you modify a key object's field after putting it into a HashMap?</div>
+            <p><strong>Answer:</strong> If the mutated field was used in calculating the key's <code>hashCode()</code>, the object's hashcode will change. The entry remains trapped in the old hash bucket determined by its original hashcode. When you later call <code>map.get(key)</code> or <code>map.containsKey(key)</code>, the map calculates the bucket index using the <em>new</em> hashcode, searches the wrong bucket, and fails to find the entry. It creates a <strong>memory leak</strong> because the object cannot be retrieved or removed.</p>
+          </div>
+
+          <div class="callout callout-interview">
+            <div class="callout-title">🎯 Q3: How does Compact Strings in Java 9 improve memory footprint compared to Java 8?</div>
+            <p><strong>Answer:</strong> In Java 8, <code>String</code> stored characters in a <code>char[]</code> array where every character consumed 2 bytes (UTF-16), even though the vast majority of application strings contain Latin-1 characters requiring only 1 byte (0x00 - 0xFF). Java 9 replaced <code>char[]</code> with <code>byte[]</code> plus a 1-byte <code>coder</code> flag. If all characters fit into Latin-1, the coder flag is <code>0</code> and each character consumes only 1 byte, cutting String heap consumption by up to 50% in production workloads.</p>
+          </div>
+
+          <div class="callout callout-interview">
+            <div class="callout-title">🎯 Q4: Can a finally block override the return value of a try block?</div>
+            <p><strong>Answer:</strong> Yes. If a <code>try</code> block returns a value (e.g. <code>return 10;</code>), but the <code>finally</code> block also contains a return statement (e.g. <code>return 20;</code>), the finally block's return statement discards and overrides the original return value. Furthermore, if the <code>try</code> block throws an exception and <code>finally</code> executes a <code>return</code>, the exception is silently swallowed and discarded, which is why placing <code>return</code> or throwing unhandled exceptions inside <code>finally</code> is a critical code smell flagged by SonarQube.</p>
+          </div>
+        </section>
+
+      </main>
+    </div>
+  </div>
+
+  <footer>
+    <p>Interview A-Z Handbook &bull; Built for GitHub Pages &bull; Production Grade Interview Prep</p>
+  </footer>
+
+  <script src="../../assets/js/main.js"></script>
+</body>
+</html>

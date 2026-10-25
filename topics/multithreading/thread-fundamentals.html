@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Module 2: Thread Fundamentals & Lifecycle Deep Dive | Interview A-Z</title>
+  <link rel="stylesheet" href="../../assets/css/style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+</head>
+<body>
+
+  <!-- Top Navigation -->
+  <nav class="navbar">
+    <div class="brand">
+      <span class="brand-badge">Interview A-Z</span>
+      <span>Engineering & Architecture Handbook</span>
+    </div>
+    <div class="nav-links">
+      <a href="../../index.html" class="nav-link">Home</a>
+      <a href="../../index.html#module2" class="nav-link">Module Catalog</a>
+      <a href="https://github.com" target="_blank" class="nav-link">GitHub</a>
+    </div>
+  </nav>
+
+  <div class="container">
+    <div class="article-layout">
+      <!-- Sticky Sidebar Table of Contents -->
+      <aside class="sidebar-toc">
+        <h3>On This Page</h3>
+        <ul class="toc-links" id="dynamic-toc">
+          <!-- Dynamically populated via main.js -->
+        </ul>
+      </aside>
+
+      <!-- Main Article Content -->
+      <main class="article-content">
+        <!-- Breadcrumb -->
+        <nav class="breadcrumb">
+          <a href="../../index.html">Home</a>
+          <span>/</span>
+          <span>Module 2: Multithreading</span>
+          <span>/</span>
+          <span style="color: #fff;">Thread Fundamentals</span>
+        </nav>
+
+        <!-- Article Header -->
+        <header class="article-header">
+          <h1>Module 2: Thread Fundamentals, OS Scheduling & Future Architecture</h1>
+          <div class="article-meta">
+            <span class="badge badge-multithread">Multithreading</span>
+            <span class="badge badge-advanced">OS & JVM Internals</span>
+            <span class="badge badge-prod">Production Incidents</span>
+            <span>⏱️ 45 min deep dive</span>
+            <span>Target Roles: SDE-2, SDE-3, Systems / Backend Architect</span>
+          </div>
+        </header>
+
+        <!-- SECTION 1: PROCESS VS THREAD -->
+        <section>
+          <h2>1. Operating System Mechanics: Process vs. Thread</h2>
+
+          <h3>1.1 Process Architecture</h3>
+          <p>
+            An <strong>OS Process</strong> is an execution container providing isolated resources (private virtual memory address space, page tables, file descriptors, security credentials, and environment variables).
+          </p>
+          <ul>
+            <li><strong>Memory Isolation:</strong> Processes cannot access each other's memory directly. If Process A crashes due to a segmentation fault, Process B is completely unaffected.</li>
+            <li><strong>Inter-Process Communication (IPC):</strong> Sharing data between processes requires heavy OS-mediated mechanisms such as Unix Domain Sockets, Pipes, Shared Memory segments (POSIX), or TCP loopbacks.</li>
+            <li><strong>Process Control Block (PCB):</strong> The OS kernel maintains a heavy data structure tracking registers, page tables, and I/O status.</li>
+          </ul>
+
+          <h3>1.2 Thread Architecture (Lightweight Process)</h3>
+          <p>
+            A <strong>Thread</strong> is the smallest schedulable unit of CPU execution within a process.
+          </p>
+          <ul>
+            <li><strong>Shared Resources:</strong> All threads within the same JVM process share the exact same <strong>Heap Memory</strong>, <strong>Metaspace</strong>, and <strong>File Descriptors</strong>.</li>
+            <li><strong>Per-Thread Private Resources:</strong> Each thread maintains its own private <strong>JVM Stack</strong> (for local variables and method invocation frames), <strong>Program Counter (PC) Register</strong>, and CPU register state.</li>
+            <li><strong>Thread Control Block (TCB):</strong> Maintained by the kernel to record thread ID, CPU affinity, priority, and scheduling state.</li>
+          </ul>
+
+          <pre><code>+-----------------------------------------------------------------------------------------+
+|                                      JVM PROCESS                                        |
+|  SHARED MEMORY: Heap (Objects, Arrays) | Metaspace (Classes) | Open Sockets/Files       |
+|                                                                                         |
+|  +---------------------------+  +---------------------------+  +---------------------+  |
+|  | THREAD 1                  |  | THREAD 2                  |  | THREAD N            |  |
+|  | - Private Stack (1MB -Xss)|  | - Private Stack (1MB -Xss)|  | - Private Stack     |  |
+|  | - PC Register             |  | - PC Register             |  | - PC Register       |  |
+|  | - CPU Register Context    |  | - CPU Register Context    |  | - CPU Context       |  |
+|  +---------------------------+  +---------------------------+  +---------------------+  |
++-----------------------------------------------------------------------------------------+</code></pre>
+
+          <h3>1.3 The Real Cost of Context Switching</h3>
+          <p>
+            When a CPU core switches from executing Thread 1 to Thread 2:
+          </p>
+          <ol>
+            <li><strong>Direct Overhead:</strong> The CPU traps into kernel mode, saves Thread 1's hardware register state (PC, stack pointer, general-purpose registers) into its TCB, and loads Thread 2's registers.</li>
+            <li><strong>Indirect Cache Invalidation Overhead (The Big Killer):</strong> The hardware CPU L1/L2 data and instruction caches become "cold". The new thread experiences massive cache misses, forcing the CPU pipeline to stall while waiting for main RAM memory fetches. Having too many platform threads (e.g. 5,000+) causes <em>thrashing</em>, where the CPU spends more time swapping thread contexts than running application logic!</li>
+          </ol>
+        </section>
+
+        <!-- SECTION 2: THREAD LIFECYCLE & STATES -->
+        <section>
+          <h2>2. Thread Lifecycle & The 6 JVM Thread States</h2>
+          <p>
+            While the underlying OS kernel typically has 3 primary states (Ready, Running, Waiting), the Java Virtual Machine defines exactly <strong>6 states</strong> in the <code>java.lang.Thread.State</code> enum:
+          </p>
+
+          <pre><code>                              [ NEW ]
+                                 |  Thread.start()
+                                 v
+                         +---------------+
+                         |   RUNNABLE    | &lt;-- (Ready in OS queue or executing on CPU)
+                         +---------------+
+                            /    |    \
+       acquire monitor lock/     |     \  Thread.sleep(t) / Object.wait(t) /
+                          /      |      \ LockSupport.parkNanos()
+                         v       |       v
+                  [ BLOCKED ]    |    [ TIMED_WAITING ]
+                         \       |       /
+      monitor lock freed  \      |      /  timeout expires / notify()
+                           \     |     /
+                            v    v    v
+                         +---------------+
+                         |   RUNNABLE    |
+                         +---------------+
+                                 ^
+                                 | Object.wait() / Thread.join() / LockSupport.park()
+                                 v
+                            [ WAITING ]
+                                 |
+                                 | run() method returns or unhandled exception
+                                 v
+                           [ TERMINATED ]</code></pre>
+
+          <h3>2.1 Exhaustive Breakdown of Each State</h3>
+          <table>
+            <thead>
+              <tr>
+                <th>JVM State</th>
+                <th>Underlying Cause / Trigger</th>
+                <th>Consuming CPU?</th>
+                <th>How to Exit the State</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong><code>NEW</code></strong></td>
+                <td><code>Thread t = new Thread()</code> has been instantiated, but <code>t.start()</code> has not yet been invoked.</td>
+                <td>No</td>
+                <td>Calling <code>start()</code></td>
+              </tr>
+              <tr>
+                <td><strong><code>RUNNABLE</code></strong></td>
+                <td>Actively executing instructions on a CPU core OR waiting in the OS run-queue for a CPU time-slice.</td>
+                <td><strong>YES</strong></td>
+                <td>Preemption, yielding, entering lock/I/O wait, or method completion</td>
+              </tr>
+              <tr>
+                <td><strong><code>BLOCKED</code></strong></td>
+                <td>Waiting specifically to acquire an intrinsic object monitor lock inside a <code>synchronized</code> block or method.</td>
+                <td>No (OS parked)</td>
+                <td>The holding thread exits the <code>synchronized</code> block and releases the monitor</td>
+              </tr>
+              <tr>
+                <td><strong><code>WAITING</code></strong></td>
+                <td>Waiting indefinitely for another thread to perform a specific action. Triggered by <code>Object.wait()</code>, <code>Thread.join()</code>, or <code>LockSupport.park()</code> (e.g. waiting on a <code>ReentrantLock</code>).</td>
+                <td>No (OS parked)</td>
+                <td>Another thread calls <code>notify()</code>, <code>notifyAll()</code>, or <code>LockSupport.unpark(t)</code></td>
+              </tr>
+              <tr>
+                <td><strong><code>TIMED_WAITING</code></strong></td>
+                <td>Waiting for a specified duration. Triggered by <code>Thread.sleep(ms)</code>, <code>Object.wait(ms)</code>, <code>Thread.join(ms)</code>, or <code>LockSupport.parkNanos()</code>.</td>
+                <td>No (OS timer)</td>
+                <td>Specified time elapses, or notification / interrupt is received</td>
+              </tr>
+              <tr>
+                <td><strong><code>TERMINATED</code></strong></td>
+                <td>The thread's <code>run()</code> method completed normally or threw an unhandled runtime exception.</td>
+                <td>No</td>
+                <td>Thread is dead; cannot be restarted via <code>start()</code> (throws <code>IllegalThreadStateException</code>)</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <div class="callout callout-warning">
+            <div class="callout-title">⚠️ Senior Distinction: BLOCKED vs. WAITING</div>
+            <p>
+              In thread dumps, engineers often confuse <code>BLOCKED</code> and <code>WAITING</code>:
+              <br>
+              - <strong><code>BLOCKED</code></strong> applies <em>strictly</em> to intrinsic Java monitors (<code>synchronized</code>). A thread is blocked trying to cross a lock boundary.
+              <br>
+              - <strong><code>WAITING</code></strong> occurs when a thread has already acquired a lock, but voluntarily surrendered it (via <code>wait()</code>) or is waiting on a higher-level JUC synchronization primitive (like <code>ReentrantLock</code>, <code>CountDownLatch</code>, or <code>CompletableFuture</code>).
+            </p>
+          </div>
+        </section>
+
+        <!-- SECTION 3: THREAD CREATION MECHANISMS -->
+        <section>
+          <h2>3. Thread Creation Mechanisms: Thread vs. Runnable vs. Callable & Future</h2>
+
+          <h3>3.1 Mechanism 1: Extending <code>java.lang.Thread</code></h3>
+          <pre><code>public class WorkerThread extends Thread {
+    @Override
+    public void run() {
+        System.out.println("Executing on: " + Thread.currentThread().getName());
+    }
+}
+// Launching:
+new WorkerThread().start(); // Calls native JVM start0()</code></pre>
+          <p>
+            <strong>Architectural Limitation:</strong> Java does not support multiple class inheritance. If a class extends <code>Thread</code>, it cannot extend any other domain class. Furthermore, it tightly couples the unit of work (the task) to the execution mechanism (the thread).
+          </p>
+
+          <h3>3.2 Mechanism 2: Implementing <code>java.lang.Runnable</code></h3>
+          <pre><code>@FunctionalInterface
+public interface Runnable {
+    void run();
+}
+
+// Decoupled task:
+Runnable task = () -&gt; System.out.println("Running task: " + Thread.currentThread().getName());
+new Thread(task).start();</code></pre>
+          <p>
+            <strong>Pros:</strong> Clean separation of concerns. Can be submitted to thread pools (<code>ExecutorService</code>).
+            <br>
+            <strong>Cons:</strong> <code>run()</code> returns <code>void</code> (cannot return a computation result) and cannot throw checked exceptions.
+          </p>
+
+          <h3>3.3 Mechanism 3: Implementing <code>Callable&lt;V&gt;</code></h3>
+          <pre><code>@FunctionalInterface
+public interface Callable&lt;V&gt; {
+    V call() throws Exception;
+}</code></pre>
+          <p>
+            Introduced in Java 5 to solve the limitations of <code>Runnable</code>: it is parameterized to return a computed value $V$ and is permitted to throw checked exceptions.
+          </p>
+
+          <h3>3.4 The <code>Future&lt;V&gt;</code> Interface & <code>FutureTask&lt;V&gt;</code></h3>
+          <p>
+            A <code>Future&lt;V&gt;</code> represents the pending result of an asynchronous computation:
+          </p>
+          <div class="code-header">
+            <span>Executing Callable with Future</span>
+            <span>Java</span>
+          </div>
+          <pre><code>ExecutorService executor = Executors.newFixedThreadPool(4);
+
+Callable&lt;OrderSummary&gt; task = () -&gt; {
+    // Simulate external inventory check
+    return inventoryClient.fetchStock("SKU-991");
+};
+
+Future&lt;OrderSummary&gt; future = executor.submit(task);
+
+// Non-blocking status check:
+if (!future.isDone()) {
+    System.out.println("Inventory check still calculating...");
+}
+
+try {
+    // CRITICAL: Always use timed get() in production to prevent thread hanging!
+    OrderSummary summary = future.get(3, TimeUnit.SECONDS);
+    System.out.println("Result received: " + summary);
+} catch (TimeoutException e) {
+    future.cancel(true); // Interrupt the running thread
+    logger.warn("Inventory check timed out after 3 seconds");
+} catch (ExecutionException e) {
+    logger.error("Callable threw an exception: ", e.getCause());
+}</code></pre>
+        </section>
+
+        <!-- SECTION 4: REAL-TIME PRODUCTION ISSUES -->
+        <section>
+          <h2>4. Real-Time Production Issues & Post-Mortems</h2>
+
+          <!-- Incident 1 -->
+          <div class="callout callout-production">
+            <div class="callout-title">🚨 Incident 1: "OutOfMemoryError: unable to create new native thread" Outage</div>
+            <p><strong>Scenario:</strong> A payment notification service handling 4,000 webhooks/sec suddenly crashed with <code>java.lang.OutOfMemoryError: unable to create new native thread</code>. The JVM had 12GB of free heap, yet the entire process crashed and Linux prevented SSH access.</p>
+          </div>
+
+          <div class="callout callout-warning">
+            <div class="callout-title">🔍 Root Cause Analysis (RCA)</div>
+            <p>
+              A junior engineer handled incoming webhook alerts by writing:
+              <code>new Thread(() -&gt; sendWebhook(payload)).start();</code>.
+              Under peak traffic, over 15,000 threads were spawned in 3 seconds. Each platform thread allocated a 1MB virtual stack and required a kernel PID in the OS process table.
+              <br><br>
+              The system hit the Linux user process limit defined in <code>/etc/security/limits.conf</code> (<code>nproc = 4096</code>). When the JVM requested the OS to spawn thread #4097, the OS kernel refused the <code>clone()</code> system call with error <code>EAGAIN</code>, crashing the JVM.
+            </p>
+          </div>
+
+          <div class="callout callout-solution">
+            <div class="callout-title">💡 Production Resolution</div>
+            <ul>
+              <li><strong>Zero Manual Thread Instantiation:</strong> Strictly banned <code>new Thread()</code> in SonarQube rules.</li>
+              <li><strong>Bounded Thread Pools:</strong> Replaced with a tuned <code>ThreadPoolExecutor</code> using a bounded <code>ArrayBlockingQueue</code> and an explicit rejection policy (<code>CallerRunsPolicy</code> or metric-monitored <code>AbortPolicy</code>).</li>
+              <li><strong>OS Limit Adjustment:</strong> Tuned Linux OS limits: <code>ulimit -u 65535</code> in the Docker/systemd service configuration.</li>
+            </ul>
+          </div>
+
+          <!-- Incident 2 -->
+          <div class="callout callout-production">
+            <div class="callout-title">🚨 Incident 2: Total Tomcat Thread Starvation via Untimed Future.get()</div>
+            <p><strong>Scenario:</strong> An e-commerce search service's p99 latency jumped from 25ms to infinity. Tomcat's max thread pool (200 threads) became 100% occupied. All incoming HTTP requests were queued and rejected with 504 Gateway Timeouts.</p>
+          </div>
+
+          <div class="callout callout-warning">
+            <div class="callout-title">🔍 Root Cause Analysis (RCA)</div>
+            <p>
+              To fetch pricing, the controller called:
+              <code>Future&lt;Price&gt; future = pricingExecutor.submit(pricingTask); Price p = future.get(); // BLOCKS INDEFINITELY!</code>.
+              <br><br>
+              A downstream pricing vendor suffered a network partition and failed to respond. Because <code>future.get()</code> was invoked without a timeout, Tomcat worker threads remained parked in <code>WAITING</code> indefinitely waiting for a notification that never arrived. Within 20 seconds, all 200 Tomcat worker threads were trapped in <code>future.get()</code>, paralyzing the application.
+            </p>
+          </div>
+
+          <div class="callout callout-solution">
+            <div class="callout-title">💡 Production Resolution</div>
+            <p>Mandated timeouts on every blocking operation across the codebase:</p>
+            <pre><code>// PRODUCTION RULE: Never use untimed future.get()
+Price p = future.get(500, TimeUnit.MILLISECONDS);</code></pre>
+          </div>
+        </section>
+
+        <!-- SECTION 5: PRODUCTION DIAGNOSTICS TOOLKIT -->
+        <section>
+          <h2>5. Production Triage & Inspection Toolkit</h2>
+
+          <div class="code-header">
+            <span>Mapping High-CPU Java Threads to OS Native Threads</span>
+            <span>Bash</span>
+          </div>
+          <pre><code># 1. Identify which thread in the JVM is consuming 100% CPU on Linux
+top -H -p &lt;PID&gt;
+
+# Example top output:
+# PID   USER      PR  NI    VIRT    RES    SHR S  %CPU %MEM     TIME+ COMMAND
+# 18422 appuser   20   0   14.2g   6.1g  18400 R  98.4 12.1   4:15.22 java
+
+# 2. Convert the native OS Thread ID (18422) to hexadecimal:
+printf '%x\n' 18422
+# Output: 47f6
+
+# 3. Locate the exact thread in a JVM thread dump using the hex nid:
+jstack &lt;PID&gt; | grep -A 25 "nid=0x47f6"
+
+# 4. Check total active OS threads for a process:
+ls -1 /proc/&lt;PID&gt;/task | wc -l
+
+# 5. Check system-wide thread limits on Linux:
+cat /proc/sys/kernel/threads-max
+ulimit -u</code></pre>
+        </section>
+
+        <!-- SECTION 6: SENIOR INTERVIEW Q&A -->
+        <section>
+          <h2>6. Senior / Staff Technical Interview Q&A</h2>
+
+          <div class="callout callout-interview">
+            <div class="callout-title">🎯 Q1: What happens if you call run() instead of start() on a Thread?</div>
+            <p><strong>Answer:</strong> Calling <code>run()</code> executes the method synchronously on the <strong>current calling thread</strong>, behaving like any standard Java method call. No new OS thread or stack frame is created. Calling <code>start()</code> invokes the native method <code>start0()</code>, which requests the OS kernel to spawn a new native thread with its own call stack and invokes <code>run()</code> asynchronously on that new thread.</p>
+          </div>
+
+          <div class="callout callout-interview">
+            <div class="callout-title">🎯 Q2: Can a terminated thread be restarted by calling start() again?</div>
+            <p><strong>Answer:</strong> No. Once a thread reaches the <code>TERMINATED</code> state, its native OS thread context has been deallocated. Calling <code>start()</code> again throws <code>IllegalThreadStateException</code>. The JVM explicitly checks <code>if (threadStatus != 0) throw new IllegalThreadStateException();</code> at the very beginning of <code>Thread.start()</code>.</p>
+          </div>
+
+          <div class="callout callout-interview">
+            <div class="callout-title">🎯 Q3: What is the internal difference between Thread.sleep() and Object.wait()?</div>
+            <p><strong>Answer:</strong> 
+              1. <strong>Lock Retention:</strong> <code>Thread.sleep()</code> puts the current thread into <code>TIMED_WAITING</code> but <strong>retains all monitor locks</strong> it currently holds. In contrast, <code>Object.wait()</code> <strong>releases the monitor lock</strong> of the object it is called upon, allowing other waiting threads to acquire the lock.
+              <br>
+              2. <strong>Monitor Requirement:</strong> <code>Object.wait()</code> must be called from within a <code>synchronized</code> block on that specific object; otherwise, it throws <code>IllegalMonitorStateException</code>. <code>Thread.sleep()</code> can be called from anywhere.
+            </p>
+          </div>
+
+          <div class="callout callout-interview">
+            <div class="callout-title">🎯 Q4: How does future.cancel(true) actually interrupt a running thread?</div>
+            <p><strong>Answer:</strong> If passed <code>true</code>, <code>cancel()</code> calls <code>Thread.interrupt()</code> on the worker thread executing the task. It does <em>not</em> forcefully kill the thread. It sets the thread's interrupt status flag. If the thread is currently blocked in an interruptible method (such as <code>sleep()</code>, <code>wait()</code>, or socket I/O), an <code>InterruptedException</code> is thrown. If the thread is executing pure CPU calculations, it will continue running unless the code explicitly checks <code>Thread.currentThread().isInterrupted()</code> and exits voluntarily.</p>
+          </div>
+        </section>
+
+      </main>
+    </div>
+  </div>
+
+  <footer>
+    <p>Interview A-Z Handbook &bull; Built for GitHub Pages &bull; Production Grade Interview Prep</p>
+  </footer>
+
+  <script src="../../assets/js/main.js"></script>
+</body>
+</html>

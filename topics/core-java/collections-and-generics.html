@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Module 1: Collections Framework & Generics Deep Dive | Interview A-Z</title>
+  <link rel="stylesheet" href="../../assets/css/style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+</head>
+<body>
+
+  <!-- Top Navigation -->
+  <nav class="navbar">
+    <div class="brand">
+      <span class="brand-badge">Interview A-Z</span>
+      <span>Engineering & Architecture Handbook</span>
+    </div>
+    <div class="nav-links">
+      <a href="../../index.html" class="nav-link">Home</a>
+      <a href="../../index.html#topics" class="nav-link">Topic Catalog</a>
+      <a href="https://github.com" target="_blank" class="nav-link">GitHub</a>
+    </div>
+  </nav>
+
+  <div class="container">
+    <div class="article-layout">
+      <!-- Sticky Sidebar Table of Contents -->
+      <aside class="sidebar-toc">
+        <h3>On This Page</h3>
+        <ul class="toc-links" id="dynamic-toc">
+          <!-- Dynamically populated via main.js -->
+        </ul>
+      </aside>
+
+      <!-- Main Article Content -->
+      <main class="article-content">
+        <!-- Breadcrumb -->
+        <nav class="breadcrumb">
+          <a href="../../index.html">Home</a>
+          <span>/</span>
+          <span>Core Java</span>
+          <span>/</span>
+          <span style="color: #fff;">Collections & Generics</span>
+        </nav>
+
+        <!-- Article Header -->
+        <header class="article-header">
+          <h1>Module 1: Java Collections Framework & Generics Internals</h1>
+          <div class="article-meta">
+            <span class="badge badge-core">Core Java</span>
+            <span class="badge badge-advanced">Data Structures & JMM</span>
+            <span class="badge badge-prod">High Throughput</span>
+            <span>⏱️ 50 min deep dive</span>
+            <span>Target Roles: SDE-2, SDE-3, Principal Backend Engineer</span>
+          </div>
+        </header>
+
+        <!-- SECTION 1: COLLECTION FRAMEWORK HIERARCHY -->
+        <section>
+          <h2>1. Collections Framework Architecture & Hierarchy</h2>
+          <p>
+            The Java Collections Framework separates collection operations into two fundamental interface root hierarchies:
+          </p>
+          <pre><code>                              java.lang.Iterable&lt;T&gt;
+                                       |
+                           java.util.Collection&lt;E&gt;
+                                       |
+          +----------------------------+----------------------------+
+          |                            |                            |
+  java.util.List&lt;E&gt;            java.util.Set&lt;E&gt;            java.util.Queue&lt;E&gt;
+          |                            |                            |
+  - ArrayList                  - HashSet                    - PriorityQueue
+  - LinkedList                 - LinkedHashSet              - ArrayDeque (implements Deque)
+  - Vector (Legacy)            - TreeSet (NavigableSet)
+    `- Stack (Legacy)
+
+NOTE: java.util.Map&lt;K,V&gt; does NOT extend Collection&lt;E&gt; (Key-Value pairs vs. Single Elements)
+  - HashMap
+  - LinkedHashMap (LRU caching)
+  - TreeMap (Red-Black Tree sorted keys)
+  - Hashtable (Legacy synchronized)
+  - ConcurrentHashMap (CAS + Synchronized Node heads in java.util.concurrent)</code></pre>
+
+          <h3>1.1 List Implementations: ArrayList vs. LinkedList vs. Vector/Stack</h3>
+          <ul>
+            <li><strong>ArrayList:</strong> Backed by a dynamic array (<code>Object[] elementData</code>).
+              <ul>
+                <li>Initial default capacity: <code>10</code> (allocated lazily upon first insertion).</li>
+                <li>Growth factor: <strong>$1.5\times$</strong> (<code>newCapacity = oldCapacity + (oldCapacity &gt;&gt; 1)</code>). Copies memory using native <code>System.arraycopy()</code>.</li>
+                <li>Random access ($O(1)$) via index. Cache-line friendly because elements reside in contiguous physical memory.</li>
+              </ul>
+            </li>
+            <li><strong>LinkedList:</strong> Doubly-linked list with independent <code>Node</code> objects holding <code>item</code>, <code>next</code>, and <code>prev</code> pointers.
+              <ul>
+                <li>Huge memory overhead: Every element consumes a 24-byte Node wrapper plus reference pointers.</li>
+                <li>Poor cache locality: Nodes are scattered across the heap, triggering continuous CPU L1/L2 cache misses. In modern hardware, <strong>ArrayList almost always outperforms LinkedList</strong>, even for arbitrary insertions/removals!</li>
+              </ul>
+            </li>
+            <li><strong>Vector & Stack:</strong> Legacy Java 1.0 classes. Vector synchronizes every individual method call via <code>synchronized</code>, introducing heavy lock contention. <code>Stack</code> extends <code>Vector</code>, violating OOP (it allows index-based insertions breaking LIFO semantics). Use <strong><code>ArrayDeque</code></strong> instead.</li>
+          </ul>
+
+          <h3>1.2 Queue & Deque: ArrayDeque vs. PriorityQueue</h3>
+          <ul>
+            <li><strong>ArrayDeque:</strong> Resizable circular array implementation of a double-ended queue. Has no capacity restrictions, allocates no node objects, has pointer head/tail bitmasking, and significantly beats <code>Stack</code> and <code>LinkedList</code> in memory and speed.</li>
+            <li><strong>PriorityQueue:</strong> Unbounded priority heap backed by an array representing a <strong>Binary Min-Heap</strong>. Elements are ordered according to natural ordering (<code>Comparable</code>) or a provided <code>Comparator</code>. Peek/element is $O(1)$; add/offer/poll is $O(\log N)$.</li>
+          </ul>
+
+          <h3>1.3 Set Implementations: HashSet vs. LinkedHashSet vs. TreeSet</h3>
+          <ul>
+            <li><strong>HashSet:</strong> Backed internally by a <code>HashMap&lt;E, Object&gt;</code>. Elements are stored as keys in the map, with a dummy static object (<code>private static final Object PRESENT = new Object();</code>) stored as the value. Offers $O(1)$ lookup, insertion, and deletion.</li>
+            <li><strong>LinkedHashSet:</strong> Extends <code>HashSet</code> and is backed by a <code>LinkedHashMap</code>. Maintains a doubly-linked list running through all entries to preserve <strong>insertion order</strong>.</li>
+            <li><strong>TreeSet:</strong> Backed by a <code>TreeMap</code> (Red-Black Tree). Guarantees elements are sorted in ascending order. Search, addition, and removal operate in guaranteed $O(\log N)$ time. Does not permit <code>null</code> elements.</li>
+          </ul>
+        </section>
+
+        <!-- SECTION 2: MAP DEEP DIVE & CONCURRENTHASHMAP -->
+        <section>
+          <h2>2. Map Architecture & High-Performance Internals</h2>
+
+          <h3>2.1 HashMap Internal Architecture in Java 8+</h3>
+          <p>
+            <code>HashMap</code> is a hash table based on an array of buckets (<code>Node&lt;K,V&gt;[] table</code>) using separate chaining.
+          </p>
+
+          <pre><code>+-----------------------------------------------------------------------------------------+
+| HASHMAP INTERNAL RESOLUTION                                                             |
++-----------------------------------------------------------------------------------------+
+| 1. Hash Perturbation Function:                                                          |
+|    static final int hash(Object key) {                                                  |
+|        int h;                                                                           |
+|        return (key == null) ? 0 : (h = key.hashCode()) ^ (h &gt;&gt;&gt; 16); // XOR upper bits  |
+|    }                                                                                    |
+|                                                                                         |
+| 2. Bucket Index Calculation (Power-of-Two Bitmasking):                                  |
+|    index = (n - 1) &amp; hash;   // Equivalent to (hash % n), but executes in 1 CPU cycle!  |
+|                                                                                         |
+| 3. Collision Handling:                                                                  |
+|    - Linked List: For bucket length &lt; 8                                                 |
+|    - Red-Black Tree (TreeNode): When bucket size &gt;= 8 AND total table capacity &gt;= 64    |
+|      (Treeification prevents Hash-DoS attacks, reducing lookup from O(N) to O(log N))   |
+|    - Untreeification: Converts back to Linked List when bucket size shrinks to &lt;= 6     |
++-----------------------------------------------------------------------------------------+</code></pre>
+
+          <ul>
+            <li><strong>Default Initial Capacity:</strong> <code>16</code> (must always be a power of 2 to guarantee <code>(n - 1) & hash</code> uniformly distributes keys).</li>
+            <li><strong>Load Factor:</strong> Default <code>0.75</code> (optimal trade-off between space and lookup frequency).</li>
+            <li><strong>Resize Threshold:</strong> <code>capacity * loadFactor</code> (e.g., $16 \times 0.75 = 12$). When exceeded, the capacity doubles ($16 \rightarrow 32$), and elements are rehashed. In Java 8, rehash uses bit testing (<code>(e.hash & oldCap) == 0</code>) to move nodes to either the same index or <code>index + oldCap</code> without recalculating full hashes.</li>
+          </ul>
+
+          <h3>2.2 LinkedHashMap & LRU Cache Implementation</h3>
+          <p>
+            <code>LinkedHashMap</code> extends <code>HashMap</code> and adds a doubly-linked list across all buckets. It can maintain <strong>Insertion-Order</strong> (default) or <strong>Access-Order</strong> (ordering by recent read/write), making it the standard building block for in-memory LRU (Least Recently Used) caches:
+          </p>
+          <div class="code-header">
+            <span>Production LRU Cache with LinkedHashMap</span>
+            <span>Java</span>
+          </div>
+          <pre><code>public class LruCache&lt;K, V&gt; extends LinkedHashMap&lt;K, V&gt; {
+    private final int maxEntries;
+
+    public LruCache(int maxEntries) {
+        // initialCapacity, loadFactor, accessOrder = true (enables LRU)
+        super(maxEntries, 0.75f, true);
+        this.maxEntries = maxEntries;
+    }
+
+    @Override
+    protected boolean removeEldestEntry(Map.Entry&lt;K, V&gt; eldest) {
+        // Automatically evicts the least recently accessed item when capacity exceeds limit
+        return size() &gt; maxEntries;
+    }
+}</code></pre>
+
+          <h3>2.3 ConcurrentHashMap Internals: Java 7 vs. Java 8+</h3>
+          <p>
+            To achieve thread safety without synchronizing the entire map like legacy <code>Hashtable</code> or <code>Collections.synchronizedMap()</code>:
+          </p>
+          <table>
+            <thead>
+              <tr>
+                <th>Feature</th>
+                <th>Java 7 ConcurrentHashMap</th>
+                <th>Java 8+ ConcurrentHashMap</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Locking Mechanism</strong></td>
+                <td><strong>Segment-Level Locking</strong> (Array of 16 <code>ReentrantLock</code> segments). Concurrency level was fixed at 16 by default.</td>
+                <td><strong>Node-Level Locking</strong>. Uses atomic <strong>CAS</strong> for empty bucket insertion and fine-grained <code>synchronized</code> on the first node (bin head) of the colliding bucket.</td>
+              </tr>
+              <tr>
+                <td><strong>Data Structure</strong></td>
+                <td>Array of HashEntry segments</td>
+                <td>Array of <code>Node&lt;K,V&gt;</code> with Red-Black <code>TreeBin</code> support</td>
+              </tr>
+              <tr>
+                <td><strong>Read Operations (<code>get</code>)</strong></td>
+                <td>Non-blocking via volatile value fields</td>
+                <td><strong>100% Lock-Free</strong> reads via volatile node pointers and volatile value reads</td>
+              </tr>
+              <tr>
+                <td><strong>Concurrent Sizing</strong></td>
+                <td>Locked across segments if multi-pass check failed</td>
+                <td><strong>CounterCell Striping</strong> (similar to <code>LongAdder</code>) to avoid thread contention when updating map size</td>
+              </tr>
+            </tbody>
+          </table>
+        </section>
+
+        <!-- SECTION 3: GENERICS ARCHITECTURE -->
+        <section>
+          <h2>3. Generics: Type Safety, Wildcards & Type Erasure</h2>
+
+          <h3>3.1 Generic Classes & Methods</h3>
+          <p>
+            Generics enforce compile-time type safety and eliminate runtime explicit casts.
+          </p>
+          <div class="code-header">
+            <span>Generic Service Interface & Method Pattern</span>
+            <span>Java</span>
+          </div>
+          <pre><code>public interface Repository&lt;T, ID&gt; {
+    T findById(ID id);
+    void save(T entity);
+    
+    // Generic Method with its own independent type parameter
+    &lt;R&gt; R executeCustomQuery(String query, Function&lt;T, R&gt; transformer);
+}</code></pre>
+
+          <h3>3.2 Bounded Type Parameters & Wildcards</h3>
+          <ul>
+            <li><strong>Upper Bound (<code>&lt;T extends Number&gt;</code>):</strong> Restricts the type to <code>Number</code> or any of its subclasses (<code>Integer</code>, <code>Double</code>).</li>
+            <li><strong>Unbounded Wildcard (<code>List&lt;?&gt;</code>):</strong> Represents a list of unknown type. You can read objects from it (as <code>Object</code>), but you cannot write anything into it (except <code>null</code>).</li>
+            <li><strong>Upper Bounded Wildcard (<code>List&lt;? extends Number&gt;</code>):</strong> Represents a family of types that are subclasses of <code>Number</code>. Covariant.</li>
+            <li><strong>Lower Bounded Wildcard (<code>List&lt;? super Integer&gt;</code>):</strong> Represents a family of types that are superclasses of <code>Integer</code> (e.g. <code>Integer</code>, <code>Number</code>, <code>Object</code>). Contravariant.</li>
+          </ul>
+
+          <h3>3.3 The PECS Principle (Producer Extends, Consumer Super)</h3>
+          <p>
+            The foundational rule formulated by Joshua Bloch for designing robust generic APIs:
+          </p>
+          <ul>
+            <li><strong>Producer Extends (<code>? extends T</code>):</strong> If your method reads/extracts items from a collection (the collection is <em>producing</em> data for you), use <code>? extends T</code>.</li>
+            <li><strong>Consumer Super (<code>? super T</code>):</strong> If your method writes/inserts items into a collection (the collection is <em>consuming</em> data from you), use <code>? super T</code>.</li>
+          </ul>
+
+          <div class="code-header">
+            <span>PECS in Action (Collections.copy)</span>
+            <span>Java</span>
+          </div>
+          <pre><code>// dest CONSUMES elements (writes into it) -&gt; ? super T
+// src PRODUCES elements (reads from it)    -&gt; ? extends T
+public static &lt;T&gt; void copy(List&lt;? super T&gt; dest, List&lt;? extends T&gt; src) {
+    for (int i = 0; i &lt; src.size(); i++) {
+        dest.set(i, src.get(i));
+    }
+}</code></pre>
+
+          <h3>3.4 Type Erasure & Bridge Methods</h3>
+          <p>
+            To maintain backward compatibility with pre-Java 5 legacy bytecode, Java implements Generics via <strong>Type Erasure</strong>.
+          </p>
+          <ul>
+            <li>At compile time, <code>javac</code> validates type constraints.</li>
+            <li>During compilation into bytecode, all type parameters are <strong>erased</strong>:
+              <ul>
+                <li>Unbounded types (<code>&lt;T&gt;</code>) are replaced with <code>Object</code>.</li>
+                <li>Bounded types (<code>&lt;T extends Comparable&lt;T&gt;&gt;</code>) are replaced with the bound (<code>Comparable</code>).</li>
+                <li>Appropriate casts are inserted automatically at call sites.</li>
+              </ul>
+            </li>
+            <li><strong>Bridge Methods:</strong> Synthetic methods generated by <code>javac</code> when a subclass inherits a parameterized class/interface to preserve polymorphism after type erasure.</li>
+            <li><strong>Why you cannot execute <code>new T()</code> or <code>new T[10]</code>:</strong> Because at runtime, <code>T</code> does not exist on the heap!</li>
+          </ul>
+        </section>
+
+        <!-- SECTION 4: REAL-TIME PRODUCTION ISSUES -->
+        <section>
+          <h2>4. Real-Time Production Issues & Post-Mortems</h2>
+
+          <!-- Incident 1 -->
+          <div class="callout callout-production">
+            <div class="callout-title">🚨 Incident 1: 100% CPU Infinite Loop Spike in Java 7 HashMap During Traffic Peak</div>
+            <p><strong>Scenario:</strong> During a major Black Friday sale, a legacy microservice's CPU utilization suddenly pinned at 100% across all worker nodes. Application requests froze, health checks timed out, and nodes were terminated by Kubernetes.</p>
+          </div>
+
+          <div class="callout callout-warning">
+            <div class="callout-title">🔍 Root Cause Analysis (RCA)</div>
+            <p>
+              Developers shared a standard non-thread-safe <code>java.util.HashMap</code> as a static global in-memory cache accessed concurrently by Tomcat threads. In <strong>Java 7</strong>, during map resizing (<code>transfer()</code>), elements in a collision bucket were re-inserted using <em>head insertion</em>.
+            </p>
+            <p>
+              When two threads attempted to resize the map simultaneously, a race condition occurred where Thread 1 was preempted while pointing to Node A and Node B. Thread 2 finished the resize, reversing the order ($B \rightarrow A$). When Thread 1 resumed, it linked $A \rightarrow B \rightarrow A$, forming an <strong>infinite circular linked list</strong>! Subsequent <code>map.get()</code> calls entered an infinite <code>while</code> loop traversing the circular pointer, driving CPU to 100%.
+            </p>
+          </div>
+
+          <div class="callout callout-solution">
+            <div class="callout-title">💡 Production Resolution</div>
+            <ul>
+              <li><strong>Immediate Fix:</strong> Replaced the standard <code>HashMap</code> with <code>ConcurrentHashMap</code>.</li>
+              <li><strong>Java 8 Architectural Hardening:</strong> Java 8 redesigned HashMap resizing to use <em>tail insertion</em> with two pointer chains (loHead/loTail and hiHead/hiTail), completely eliminating the possibility of circular loops during resizing.</li>
+            </ul>
+          </div>
+
+          <!-- Incident 2 -->
+          <div class="callout callout-production">
+            <div class="callout-title">🚨 Incident 2: Race Condition via Non-Atomic Compound Operations in ConcurrentHashMap</div>
+            <p><strong>Scenario:</strong> In a high-volume notification microservice, duplicate SMS messages and emails were being dispatched to customers, despite using a <code>ConcurrentHashMap</code> to record already-processed message IDs.</p>
+          </div>
+
+          <div class="callout callout-warning">
+            <div class="callout-title">🔍 Root Cause Analysis (RCA)</div>
+            <p>
+              The engineer assumed that because <code>ConcurrentHashMap</code> is thread-safe, multiple consecutive operations on it are automatically atomic:
+            </p>
+            <pre><code>// BROKEN CODE:
+if (!processedMessages.containsKey(messageId)) { // Step 1: Check
+    processedMessages.put(messageId, true);      // Step 2: Act
+    sendNotification(messageId);
+}</code></pre>
+            <p>
+              This is a classic <strong>Check-Then-Act</strong> race condition. While <code>containsKey()</code> and <code>put()</code> are independently thread-safe, the gap between them is NOT atomic. Two threads handling duplicate webhook deliveries both evaluated <code>containsKey() == false</code>, both executed <code>put()</code>, and both triggered customer notifications!
+            </p>
+          </div>
+
+          <div class="callout callout-solution">
+            <div class="callout-title">💡 Production Resolution</div>
+            <p>Used atomic compound methods provided by <code>ConcurrentMap</code> (<code>putIfAbsent</code> or <code>computeIfAbsent</code>):</p>
+            <pre><code>// ATOMIC SOLUTION:
+Boolean alreadyPresent = processedMessages.putIfAbsent(messageId, Boolean.TRUE);
+if (alreadyPresent == null) {
+    // Only the winning thread executes this block
+    sendNotification(messageId);
+}</code></pre>
+          </div>
+        </section>
+
+        <!-- SECTION 5: PRODUCTION DIAGNOSTICS TOOLKIT -->
+        <section>
+          <h2>5. Production Triage & Inspection Toolkit</h2>
+
+          <div class="code-header">
+            <span>Diagnosing Collection Contention & Heap Memory Footprints</span>
+            <span>Bash</span>
+          </div>
+          <pre><code># 1. Detect Threads Blocked on Synchronized Collections (Hashtable / Vector)
+jstack -l &lt;PID&gt; | grep -E "BLOCKED.*(java.util.Hashtable|java.util.Vector)" -A 10
+
+# 2. Inspect Large Collections Consuming Heap via JMap Live Histogram
+# Look for excessive [Ljava.lang.Object; (underlying arrays for ArrayList/HashMap)
+jmap -histo:live &lt;PID&gt; | head -n 30
+
+# 3. Check for Hash Collision Storms in Live Production
+# High CPU in HashMap.get or HashMap.put indicates degraded bucket chains:
+jcmd &lt;PID&gt; Thread.print | grep -A 5 "java.util.HashMap.getNode"</code></pre>
+        </section>
+
+        <!-- SECTION 6: SENIOR INTERVIEW Q&A -->
+        <section>
+          <h2>6. Senior / Staff Technical Interview Q&A</h2>
+
+          <div class="callout callout-interview">
+            <div class="callout-title">🎯 Q1: Why does ConcurrentHashMap not allow null keys or null values, whereas HashMap does?</div>
+            <p><strong>Answer:</strong> In a single-threaded <code>HashMap</code>, if <code>map.get(key)</code> returns <code>null</code>, you can disambiguate whether the key was mapped to <code>null</code> or the key was not present by calling <code>map.containsKey(key)</code>. In a multi-threaded map, the map's state can change between the <code>get()</code> and <code>containsKey()</code> calls. If <code>null</code> were allowed, it would be impossible to know whether another thread removed the key or mapped it to <code>null</code>. Doug Lea intentionally designed <code>ConcurrentHashMap</code> to disallow <code>null</code> to prevent this fundamental ambiguity.</p>
+          </div>
+
+          <div class="callout callout-interview">
+            <div class="callout-title">🎯 Q2: What is the difference between Fail-Fast and Fail-Safe (Non-Fail-Fast) Iterators?</div>
+            <p><strong>Answer:</strong> 
+              <strong>Fail-Fast Iterators</strong> (e.g. <code>ArrayList</code>, <code>HashMap</code>) maintain an internal modification counter (<code>modCount</code>). If the collection is structurally modified during iteration by any method other than the iterator's own <code>remove()</code>, it immediately throws <code>ConcurrentModificationException</code>.
+              <br><br>
+              <strong>Fail-Safe Iterators</strong> (e.g. <code>CopyOnWriteArrayList</code>, <code>ConcurrentHashMap</code>) operate on a snapshot or dynamically iterate through volatile node chains. They never throw <code>ConcurrentModificationException</code>, though they may or may not reflect modifications made after the iterator was constructed.
+            </p>
+          </div>
+
+          <div class="callout callout-interview">
+            <div class="callout-title">🎯 Q3: Why is List&lt;String&gt; NOT a subtype of List&lt;Object&gt; in Java?</div>
+            <p><strong>Answer:</strong> Because arrays in Java are <em>covariant</em> (which allows runtime <code>ArrayStoreException</code>), but generic types are <strong>invariant</strong> to guarantee compile-time type safety. If <code>List&lt;String&gt;</code> were a subtype of <code>List&lt;Object&gt;</code>, you could assign <code>List&lt;Object&gt; list = new ArrayList&lt;String&gt;();</code> and then execute <code>list.add(Integer.valueOf(42));</code>, which would corrupt the underlying string list with an integer, leading to heap pollution and runtime <code>ClassCastException</code>.</p>
+          </div>
+
+          <div class="callout callout-interview">
+            <div class="callout-title">🎯 Q4: Explain how CounterCell works in Java 8 ConcurrentHashMap for computing size().</div>
+            <p><strong>Answer:</strong> In multi-threaded environments, updating a single shared volatile <code>size</code> counter creates severe CAS contention on CPU cache lines. Java 8 <code>ConcurrentHashMap</code> adopts the striping design of <code>LongAdder</code>: it maintains a <code>baseCount</code> field and an array of <code>CounterCell</code> objects. Threads attempting to increment the count first try to CAS <code>baseCount</code>; if contention is detected, each thread hashes to an individual cell in the <code>CounterCell[]</code> array. Calling <code>size()</code> sums <code>baseCount</code> plus all <code>CounterCell</code> values, achieving near-linear multi-core throughput.</p>
+          </div>
+        </section>
+
+      </main>
+    </div>
+  </div>
+
+  <footer>
+    <p>Interview A-Z Handbook &bull; Built for GitHub Pages &bull; Production Grade Interview Prep</p>
+  </footer>
+
+  <script src="../../assets/js/main.js"></script>
+</body>
+</html>

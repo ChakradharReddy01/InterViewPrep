@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Topic Template & Reference Structure | Interview A-Z</title>
+  <link rel="stylesheet" href="../assets/css/style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+</head>
+<body>
+
+  <!-- Top Navigation -->
+  <nav class="navbar">
+    <div class="brand">
+      <span class="brand-badge">Interview A-Z</span>
+      <span>Engineering & Architecture Handbook</span>
+    </div>
+    <div class="nav-links">
+      <a href="../index.html" class="nav-link">Home</a>
+      <a href="../index.html#topics" class="nav-link">Topic Catalog</a>
+    </div>
+  </nav>
+
+  <div class="container">
+    <div class="article-layout">
+      <!-- Sticky Sidebar Table of Contents -->
+      <aside class="sidebar-toc">
+        <h3>On This Page</h3>
+        <ul class="toc-links" id="dynamic-toc">
+          <!-- Populated dynamically via main.js -->
+        </ul>
+      </aside>
+
+      <!-- Main Article Content -->
+      <main class="article-content">
+        <!-- Breadcrumbs -->
+        <nav class="breadcrumb">
+          <a href="../index.html">Home</a>
+          <span>/</span>
+          <span>Topic Group</span>
+          <span>/</span>
+          <span style="color: #fff;">Topic Name</span>
+        </nav>
+
+        <!-- Article Header -->
+        <header class="article-header">
+          <h1>[Sample Topic] Database Connection Pooling & Thread Starvation</h1>
+          <div class="article-meta">
+            <span class="badge badge-prod">Production Incident</span>
+            <span class="badge badge-advanced">Advanced</span>
+            <span>⏱️ 15 min read</span>
+            <span>Target Roles: SDE-2, SDE-3, Staff / Tech Lead</span>
+          </div>
+        </header>
+
+        <!-- Section 1: Overview & Under-the-Hood Mechanism -->
+        <section>
+          <h2>1. Under-the-Hood Mechanisms & Architectural Flow</h2>
+          <p>
+            When building scalable backend microservices, establishing physical TCP connections to a relational database involves a 3-way TCP handshake, TLS negotiation, authentication, and session initialization. Doing this per-request degrades throughput and exhausts server sockets. Connection poolers (such as HikariCP) maintain an active pool of warmed-up connections.
+          </p>
+          <p>
+            Internally, pools utilize a lock-free or specialized concurrent data structure (e.g., HikariCP's <code>FastList</code> and thread-local caches via <code>ConcurrentBag</code>) to hand off pooled connections to waiting worker threads within nanoseconds.
+          </p>
+        </section>
+
+        <!-- Section 2: Real-World Implementation -->
+        <section>
+          <h2>2. Production-Grade Configuration & Code Pattern</h2>
+          <p>Here is an optimized production configuration with proper leak detection and pool sizing based on PostgreSQL/MySQL IO concurrency:</p>
+          
+          <div class="code-header">
+            <span>application.yml (Production HikariCP Config)</span>
+            <span>YAML</span>
+          </div>
+          <pre><code>spring:
+  datasource:
+    hikari:
+      pool-name: OrdersDbPool
+      maximum-pool-size: 30
+      minimum-idle: 10
+      idle-timeout: 300000
+      connection-timeout: 20000 # Max 20s wait before failing fast
+      max-lifetime: 1800000     # 30 mins, slightly below database wait_timeout
+      leak-detection-threshold: 5000 # Warn if connection borrowed > 5s
+      auto-commit: true</code></pre>
+        </section>
+
+        <!-- Section 3: Real-Time Production Issue -->
+        <section>
+          <h2>3. Real-Time Production Issue & Post-Mortem</h2>
+          
+          <div class="callout callout-production">
+            <div class="callout-title">🚨 Production Incident: Sudden HTTP 504 Gateway Timeouts During Flash Sale</div>
+            <p><strong>Symptoms:</strong> During a peak sale event, the Order Service p99 latency spiked from 45ms to >15,000ms. CPU utilization remained abnormally low (&lt;20%), yet Kubernetes readiness probes failed, triggering cascading pod restarts.</p>
+          </div>
+
+          <div class="callout callout-warning">
+            <div class="callout-title">🔍 Root Cause Analysis (RCA)</div>
+            <p><strong>Root Cause:</strong> A newly shipped feature invoked an un-indexed reporting query inside an open <code>@Transactional</code> block. The query locked a connection for 12 seconds. As traffic surged, all 30 connections in the Hikari pool were held by slow transactions. Subsequent worker threads blocked on <code>getConnection()</code> until their 30-second timeouts expired, exhausting the Tomcat thread pool.</p>
+          </div>
+
+          <div class="callout callout-solution">
+            <div class="callout-title">💡 Production Resolution & Hardening Steps</div>
+            <ul>
+              <li><strong>Immediate Hotfix:</strong> Raised HikariCP pool leak detection to <code>leak-detection-threshold: 3000</code> to identify offending queries in Datadog/Splunk logs. Added read replicas for long-running reporting queries.</li>
+              <li><strong>Architectural Separation:</strong> Refactored the code to fetch data and call external APIs <em>outside</em> the database transaction, strictly shrinking transaction boundaries.</li>
+              <li><strong>Circuit Breaker:</strong> Configured Resilience4j circuit breakers on database operations to fail fast when connection acquisition latency surpasses 500ms.</li>
+            </ul>
+          </div>
+        </section>
+
+        <!-- Section 4: L3/L4 Diagnostic Commands -->
+        <section>
+          <h2>4. Production Diagnostic & Triage Commands</h2>
+          <p>When investigating pool exhaustion or thread starvation on live production nodes:</p>
+          <pre><code># 1. Capture thread dump to inspect threads blocked on HikariCP getConnection
+jcmd &lt;PID&gt; Thread.print | grep -A 10 "com.zaxxer.hikari.pool.HikariPool.getConnection"
+
+# 2. Check active database connections and state in PostgreSQL
+SELECT pid, query_start, state, query 
+FROM pg_stat_activity 
+WHERE state != 'idle' 
+ORDER BY query_start ASC;
+
+# 3. Check TCP socket state between app and database host
+netstat -an | grep 5432 | awk '{print $6}' | sort | uniq -c</code></pre>
+        </section>
+
+        <!-- Section 5: Senior Interview Questions & Trade-Offs -->
+        <section>
+          <h2>5. Senior Interview Questions & Answers</h2>
+          
+          <div class="callout callout-interview">
+            <div class="callout-title">🎯 Q: Why shouldn't you simply set maximumPoolSize to a very large number (e.g. 500)?</div>
+            <p><strong>Answer:</strong> Increasing the pool beyond CPU/disk saturation creates severe context switching overhead on the database server. PostgreSQL and MySQL process queries concurrently; each query requires memory, disk I/O, and CPU time. According to queuing theory and the formula <code>pool size = (core_count * 2) + effective_spindle_count</code>, smaller pools keep the database CPU caches warm, preventing thrashing and disk head contention, which yields significantly higher sustained throughput than large pools.</p>
+          </div>
+        </section>
+      </main>
+    </div>
+  </div>
+
+  <footer>
+    <p>Interview A-Z Handbook &bull; Built for GitHub Pages &bull; Production Grade Interview Prep</p>
+  </footer>
+
+  <script src="../assets/js/main.js"></script>
+</body>
+</html>

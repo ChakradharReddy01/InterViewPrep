@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Module 1: Java 8+ Lambdas, Functional Interfaces & Streams | Interview A-Z</title>
+  <link rel="stylesheet" href="../../assets/css/style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+</head>
+<body>
+
+  <!-- Top Navigation -->
+  <nav class="navbar">
+    <div class="brand">
+      <span class="brand-badge">Interview A-Z</span>
+      <span>Engineering & Architecture Handbook</span>
+    </div>
+    <div class="nav-links">
+      <a href="../../index.html" class="nav-link">Home</a>
+      <a href="../../index.html#topics" class="nav-link">Topic Catalog</a>
+      <a href="https://github.com" target="_blank" class="nav-link">GitHub</a>
+    </div>
+  </nav>
+
+  <div class="container">
+    <div class="article-layout">
+      <!-- Sticky Sidebar Table of Contents -->
+      <aside class="sidebar-toc">
+        <h3>On This Page</h3>
+        <ul class="toc-links" id="dynamic-toc">
+          <!-- Dynamically populated via main.js -->
+        </ul>
+      </aside>
+
+      <!-- Main Article Content -->
+      <main class="article-content">
+        <!-- Breadcrumb -->
+        <nav class="breadcrumb">
+          <a href="../../index.html">Home</a>
+          <span>/</span>
+          <span>Core Java</span>
+          <span>/</span>
+          <span style="color: #fff;">Java 8+ Lambdas & Streams</span>
+        </nav>
+
+        <!-- Article Header -->
+        <header class="article-header">
+          <h1>Module 1: Java 8+ Functional Programming, Streams Deep Dive & Coding Problems</h1>
+          <div class="article-meta">
+            <span class="badge badge-core">Core Java</span>
+            <span class="badge badge-advanced">High Priority</span>
+            <span class="badge badge-prod">Production Incidents & Coding</span>
+            <span>⏱️ 55 min deep dive</span>
+            <span>Target Roles: SDE-2, SDE-3, Lead Architect</span>
+          </div>
+        </header>
+
+        <!-- SECTION 1: LAMBDAS & FUNCTIONAL INTERFACES -->
+        <section>
+          <h2>1. Lambda Expressions & Under-the-Hood Mechanics</h2>
+          
+          <h3>1.1 What is a Lambda Expression?</h3>
+          <p>
+            A Lambda expression is an anonymous function—a concise way of representing an instance of a <strong>Functional Interface</strong> without generating a full anonymous inner class.
+          </p>
+
+          <h3>1.2 How Lambdas Work Under the Hood: <code>invokedynamic</code> vs. Anonymous Inner Classes</h3>
+          <p>
+            A common misconception is that a Lambda is just syntactic sugar for an anonymous inner class (e.g. <code>new Runnable() { ... }</code>). In reality, their JVM execution models are fundamentally different:
+          </p>
+          <ul>
+            <li><strong>Anonymous Inner Classes:</strong> Generate a separate physical <code>.class</code> file at compile time (e.g., <code>OrderService$1.class</code>), load it into Metaspace at runtime, allocate an extra object on the heap per instantiation, and bind <code>this</code> to the inner class instance.</li>
+            <li><strong>Lambdas via <code>invokedynamic</code> (JEP 186):</strong> 
+              <ol>
+                <li>The Java compiler (<code>javac</code>) compiles the lambda body into a private synthetic method inside the enclosing class (e.g., <code>private static synthetic void lambda$0(...)</code>).</li>
+                <li>In place of the allocation, <code>javac</code> emits an <strong><code>invokedynamic</code></strong> bytecode instruction pointing to a bootstrap method: <code>LambdaMetafactory.metafactory()</code>.</li>
+                <li>On first execution, the JVM links the call site dynamically and uses internal spin generation (via <code>MethodHandles</code>) to create a lightweight functional object or reuse a cached singleton if no variables are captured.</li>
+                <li>Zero extra <code>.class</code> files on disk; minimal Metaspace and GC footprint.</li>
+              </ol>
+            </li>
+          </ul>
+
+          <h3>1.3 Variable Capture & "Effectively Final" Rule</h3>
+          <p>
+            Lambdas can access local variables from their enclosing method only if they are declared <code>final</code> or are <strong>effectively final</strong> (never modified after assignment).
+          </p>
+          <div class="callout callout-interview">
+            <div class="callout-title">🎯 Why can't Lambdas mutate local variables?</div>
+            <p>
+              Local variables reside on the thread's <strong>Stack Frame</strong>. If a lambda is passed to an asynchronous thread pool, the enclosing method may return and pop its stack frame while the lambda is still running! To prevent reading deallocated memory, the lambda makes a <em>copy</em> of the variable on the heap. If mutation were allowed, the stack copy and heap copy would fall out of sync, violating Java's memory model.
+            </p>
+          </div>
+
+          <h3>1.4 Functional Interface Definition & <code>@FunctionalInterface</code></h3>
+          <p>
+            An interface with <strong>exactly one Single Abstract Method (SAM)</strong>. It may have any number of <code>default</code> or <code>static</code> methods, and abstract methods that override methods from <code>java.lang.Object</code> (like <code>equals()</code>) do not count against the SAM limit.
+          </p>
+
+          <h3>1.5 The Core Built-in Functional Interfaces (<code>java.util.function</code>)</h3>
+          <table>
+            <thead>
+              <tr>
+                <th>Interface</th>
+                <th>Method Signature</th>
+                <th>Input &rarr; Output</th>
+                <th>Standard Enterprise Use Case</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong><code>Predicate&lt;T&gt;</code></strong></td>
+                <td><code>boolean test(T t)</code></td>
+                <td>$T \rightarrow \text{boolean}$</td>
+                <td>Filtering records, validation checks (supports <code>and</code>, <code>or</code>, <code>negate</code>)</td>
+              </tr>
+              <tr>
+                <td><strong><code>Function&lt;T, R&gt;</code></strong></td>
+                <td><code>R apply(T t)</code></td>
+                <td>$T \rightarrow R$</td>
+                <td>Data transformation, entity-to-DTO mapping (supports <code>andThen</code>, <code>compose</code>, <code>identity</code>)</td>
+              </tr>
+              <tr>
+                <td><strong><code>Consumer&lt;T&gt;</code></strong></td>
+                <td><code>void accept(T t)</code></td>
+                <td>$T \rightarrow \text{void}$</td>
+                <td>Side-effects, logging, printing, persisting to database (supports <code>andThen</code>)</td>
+              </tr>
+              <tr>
+                <td><strong><code>Supplier&lt;T&gt;</code></strong></td>
+                <td><code>T get()</code></td>
+                <td>$\emptyset \rightarrow T$</td>
+                <td>Lazy evaluation, factory initialization, deferred token generation</td>
+              </tr>
+              <tr>
+                <td><strong><code>UnaryOperator&lt;T&gt;</code></strong></td>
+                <td><code>T apply(T t)</code></td>
+                <td>$T \rightarrow T$</td>
+                <td>In-place mutation/transformation of the same type (extends <code>Function&lt;T, T&gt;</code>)</td>
+              </tr>
+              <tr>
+                <td><strong><code>BinaryOperator&lt;T&gt;</code></strong></td>
+                <td><code>T apply(T t1, T t2)</code></td>
+                <td>$(T, T) \rightarrow T$</td>
+                <td>Mathematical aggregation, stream <code>reduce()</code> operations (extends <code>BiFunction&lt;T, T, T&gt;</code>)</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <h3>1.6 Method References (4 Varieties)</h3>
+          <ul>
+            <li><strong>Reference to a Static Method:</strong> <code>ClassName::staticMethod</code> (e.g., <code>Integer::parseInt</code>)</li>
+            <li><strong>Reference to an Instance Method of an Existing Object:</strong> <code>instance::method</code> (e.g., <code>System.out::println</code>)</li>
+            <li><strong>Reference to an Instance Method of an Arbitrary Object of a Type:</strong> <code>ClassName::instanceMethod</code> (e.g., <code>String::toLowerCase</code>)</li>
+            <li><strong>Reference to a Constructor:</strong> <code>ClassName::new</code> (e.g., <code>ArrayList::new</code>)</li>
+          </ul>
+
+          <h3>1.7 Default & Static Interface Methods</h3>
+          <ul>
+            <li><strong>Default Methods:</strong> Enabled adding new methods (like <code>forEach()</code> and <code>stream()</code>) to existing interfaces without breaking legacy implementing classes.</li>
+            <li><strong>Conflict Resolution Rules:</strong>
+              <ol>
+                <li><strong>Class Always Wins:</strong> A concrete method in a superclass always takes priority over any interface default method.</li>
+                <li><strong>Most Specific Interface Wins:</strong> If interface B extends interface A, B's default method takes precedence.</li>
+                <li><strong>Explicit Disambiguation:</strong> If two unrelated interfaces provide identical default methods, the implementing class must explicitly override and disambiguate: <code>InterfaceA.super.method()</code>.</li>
+              </ol>
+            </li>
+            <li><strong>Static Methods in Interfaces:</strong> Provide cohesive utility methods without needing separate companion classes (like <code>Collections</code> for <code>Collection</code>). Static interface methods are <strong>not inherited</strong> by implementing classes.</li>
+          </ul>
+        </section>
+
+        <!-- SECTION 2: STREAM API ARCHITECTURE & OPERATIONS -->
+        <section>
+          <h2>2. Stream API Architecture & Pipelines</h2>
+          
+          <pre><code>+--------------------+      +-----------------------------------------+      +-------------------+
+|   STREAM SOURCE    | ---&gt; | INTERMEDIATE OPERATIONS (Lazy Pipelines)| ---&gt; | TERMINAL OPERATION|
+| Collections, Array,|      | - filter, map, flatMap, distinct,       |      | collect, reduce,  |
+| I/O Channels, etc. |      | - sorted, limit, skip, peek             |      | count, forEach    |
++--------------------+      +-----------------------------------------+      +-------------------+
+                                        | (Evaluation starts ONLY here!)
+                                        v
+                                 Materialized Result</code></pre>
+
+          <h3>2.1 Lazy Evaluation & Loop Fusion</h3>
+          <p>
+            Streams are completely <strong>lazy</strong>. Intermediate operations do not process elements when called; they merely build a pipeline description. Processing begins only when a <strong>Terminal Operation</strong> is triggered.
+          </p>
+          <p>
+            The JVM uses <strong>Loop Fusion</strong>: instead of executing <code>filter()</code> over the entire dataset and storing an intermediate list, followed by <code>map()</code> over that intermediate list, the Stream engine passes each element through the entire pipeline in a single pass, saving memory and maximizing CPU cache locality.
+          </p>
+
+          <h3>2.2 Intermediate Operations: Stateless vs. Stateful</h3>
+          <ul>
+            <li><strong>Stateless Operations:</strong> Each element can be processed independently of others without remembering prior elements (e.g., <code>filter</code>, <code>map</code>, <code>flatMap</code>). Highly parallelizable.</li>
+            <li><strong>Stateful Operations:</strong> Must maintain state across all elements or process the entire dataset before yielding results (e.g., <code>sorted</code>, <code>distinct</code>, <code>limit</code>, <code>skip</code>). Incurs memory buffering and barrier synchronization in parallel streams.</li>
+          </ul>
+
+          <h3>2.3 Terminal Operations & Advanced Collectors</h3>
+          <ul>
+            <li><strong><code>reduce(identity, accumulator, combiner)</code>:</strong> Performs a fold across elements. For parallel streams, the combiner is essential to merge sub-results from different threads.</li>
+            <li><strong><code>collect(Collector)</code>:</strong> Accumulates elements into collections or summary statistics.
+              <ul>
+                <li><code>Collectors.groupingBy(classifier, downstreamCollector)</code>: Groups elements into a <code>Map&lt;K, List&lt;T&gt;&gt;</code> or custom downstream reductions.</li>
+                <li><code>Collectors.partitioningBy(predicate)</code>: Special 2-bucket group partition returning <code>Map&lt;Boolean, List&lt;T&gt;&gt;</code>.</li>
+              </ul>
+            </li>
+          </ul>
+
+          <h3>2.4 <code>Optional&lt;T&gt;</code>: Best Practices & Anti-Patterns</h3>
+          <p>
+            <code>Optional&lt;T&gt;</code> is a value-based container designed specifically to represent the <strong>return type of methods that might not have a value</strong>, preventing <code>NullPointerException</code>.
+          </p>
+          <div class="callout callout-warning">
+            <div class="callout-title">⚠️ The Critical orElse() vs orElseGet() Trap</div>
+            <p>
+              <code>optional.orElse(computeDefault())</code> evaluates <code>computeDefault()</code> <strong>eagerly</strong> on every call, even if the Optional already has a value!
+              <br>
+              <code>optional.orElseGet(() -&gt; computeDefault())</code> evaluates <strong>lazily</strong> via a Supplier only when the Optional is empty.
+            </p>
+          </div>
+          <pre><code>// DANGEROUS: Executes expensive database query on EVERY request:
+User user = findUserFromCache().orElse(databaseService.queryUserFromDb(id));
+
+// CORRECT: Queries database ONLY when cache misses:
+User user = findUserFromCache().orElseGet(() -&gt; databaseService.queryUserFromDb(id));</code></pre>
+        </section>
+
+        <!-- SECTION 3: TOP INTERVIEW CODING PROBLEMS -->
+        <section>
+          <h2>3. Top 10 Java 8+ Stream Coding Problems for Senior Interviews</h2>
+
+          <h3>Problem 1: Find the Second Highest Salary / Number</h3>
+          <div class="code-header">
+            <span>Second Highest Salary with Stream API</span>
+            <span>Java</span>
+          </div>
+          <pre><code>List&lt;Integer&gt; numbers = Arrays.asList(10, 45, 90, 90, 85, 32, 90);
+
+Optional&lt;Integer&gt; secondHighest = numbers.stream()
+    .distinct()                                // 1. Remove duplicate maximums
+    .sorted(Comparator.reverseOrder())         // 2. Sort descending [90, 85, 45, 32, 10]
+    .skip(1)                                   // 3. Skip highest
+    .findFirst();                              // 4. Return second highest (85)
+
+System.out.println("Second Highest: " + secondHighest.orElseThrow());</code></pre>
+
+          <h3>Problem 2: Group Employees by Department and Find Highest Paid Employee in Each</h3>
+          <div class="code-header">
+            <span>GroupingBy with MaxBy Downstream Collector</span>
+            <span>Java</span>
+          </div>
+          <pre><code>record Employee(String name, String department, double salary) {}
+
+List&lt;Employee&gt; employees = List.of(
+    new Employee("Alice", "Engineering", 120000),
+    new Employee("Bob", "Engineering", 145000),
+    new Employee("Charlie", "Sales", 95000),
+    new Employee("Diana", "Sales", 110000)
+);
+
+Map&lt;String, Optional&lt;Employee&gt;&gt; topEarnersByDept = employees.stream()
+    .collect(Collectors.groupingBy(
+        Employee::department,
+        Collectors.maxBy(Comparator.comparingDouble(Employee::salary))
+    ));</code></pre>
+
+          <h3>Problem 3: Count Occurrences of Each Character in a String (Word & Frequency)</h3>
+          <div class="code-header">
+            <span>Character Frequency Map</span>
+            <span>Java</span>
+          </div>
+          <pre><code>String input = "concurrency";
+
+Map&lt;Character, Long&gt; charCount = input.chars()
+    .mapToObj(c -&gt; (char) c)
+    .collect(Collectors.groupingBy(
+        Function.identity(),
+        LinkedHashMap::new, // Preserves first appearance order
+        Collectors.counting()
+    ));
+
+// Find First Non-Repeated Character:
+Character firstNonRepeated = charCount.entrySet().stream()
+    .filter(entry -&gt; entry.getValue() == 1L)
+    .map(Map.Entry::getKey)
+    .findFirst()
+    .orElse(null); // 'o'</code></pre>
+
+          <h3>Problem 4: Partition Numbers into Prime and Non-Prime</h3>
+          <div class="code-header">
+            <span>PartitioningBy Custom Predicate</span>
+            <span>Java</span>
+          </div>
+          <pre><code>public static boolean isPrime(int n) {
+    if (n &lt;= 1) return false;
+    return IntStream.rangeClosed(2, (int) Math.sqrt(n)).noneMatch(i -&gt; n % i == 0);
+}
+
+List&lt;Integer&gt; nums = List.of(2, 3, 4, 5, 6, 7, 8, 9, 10, 11);
+
+Map&lt;Boolean, List&lt;Integer&gt;&gt; partitioned = nums.stream()
+    .collect(Collectors.partitioningBy(Java8Problems::isPrime));
+// true -&gt; [2, 3, 5, 7, 11], false -&gt; [4, 6, 8, 9, 10]</code></pre>
+
+          <h3>Problem 5: Flattening Nested Collections with <code>flatMap()</code></h3>
+          <div class="code-header">
+            <span>Extract Unique Items from Nested Orders</span>
+            <span>Java</span>
+          </div>
+          <pre><code>record Order(int id, List&lt;String&gt; items) {}
+
+List&lt;Order&gt; orders = List.of(
+    new Order(1, List.of("Laptop", "Mouse")),
+    new Order(2, List.of("Monitor", "Laptop")),
+    new Order(3, List.of("Keyboard", "Mouse"))
+);
+
+List&lt;String&gt; uniqueItems = orders.stream()
+    .flatMap(order -&gt; order.items().stream()) // Flattens Stream&lt;List&lt;String&gt;&gt; to Stream&lt;String&gt;
+    .distinct()
+    .sorted()
+    .toList(); // ["Keyboard", "Laptop", "Monitor", "Mouse"]</code></pre>
+
+          <h3>Problem 6: Find Duplicate Elements in a Stream</h3>
+          <div class="code-header">
+            <span>Finding Duplicates via Set.add()</span>
+            <span>Java</span>
+          </div>
+          <pre><code>List&lt;Integer&gt; listWithDuplicates = List.of(5, 12, 5, 8, 12, 90, 12);
+Set&lt;Integer&gt; seen = new HashSet&lt;&gt;();
+
+Set&lt;Integer&gt; duplicates = listWithDuplicates.stream()
+    .filter(n -&gt; !seen.add(n)) // Set.add() returns false if item already present!
+    .collect(Collectors.toSet()); // [5, 12]</code></pre>
+
+          <h3>Problem 7: Joining Strings with Custom Delimiters, Prefix and Suffix</h3>
+          <div class="code-header">
+            <span>Collectors.joining()</span>
+            <span>Java</span>
+          </div>
+          <pre><code>List&lt;String&gt; languages = List.of("Java", "Go", "Rust", "Python");
+
+String formatted = languages.stream()
+    .map(String::toUpperCase)
+    .collect(Collectors.joining(", ", "[", "]"));
+// Output: "[JAVA, GO, RUST, PYTHON]"</code></pre>
+
+          <h3>Problem 8: Calculate Sum, Average, Max, and Min in a Single Pass</h3>
+          <div class="code-header">
+            <span>SummaryStatistics Single-Pass Computation</span>
+            <span>Java</span>
+          </div>
+          <pre><code>List&lt;Double&gt; transactions = List.of(450.50, 1200.00, 35.25, 890.00);
+
+DoubleSummaryStatistics stats = transactions.stream()
+    .mapToDouble(Double::doubleValue)
+    .summaryStatistics();
+
+System.out.printf("Count: %d, Sum: %.2f, Min: %.2f, Avg: %.2f, Max: %.2f%n",
+    stats.getCount(), stats.getSum(), stats.getMin(), stats.getAverage(), stats.getMax());</code></pre>
+
+          <h3>Problem 9: Convert List to Map with Duplicate Key Merge Resolution</h3>
+          <div class="code-header">
+            <span>toMap with BinaryOperator Merge Function</span>
+            <span>Java</span>
+          </div>
+          <pre><code>record UserProfile(String email, String role) {}
+
+List&lt;UserProfile&gt; profiles = List.of(
+    new UserProfile("dev@company.com", "USER"),
+    new UserProfile("admin@company.com", "ADMIN"),
+    new UserProfile("dev@company.com", "DEVELOPER") // Duplicate email!
+);
+
+Map&lt;String, String&gt; emailToRole = profiles.stream()
+    .collect(Collectors.toMap(
+        UserProfile::email,
+        UserProfile::role,
+        (existingRole, newRole) -&gt; newRole // Merge policy: keep newest role on collision
+    ));</code></pre>
+
+          <h3>Problem 10: Sort Map by Value in Descending Order</h3>
+          <div class="code-header">
+            <span>Sorting Map Entries by Value</span>
+            <span>Java</span>
+          </div>
+          <pre><code>Map&lt;String, Integer&gt; budget = Map.of("Marketing", 50000, "R&amp;D", 120000, "Ops", 35000);
+
+LinkedHashMap&lt;String, Integer&gt; sortedBudget = budget.entrySet().stream()
+    .sorted(Map.Entry.&lt;String, Integer&gt;comparingByValue().reversed())
+    .collect(Collectors.toMap(
+        Map.Entry::getKey,
+        Map.Entry::getValue,
+        (e1, e2) -&gt; e1,
+        LinkedHashMap::new // Preserves sorted order
+    ));</code></pre>
+        </section>
+
+        <!-- SECTION 4: REAL-TIME PRODUCTION ISSUES -->
+        <section>
+          <h2>4. Real-Time Production Issues & Post-Mortems</h2>
+
+          <!-- Incident 1 -->
+          <div class="callout callout-production">
+            <div class="callout-title">🚨 Incident 1: Microservice Thread Starvation via parallelStream() Blocking I/O</div>
+            <p><strong>Scenario:</strong> A report generation service called a third-party billing REST API inside a <code>parallelStream()</code> to fetch invoices for 500 customers. Suddenly, all other endpoints across the entire Spring Boot service stopped responding, causing Kubernetes liveness probes to fail.</p>
+          </div>
+
+          <div class="callout callout-warning">
+            <div class="callout-title">🔍 Root Cause Analysis (RCA)</div>
+            <p>
+              By default, all <code>parallelStream()</code> operations in a JVM share a single, process-wide <strong><code>ForkJoinPool.commonPool()</code></strong>, whose thread count is bounded by the number of CPU cores minus one:
+              <code>Runtime.getRuntime().availableProcessors() - 1</code>.
+              <br><br>
+              When threads in the common pool execute blocking HTTP or JDBC network calls, all worker threads become blocked in <code>WAITING</code>/<code>TIMED_WAITING</code>. Because the common pool is shared globally, other parts of the application using parallel streams or async computations were starved of threads, freezing the entire application!
+            </p>
+          </div>
+
+          <div class="callout callout-solution">
+            <div class="callout-title">💡 Production Resolution</div>
+            <ul>
+              <li><strong>Rule:</strong> Never execute blocking network/disk I/O inside <code>parallelStream()</code>. Reserve parallel streams exclusively for CPU-bound computations.</li>
+              <li><strong>Dedicated Custom Executor:</strong> Use <code>CompletableFuture.supplyAsync(task, customThreadPool)</code> where <code>customThreadPool</code> is an isolated, bounded thread pool sized for I/O tasks.</li>
+            </ul>
+          </div>
+
+          <!-- Incident 2 -->
+          <div class="callout callout-production">
+            <div class="callout-title">🚨 Incident 2: High Database Connection Spike via orElse() Eager Evaluation</div>
+            <p><strong>Scenario:</strong> After deploying a user authentication service, database connection pool exhaustion alarms fired. RDS PostgreSQL CPU hit 99%, even though traffic volume remained modest.</p>
+          </div>
+
+          <div class="callout callout-warning">
+            <div class="callout-title">🔍 Root Cause Analysis (RCA)</div>
+            <p>
+              A repository lookup was written as:
+              <code>userCache.get(id).orElse(userRepository.fetchFullUserProfileFromDb(id));</code>.
+              Because parameters in Java are evaluated before the method call, <code>userRepository.fetchFullUserProfileFromDb(id)</code> was executed on <strong>every single cache hit</strong>, completely negating the Redis cache and swamping the relational database!
+            </p>
+          </div>
+
+          <div class="callout callout-solution">
+            <div class="callout-title">💡 Production Resolution</div>
+            <p>Replaced <code>orElse()</code> with lazy <code>orElseGet()</code>:</p>
+            <pre><code>// Resolved: Supplier only invoked on cache miss
+userCache.get(id).orElseGet(() -&gt; userRepository.fetchFullUserProfileFromDb(id));</code></pre>
+          </div>
+        </section>
+
+        <!-- SECTION 5: PRODUCTION DIAGNOSTICS TOOLKIT -->
+        <section>
+          <h2>5. Production Triage & Inspection Toolkit</h2>
+
+          <div class="code-header">
+            <span>Debugging Streams & ForkJoinPool Common Pool</span>
+            <span>Bash</span>
+          </div>
+          <pre><code># 1. Inspect ForkJoinPool Common Pool threads in live thread dumps
+jstack &lt;PID&gt; | grep -E "ForkJoinPool.commonPool-worker-[0-9]+" -A 10
+
+# 2. Configure ForkJoinPool Common Pool size on container startup
+java -Djava.util.concurrent.ForkJoinPool.common.parallelism=16 -jar myapp.jar
+
+# 3. Debug intermediate stream pipeline without mutating data using peek()
+List&lt;String&gt; debugged = list.stream()
+    .filter(s -&gt; s.startsWith("A"))
+    .peek(e -&gt; log.debug("Filtered element: {}", e))
+    .map(String::toUpperCase)
+    .peek(e -&gt; log.debug("Mapped element: {}", e))
+    .toList();</code></pre>
+        </section>
+
+        <!-- SECTION 6: SENIOR INTERVIEW Q&A -->
+        <section>
+          <h2>6. Senior / Staff Technical Interview Q&A</h2>
+
+          <div class="callout callout-interview">
+            <div class="callout-title">🎯 Q1: Why shouldn't Optional be used as a method parameter or as an entity field?</div>
+            <p><strong>Answer:</strong> 
+              1. <strong>Not Serializable:</strong> <code>Optional</code> does not implement <code>java.io.Serializable</code>. Placing it in JPA/Hibernate entities or DTOs causes serialization failures during caching or RPC transport.
+              <br>
+              2. <strong>Memory Overhead:</strong> An <code>Optional</code> is a wrapper object consuming 16 bytes on the heap. Using it for fields creates unnecessary heap allocation and pointer indirection.
+              <br>
+              3. <strong>Anti-pattern in Parameters:</strong> Requiring <code>method(Optional&lt;User&gt; user)</code> forces callers to wrap values unnecessarily (<code>method(Optional.ofNullable(u))</code>) and still leaves the risk that a caller might pass <code>null</code> instead of <code>Optional.empty()</code>, requiring double-null checks.
+            </p>
+          </div>
+
+          <div class="callout callout-interview">
+            <div class="callout-title">🎯 Q2: How does LambdaMetafactory generate lambda objects without generating .class files?</div>
+            <p><strong>Answer:</strong> The first time an <code>invokedynamic</code> instruction associated with a lambda is executed, the JVM invokes <code>LambdaMetafactory.metafactory()</code>. It uses the <code>MethodHandles</code> API to spin an anonymous inner class directly in native JVM memory using internal bytecode generation (similar to <code>Unsafe.defineAnonymousClass</code> / hidden classes). The dynamically spun class implements the target Functional Interface and delegates to the synthetic compiler-generated method. If the lambda captures no variables, a single immutable instance is cached and reused for all future executions.</p>
+          </div>
+
+          <div class="callout callout-interview">
+            <div class="callout-title">🎯 Q3: What is the difference between map() and flatMap() in Streams and Optionals?</div>
+            <p><strong>Answer:</strong> <code>map()</code> applies a $1 \rightarrow 1$ transformation function $f: T \rightarrow R$, wrapping the result into a <code>Stream&lt;R&gt;</code> or <code>Optional&lt;R&gt;</code>. If the mapper function itself returns a Stream or Optional ($f: T \rightarrow \text{Stream}&lt;R&gt;$), <code>map()</code> produces a nested structure: <code>Stream&lt;Stream&lt;R&gt;&gt;</code> or <code>Optional&lt;Optional&lt;R&gt;&gt;</code>. <code>flatMap()</code> applies a $1 \rightarrow N$ function and automatically flattens the resulting streams or containers into a single-level <code>Stream&lt;R&gt;</code> or <code>Optional&lt;R&gt;</code>.</p>
+          </div>
+
+          <div class="callout callout-interview">
+            <div class="callout-title">🎯 Q4: Why can't a stream be reused or traversed more than once?</div>
+            <p><strong>Answer:</strong> A Stream is not a data structure; it does not store elements in memory. It is a pipeline of computations connected to an underlying I/O channel, collection, or generator. Once a terminal operation executes, the pipeline is consumed and closed, similar to an iterator or file stream. Attempting to invoke another terminal or intermediate operation throws an <code>IllegalStateException: stream has already been operated upon or closed</code>.</p>
+          </div>
+        </section>
+
+      </main>
+    </div>
+  </div>
+
+  <footer>
+    <p>Interview A-Z Handbook &bull; Built for GitHub Pages &bull; Production Grade Interview Prep</p>
+  </footer>
+
+  <script src="../../assets/js/main.js"></script>
+</body>
+</html>

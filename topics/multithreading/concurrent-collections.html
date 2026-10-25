@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Module 2: Concurrent Collections Deep Dive | Interview A-Z</title>
+  <link rel="stylesheet" href="../../assets/css/style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+</head>
+<body>
+
+  <!-- Top Navigation -->
+  <nav class="navbar">
+    <div class="brand">
+      <span class="brand-badge">Interview A-Z</span>
+      <span>Engineering & Architecture Handbook</span>
+    </div>
+    <div class="nav-links">
+      <a href="../../index.html" class="nav-link">Home</a>
+      <a href="../../index.html#module-2" class="nav-link">Module Catalog</a>
+      <a href="https://github.com" target="_blank" class="nav-link">GitHub</a>
+    </div>
+  </nav>
+
+  <div class="container">
+    <div class="article-layout">
+      <!-- Sticky Sidebar Table of Contents -->
+      <aside class="sidebar-toc">
+        <h3>On This Page</h3>
+        <ul class="toc-links" id="dynamic-toc">
+          <!-- Dynamically populated via main.js -->
+        </ul>
+      </aside>
+
+      <!-- Main Article Content -->
+      <main class="article-content">
+        <!-- Breadcrumb -->
+        <nav class="breadcrumb">
+          <a href="../../index.html">Home</a>
+          <span>/</span>
+          <span>Module 2: Multithreading</span>
+          <span>/</span>
+          <span style="color: #fff;">Concurrent Collections</span>
+        </nav>
+
+        <!-- Article Header -->
+        <header class="article-header">
+          <h1>Module 2: Concurrent Collections & Lock-Free Data Structures</h1>
+          <div class="article-meta">
+            <span class="badge badge-multithread">Concurrent Collections</span>
+            <span class="badge badge-advanced">Lock-Free CAS</span>
+            <span class="badge badge-prod">High-Throughput Queues</span>
+            <span>⏱️ 45 min deep dive</span>
+            <span>Target Roles: SDE-2, SDE-3, Distributed Systems Engineer</span>
+          </div>
+        </header>
+
+        <!-- SECTION 1: CONCURRENTHASHMAP -->
+        <section>
+          <h2>1. ConcurrentHashMap: The High-Throughput Standard</h2>
+
+          <h3>1.1 Architecture & Lock-Free Reads</h3>
+          <p>
+            <code>ConcurrentHashMap</code> achieves multi-core scalability without coarse synchronized blocks:
+          </p>
+          <ul>
+            <li><strong>Lock-Free Reads (<code>get()</code>):</strong> Uses volatile field references (<code>volatile Node&lt;K,V&gt; next;</code> and <code>volatile V val;</code>). A reader never acquires a lock, guaranteeing non-blocking reads even during concurrent writes.</li>
+            <li><strong>Fine-Grained Writes (<code>put()</code>):</strong>
+              <ol>
+                <li>If the bucket is empty, it uses atomic <strong>CAS</strong> (<code>compareAndSetObject</code>) to insert the head node with zero locking.</li>
+                <li>If the bucket already contains nodes, it acquires a <code>synchronized</code> lock <strong>only on the first node (bin head)</strong> of that specific bucket. Other buckets remain completely unobstructed!</li>
+                <li>If a bucket length reaches 8, it converts to a Red-Black <strong>TreeBin</strong> to protect against Hash-DoS attacks.</li>
+              </ol>
+            </li>
+          </ul>
+
+          <div class="code-header">
+            <span>Atomic Compound Operations in ConcurrentHashMap</span>
+            <span>Java</span>
+          </div>
+          <pre><code>ConcurrentHashMap&lt;String, AtomicLong&gt; counters = new ConcurrentHashMap&lt;&gt;();
+
+// computeIfAbsent: Atomic check-and-insert guaranteed by bin-head monitor lock
+counters.computeIfAbsent("API_USERS", k -&gt; new AtomicLong(0)).incrementAndGet();
+
+// merge: Atomic accumulation without race conditions
+ConcurrentHashMap&lt;String, Integer&gt; inventory = new ConcurrentHashMap&lt;&gt;();
+inventory.merge("ITEM_101", 5, Integer::sum);</code></pre>
+        </section>
+
+        <!-- SECTION 2: COPYONWRITEARRAYLIST -->
+        <section>
+          <h2>2. CopyOnWriteArrayList: Read-Mostly Snapshot Semantics</h2>
+
+          <h3>2.1 How CopyOnWriteArrayList Works</h3>
+          <p>
+            Maintains an internal volatile array pointer: <code>private transient volatile Object[] array;</code>.
+          </p>
+          <ul>
+            <li><strong>Lock-Free Reads ($O(1)$):</strong> Reads access the current snapshot array directly without locks or synchronization. Perfect for high-frequency reads (e.g. event listeners, observer patterns, configuration caches).</li>
+            <li><strong>Expensive Writes ($O(N)$):</strong> Every single modification (<code>add</code>, <code>set</code>, <code>remove</code>) acquires a ReentrantLock, creates a <strong>brand new copy</strong> of the underlying array using <code>Arrays.copyOf()</code>, mutates the clone, and resets the volatile pointer.</li>
+            <li><strong>Snapshot Iterators:</strong> The iterator takes a snapshot of the array at the moment of instantiation. It <strong>never throws <code>ConcurrentModificationException</code></strong> and ignores modifications made after iteration begins.</li>
+          </ul>
+
+          <div class="callout callout-warning">
+            <div class="callout-title">⚠️ The Write-Heavy Anti-Pattern</div>
+            <p>
+              Never use <code>CopyOnWriteArrayList</code> in write-heavy services! Inserting 10,000 items creates 10,000 array copies on the heap, triggering catastrophic GC allocation storms and freezing application threads.
+            </p>
+          </div>
+        </section>
+
+        <!-- SECTION 3: BLOCKING QUEUES -->
+        <section>
+          <h2>3. BlockingQueues: ArrayBlockingQueue vs. LinkedBlockingQueue</h2>
+
+          <h3>3.1 ArrayBlockingQueue vs. LinkedBlockingQueue Deep Contrast</h3>
+          <table>
+            <thead>
+              <tr>
+                <th>Feature</th>
+                <th><code>ArrayBlockingQueue</code></th>
+                <th><code>LinkedBlockingQueue</code></th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Backing Structure</strong></td>
+                <td>Fixed circular array (Ring buffer)</td>
+                <td>Singly-linked chain of <code>Node</code> objects</td>
+              </tr>
+              <tr>
+                <td><strong>Capacity</strong></td>
+                <td>Strictly bounded at initialization</td>
+                <td>Optionally bounded (default <code>Integer.MAX_VALUE</code>)</td>
+              </tr>
+              <tr>
+                <td><strong>Locking Architecture</strong></td>
+                <td><strong>Single Lock</strong> (<code>ReentrantLock</code> shared by both producers and consumers)</td>
+                <td><strong>Two Independent Locks</strong> (<code>putLock</code> for producers and <code>takeLock</code> for consumers)</td>
+              </tr>
+              <tr>
+                <td><strong>Throughput</strong></td>
+                <td>Lower under high producer-consumer concurrency due to lock contention</td>
+                <td>Significantly higher because producers and consumers do not contend for the same lock</td>
+              </tr>
+              <tr>
+                <td><strong>GC Allocation</strong></td>
+                <td>Zero object allocation per item (pre-allocated array)</td>
+                <td>Allocates a <code>Node</code> wrapper object for every enqueued item</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <div class="code-header">
+            <span>Two-Lock Architecture in LinkedBlockingQueue</span>
+            <span>Java Internals</span>
+          </div>
+          <pre><code>// Under the hood in java.util.concurrent.LinkedBlockingQueue:
+private final ReentrantLock takeLock = new ReentrantLock(); // Consumers lock here
+private final Condition notEmpty = takeLock.newCondition();
+
+private final ReentrantLock putLock = new ReentrantLock();  // Producers lock here
+private final Condition notFull = putLock.newCondition();
+
+private final AtomicInteger count = new AtomicInteger();    // Atomic cross-lock size counter</code></pre>
+
+          <h3>3.2 ConcurrentLinkedQueue (Lock-Free FIFO)</h3>
+          <p>
+            An unbounded, thread-safe FIFO queue based on the <strong>Michael & Scott lock-free queue algorithm</strong>. Uses pure atomic <code>CAS</code> on head and tail node pointers without ever blocking or parking threads.
+          </p>
+        </section>
+
+        <!-- SECTION 4: REAL-TIME PRODUCTION ISSUES -->
+        <section>
+          <h2>4. Real-Time Production Issues & Post-Mortems</h2>
+
+          <!-- Incident 1 -->
+          <div class="callout callout-production">
+            <div class="callout-title">🚨 Incident 1: 15-Second Stop-The-World GC Storm via CopyOnWriteArrayList</div>
+            <p><strong>Scenario:</strong> A real-time IoT gateway buffering sensor telemetry saw JVM Old Gen surge to 100%, causing consecutive 15-second GC pauses that caused network connection timeouts.</p>
+          </div>
+
+          <div class="callout callout-warning">
+            <div class="callout-title">🔍 Root Cause Analysis (RCA)</div>
+            <p>
+              Developers used <code>CopyOnWriteArrayList</code> as an in-memory buffer receiving 12,000 sensor readings per second. With 50,000 readings already stored, each incoming <code>list.add(reading)</code> allocated a fresh 50,001-element array on the heap. In 1 second, the service allocated over 5GB of short-lived arrays, overwhelming the Young Generation and flooding Old Gen.
+            </p>
+          </div>
+
+          <div class="callout callout-solution">
+            <div class="callout-title">💡 Production Resolution</div>
+            <p>Replaced with a bounded <code>ArrayBlockingQueue&lt;SensorReading&gt;</code> with zero node-allocation overhead, and drained elements in batches using <code>drainTo()</code>.</p>
+          </div>
+
+          <!-- Incident 2 -->
+          <div class="callout callout-production">
+            <div class="callout-title">🚨 Incident 2: High Producer-Consumer Lock Thrashing on ArrayBlockingQueue</div>
+            <p><strong>Scenario:</strong> A high-frequency order placement pipeline hosted on a 32-core server capped at only 15,000 orders/sec. CPU profiling showed 75% of CPU time spent in <code>ReentrantLock.lock()</code>.</p>
+          </div>
+
+          <div class="callout callout-warning">
+            <div class="callout-title">🔍 Root Cause Analysis (RCA)</div>
+            <p>
+              The messaging bridge used <code>ArrayBlockingQueue</code>. Because <code>ArrayBlockingQueue</code> shares a <strong>single lock</strong> for both <code>put()</code> and <code>take()</code>, 16 producer threads and 16 consumer threads constantly blocked each other on the same monitor.
+            </p>
+          </div>
+
+          <div class="callout callout-solution">
+            <div class="callout-title">💡 Production Resolution</div>
+            <p>Switched to <code>LinkedBlockingQueue(50000)</code> with separate <code>putLock</code> and <code>takeLock</code>, doubling throughput to 42,000 orders/sec.</p>
+          </div>
+        </section>
+
+        <!-- SECTION 5: SENIOR INTERVIEW Q&A -->
+        <section>
+          <h2>5. Senior / Staff Technical Interview Q&A</h2>
+
+          <div class="callout callout-interview">
+            <div class="callout-title">🎯 Q1: Why does ConcurrentHashMap size() not simply lock the table to count elements?</div>
+            <p><strong>Answer:</strong> Locking the table would destroy read and write concurrency. Instead, <code>ConcurrentHashMap</code> uses the striping technique of <code>LongAdder</code>: it maintains a <code>baseCount</code> and an array of <code>CounterCell</code> objects. When threads update the map, they update different counter cells via CAS. Calling <code>size()</code> sums <code>baseCount</code> plus all <code>CounterCell</code> values in a lock-free pass.</p>
+          </div>
+
+          <div class="callout callout-interview">
+            <div class="callout-title">🎯 Q2: Can an iterator of CopyOnWriteArrayList reflect elements added after the iterator was created?</div>
+            <p><strong>Answer:</strong> <strong>No.</strong> The iterator maintains a reference to the exact array instance that was active at the moment <code>iterator()</code> was called. When subsequent writes occur, the list creates a new array and points its internal reference to it, while the iterator continues traversing the immutable old array snapshot.</p>
+          </div>
+        </section>
+
+      </main>
+    </div>
+  </div>
+
+  <footer>
+    <p>Interview A-Z Handbook &bull; Built for GitHub Pages &bull; Production Grade Interview Prep</p>
+  </footer>
+
+  <script src="../../assets/js/main.js"></script>
+</body>
+</html>

@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Module 4: Spring Boot Architecture, REST APIs & Production Patterns | Interview A-Z</title>
+  <link rel="stylesheet" href="../../assets/css/style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+</head>
+<body>
+
+  <!-- Top Navigation -->
+  <nav class="navbar">
+    <div class="brand">
+      <span class="brand-badge">Interview A-Z</span>
+      <span>Engineering & Architecture Handbook</span>
+    </div>
+    <div class="nav-links">
+      <a href="../../index.html" class="nav-link">Home</a>
+      <a href="../../index.html#module-4" class="nav-link">Module Catalog</a>
+      <a href="https://github.com" target="_blank" class="nav-link">GitHub</a>
+    </div>
+  </nav>
+
+  <div class="container">
+    <div class="article-layout">
+      <!-- Sticky Sidebar Table of Contents -->
+      <aside class="sidebar-toc">
+        <h3>On This Page</h3>
+        <ul class="toc-links" id="dynamic-toc">
+          <!-- Dynamically populated via main.js -->
+        </ul>
+      </aside>
+
+      <!-- Main Article Content -->
+      <main class="article-content">
+        <!-- Breadcrumb -->
+        <nav class="breadcrumb">
+          <a href="../../index.html">Home</a>
+          <span>/</span>
+          <span>Module 4: Spring Boot</span>
+          <span>/</span>
+          <span style="color: #fff;">Spring Boot Core & REST</span>
+        </nav>
+
+        <!-- Article Header -->
+        <header class="article-header">
+          <h1>Module 4: Spring Boot Architecture, Production REST APIs & Enterprise Patterns</h1>
+          <div class="article-meta">
+            <span class="badge badge-spring">Spring Boot 3.x</span>
+            <span class="badge badge-advanced">Enterprise REST</span>
+            <span class="badge badge-prod">Production Hardening</span>
+            <span>⏱️ 60 min deep dive</span>
+            <span>Target Roles: SDE-2, SDE-3, Backend Tech Lead, Cloud Architect</span>
+          </div>
+        </header>
+
+        <!-- SECTION 1: SPRING BOOT PHILOSOPHY & STARTERS -->
+        <section>
+          <h2>1. Spring Boot Philosophy, Starters & Auto-Configuration</h2>
+
+          <h3>1.1 The Core Philosophy</h3>
+          <p>
+            Spring Boot was created to solve the massive XML configuration overhead, dependency version mismatches, and deployment friction of traditional Spring applications. It operates on <strong>Opinionated Defaults</strong> and <strong>Convention over Configuration</strong>:
+          </p>
+          <ul>
+            <li><strong>Standalone Executable Fat JARs:</strong> Packages application bytecode, third-party libraries, and an embedded servlet container into a single deployable artifact executed via <code>java -jar app.jar</code>.</li>
+            <li><strong>Starter POMs:</strong> Curated dependency bundles that aggregate cohesive libraries and provide compatible, pre-tested transitive versions managed by <code>spring-boot-dependencies</code>.</li>
+          </ul>
+
+          <h3>1.2 How Auto-Configuration Works Under the Hood</h3>
+          <p>
+            When you add a starter like <code>spring-boot-starter-web</code>, Spring Boot automatically configures Tomcat, DispatcherServlet, Jackson ObjectMapper, and validation validators.
+          </p>
+          <ol>
+            <li><strong>AutoConfiguration Discovery:</strong>
+              <ul>
+                <li>In Spring Boot 2.x: Loaded from <code>META-INF/spring.factories</code>.</li>
+                <li>In Spring Boot 3.x+: Loaded from <code>META-INF/spring/org.springframework.boot.autoconfigure.AutoConfiguration.imports</code>.</li>
+              </ul>
+            </li>
+            <li><strong>Conditional Evaluation (<code>@Conditional</code> family):</strong> Auto-configuration classes evaluate conditions before loading beans:
+              <ul>
+                <li><code>@ConditionalOnClass(ObjectMapper.class)</code>: Loads only if Jackson is on the classpath.</li>
+                <li><code>@ConditionalOnMissingBean(DataSource.class)</code>: Provides a default DataSource <em>only if</em> the developer has not declared their own custom DataSource bean.</li>
+                <li><code>@ConditionalOnProperty(name = "feature.enabled", havingValue = "true")</code>: Evaluates configuration flags.</li>
+              </ul>
+            </li>
+          </ol>
+
+          <h3>1.3 Anatomy of <code>@SpringBootApplication</code></h3>
+          <p>
+            <code>@SpringBootApplication</code> is a composite meta-annotation that bundles:
+          </p>
+          <ul>
+            <li><strong><code>@SpringBootConfiguration</code>:</strong> Specialization of <code>@Configuration</code> marking the class as a configuration source.</li>
+            <li><strong><code>@EnableAutoConfiguration</code>:</strong> Triggers the auto-configuration imports mechanism.</li>
+            <li><strong><code>@ComponentScan</code>:</strong> Automatically scans for <code>@Component</code>, <code>@Service</code>, <code>@Repository</code>, and <code>@RestController</code> within the current package and its sub-packages.</li>
+          </ul>
+        </section>
+
+        <!-- SECTION 2: CONFIGURATION, PROFILES & PROPERTIES -->
+        <section>
+          <h2>2. Configuration, Profiles, YAML & Type-Safe Properties</h2>
+
+          <h3>2.1 <code>application.properties</code> vs. <code>application.yml</code></h3>
+          <p>
+            YAML (YAML Ain't Markup Language) is the enterprise standard because of hierarchical nesting, list representations, and multi-profile documents:
+          </p>
+          <div class="code-header">
+            <span>application.yml (Multi-Environment Setup)</span>
+            <span>YAML</span>
+          </div>
+          <pre><code>spring:
+  application:
+    name: order-service
+  profiles:
+    active: dev
+
+---
+# Development Profile Configuration
+spring:
+  config:
+    activate:
+      on-profile: dev
+server:
+  port: 8080
+logging:
+  level:
+    com.myapp: DEBUG
+
+---
+# Production Profile Configuration
+spring:
+  config:
+    activate:
+      on-profile: prod
+server:
+  port: 443
+  tomcat:
+    threads:
+      max: 200
+      min-spare: 20
+logging:
+  level:
+    com.myapp: INFO</code></pre>
+
+          <h3>2.2 Type-Safe <code>@ConfigurationProperties</code> with Record Validation</h3>
+          <p>
+            Avoid scattering individual <code>@Value("${prop}")</code> annotations throughout business logic. Modern Spring Boot binds configuration trees directly into validated, immutable <strong>Records</strong>:
+          </p>
+          <div class="code-header">
+            <span>Validated ConfigurationProperties Record</span>
+            <span>Java</span>
+          </div>
+          <pre><code>@ConfigurationProperties(prefix = "payment.gateway")
+@Validated
+public record PaymentGatewayProperties(
+    @NotBlank(message = "API URL must be specified")
+    String apiUrl,
+
+    @Min(value = 1000, message = "Timeout must be at least 1000ms")
+    int timeoutMs,
+
+    @NotNull
+    Duration retryInterval,
+
+    List&lt;String&gt; supportedCurrencies
+) {}</code></pre>
+        </section>
+
+        <!-- SECTION 3: EMBEDDED SERVERS, ACTUATOR & LOGGING -->
+        <section>
+          <h2>3. Embedded Servers, Production Actuator & Structured Logging</h2>
+
+          <h3>3.1 Embedded Server Tuning</h3>
+          <p>
+            Spring Boot defaults to Apache Tomcat, but can be switched to Undertow or Jetty. In high-concurrency microservices, configure connection queues and thread limits:
+          </p>
+          <pre><code>server:
+  tomcat:
+    threads:
+      max: 200           # Worker thread ceiling
+      min-spare: 20      # Pre-warmed idle threads
+    max-connections: 8192 # Max simultaneous TCP sockets
+    accept-count: 100    # OS TCP listen queue length when all worker threads are busy
+    connection-timeout: 20000</code></pre>
+
+          <h3>3.2 Spring Boot Actuator: Security & Endpoints</h3>
+          <p>
+            Actuator provides production monitoring endpoints (<code>/health</code>, <code>/metrics</code>, <code>/beans</code>, <code>/env</code>, <code>/threaddump</code>).
+          </p>
+          <div class="callout callout-warning">
+            <div class="callout-title">⚠️ Actuator Production Security Rule</div>
+            <p>
+              Never expose sensitive endpoints publicly (<code>include: "*"</code>)! Exposing <code>/actuator/env</code> or <code>/actuator/heapdump</code> can leak database passwords and security tokens. Only expose <code>health</code> and <code>metrics</code> publicly, and secure other endpoints behind OAuth2/admin role checks.
+            </p>
+          </div>
+          <pre><code>management:
+  endpoints:
+    web:
+      exposure:
+        include: health, metrics, prometheus
+  endpoint:
+    health:
+      show-details: when_authorized
+      probes:
+        enabled: true # Enables Kubernetes readiness & liveness probes!</code></pre>
+
+          <h3>3.3 Structured JSON Logging with MDC (Mapped Diagnostic Context)</h3>
+          <p>
+            In distributed microservices, tracing requests across systems requires correlating logs via a unique Trace ID injected into SLF4J's <strong>Mapped Diagnostic Context (MDC)</strong>:
+          </p>
+          <div class="code-header">
+            <span>Trace ID Logging Filter using MDC</span>
+            <span>Java</span>
+          </div>
+          <pre><code>@Component
+public class CorrelationIdFilter extends OncePerRequestFilter {
+    public static final String TRACE_ID = "traceId";
+
+    @Override
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
+            throws ServletException, IOException {
+        String traceId = request.getHeader("X-Correlation-Id");
+        if (traceId == null || traceId.isBlank()) {
+            traceId = UUID.randomUUID().toString();
+        }
+        MDC.put(TRACE_ID, traceId);
+        response.setHeader("X-Correlation-Id", traceId);
+        try {
+            chain.doFilter(request, response);
+        } finally {
+            MDC.remove(TRACE_ID); // Prevent thread pool context pollution!
+        }
+    }
+}</code></pre>
+        </section>
+
+        <!-- SECTION 4: REST APIS, DTOS & VALIDATION -->
+        <section>
+          <h2>4. Production REST APIs, DTOs & Jakarta Bean Validation</h2>
+
+          <h3>4.1 REST API Design & HTTP Status Codes</h3>
+          <table>
+            <thead>
+              <tr>
+                <th>Operation</th>
+                <th>HTTP Method</th>
+                <th>Path Pattern</th>
+                <th>Expected Success Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Create Resource</td>
+                <td><code>POST</code></td>
+                <td><code>/api/v1/orders</code></td>
+                <td><code>201 Created</code> (with <code>Location</code> header)</td>
+              </tr>
+              <tr>
+                <td>Read Resource</td>
+                <td><code>GET</code></td>
+                <td><code>/api/v1/orders/{id}</code></td>
+                <td><code>200 OK</code> (or <code>404 Not Found</code>)</td>
+              </tr>
+              <tr>
+                <td>Replace Resource</td>
+                <td><code>PUT</code></td>
+                <td><code>/api/v1/orders/{id}</code></td>
+                <td><code>200 OK</code> or <code>204 No Content</code></td>
+              </tr>
+              <tr>
+                <td>Partial Update</td>
+                <td><code>PATCH</code></td>
+                <td><code>/api/v1/orders/{id}</code></td>
+                <td><code>200 OK</code></td>
+              </tr>
+              <tr>
+                <td>Delete Resource</td>
+                <td><code>DELETE</code></td>
+                <td><code>/api/v1/orders/{id}</code></td>
+                <td><code>204 No Content</code></td>
+              </tr>
+            </tbody>
+          </table>
+
+          <h3>4.2 Validated Request DTO Pattern</h3>
+          <p>
+            Never expose JPA database entities directly to REST clients. Use immutable <strong>DTO Records</strong> with declarative Jakarta validation annotations:
+          </p>
+          <div class="code-header">
+            <span>OrderRequest DTO with Jakarta Validations</span>
+            <span>Java</span>
+          </div>
+          <pre><code>public record CreateOrderRequest(
+    @NotBlank(message = "Customer ID is required")
+    String customerId,
+
+    @NotEmpty(message = "Order must contain at least one item")
+    List&lt;@Valid OrderItemRequest&gt; items,
+
+    @NotNull(message = "Payment method is required")
+    PaymentMethodType paymentMethod
+) {}
+
+public record OrderItemRequest(
+    @NotBlank(message = "SKU must not be blank")
+    String sku,
+
+    @Min(value = 1, message = "Quantity must be at least 1")
+    int quantity,
+
+    @DecimalMin(value = "0.01", message = "Price must be greater than zero")
+    BigDecimal unitPrice
+) {}</code></pre>
+        </section>
+
+        <!-- SECTION 5: GLOBAL EXCEPTION HANDLING -->
+        <section>
+          <h2>5. Global Exception Handling & RFC 7807 ProblemDetail</h2>
+          <p>
+            Spring Boot 3 implements the <strong>RFC 7807 Problem Details for HTTP APIs</strong> specification using <code>ProblemDetail</code>:
+          </p>
+
+          <div class="code-header">
+            <span>Enterprise GlobalExceptionHandler with RFC 7807</span>
+            <span>Java</span>
+          </div>
+          <pre><code>@RestControllerAdvice
+public class GlobalExceptionHandler {
+
+    // 1. Handle Bean Validation Failures (HTTP 400)
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ProblemDetail handleValidationException(MethodArgumentNotValidException ex) {
+        ProblemDetail problem = ProblemDetail.forStatusAndDetail(
+            HttpStatus.BAD_REQUEST, "Validation failed for one or more fields"
+        );
+        problem.setTitle("Constraint Violation");
+        
+        Map&lt;String, String&gt; errors = new HashMap&lt;&gt;();
+        ex.getBindingResult().getFieldErrors().forEach(error -&gt; 
+            errors.put(error.getField(), error.getDefaultMessage())
+        );
+        problem.setProperty("invalidFields", errors);
+        problem.setProperty("timestamp", Instant.now());
+        return problem;
+    }
+
+    // 2. Handle Custom Domain Exceptions (HTTP 404)
+    @ExceptionHandler(ResourceNotFoundException.class)
+    public ProblemDetail handleResourceNotFound(ResourceNotFoundException ex) {
+        ProblemDetail problem = ProblemDetail.forStatusAndDetail(HttpStatus.NOT_FOUND, ex.getMessage());
+        problem.setTitle("Resource Not Found");
+        problem.setProperty("timestamp", Instant.now());
+        return problem;
+    }
+
+    // 3. Catch-all Internal Server Errors (HTTP 500)
+    @ExceptionHandler(Exception.class)
+    public ProblemDetail handleGenericException(Exception ex) {
+        logger.error("Unhandled system error observed: ", ex);
+        ProblemDetail problem = ProblemDetail.forStatusAndDetail(
+            HttpStatus.INTERNAL_SERVER_ERROR, "An internal error occurred. Please quote incident reference."
+        );
+        problem.setTitle("Internal Server Error");
+        problem.setProperty("traceId", MDC.get("traceId"));
+        return problem;
+    }
+}</code></pre>
+        </section>
+
+        <!-- SECTION 6: PAGINATION, SORTING & FILTERING -->
+        <section>
+          <h2>6. High-Performance Pagination, Sorting & Filtering</h2>
+
+          <h3>6.1 <code>Page&lt;T&gt;</code> vs. <code>Slice&lt;T&gt;</code></h3>
+          <p>
+            A major performance pitfall in Spring Data JPA:
+          </p>
+          <ul>
+            <li><strong><code>Page&lt;T&gt;</code>:</strong> Computes total pages and total elements. To do this, Hibernate issues two queries: the data query (<code>SELECT ... LIMIT 20</code>) PLUS an expensive <code>SELECT count(*) FROM orders</code>. On tables with 10 million rows, <code>count(*)</code> triggers full index/table scans!</li>
+            <li><strong><code>Slice&lt;T&gt;</code> (Preferred for Infinite Scroll / Mobile):</strong> Only checks if a <em>next</em> slice exists by querying <code>LIMIT 21</code> for a page size of 20. <strong>Zero count(*) queries!</strong> Saves massive database CPU.</li>
+          </ul>
+
+          <div class="code-header">
+            <span>Controller Pagination & Dynamic Sorting</span>
+            <span>Java</span>
+          </div>
+          <pre><code>@GetMapping
+public ResponseEntity&lt;Slice&lt;OrderResponse&gt;&gt; getOrders(
+    @RequestParam(defaultValue = "0") int page,
+    @RequestParam(defaultValue = "20") int size,
+    @RequestParam(defaultValue = "createdAt,desc") String[] sort
+) {
+    Sort.Direction direction = sort[1].equalsIgnoreCase("asc") ? Sort.Direction.ASC : Sort.Direction.DESC;
+    Pageable pageable = PageRequest.of(page, size, Sort.by(direction, sort[0]));
+    
+    Slice&lt;OrderResponse&gt; orders = orderService.fetchOrderSlice(pageable);
+    return ResponseEntity.ok(orders);
+}</code></pre>
+        </section>
+
+        <!-- SECTION 7: API VERSIONING & IDEMPOTENCY -->
+        <section>
+          <h2>7. API Versioning & Distributed Idempotency</h2>
+
+          <h3>7.1 API Versioning Strategies</h3>
+          <ul>
+            <li><strong>URI Path Versioning (Most Popular):</strong> <code>/api/v1/orders</code> vs <code>/api/v2/orders</code>. Simple, clean caching, self-documenting.</li>
+            <li><strong>HTTP Header Versioning:</strong> <code>X-API-VERSION: 2</code>. Keeps URIs clean.</li>
+            <li><strong>Accept Header (Content Negotiation):</strong> <code>Accept: application/vnd.company.v2+json</code>. Adheres to strict REST HATEOAS standards.</li>
+          </ul>
+
+          <h3>7.2 Distributed Idempotency Pattern (Redis SET NX)</h3>
+          <p>
+            In distributed microservices, network timeouts cause clients to retry <code>POST</code> requests, which can trigger duplicate order creation and double-billing. An <strong>Idempotency Key</strong> guarantees safe retries:
+          </p>
+
+          <div class="code-header">
+            <span>Idempotent Order Creation via Redis SETNX</span>
+            <span>Java</span>
+          </div>
+          <pre><code>@PostMapping
+public ResponseEntity&lt;OrderResponse&gt; createOrder(
+    @RequestHeader("X-Idempotency-Key") String idempotencyKey,
+    @Valid @RequestBody CreateOrderRequest request
+) {
+    // 1. Atomic Redis SET key value NX EX 3600 (Set if Not Exists with 1-hour TTL)
+    Boolean isFirstCall = redisTemplate.opsForValue().setIfAbsent(
+        "idempotency:" + idempotencyKey, "PROCESSING", Duration.ofHours(1)
+    );
+
+    if (Boolean.FALSE.equals(isFirstCall)) {
+        // Duplicate request detected! Either return cached response or HTTP 409 Conflict
+        throw new DuplicateRequestException("Transaction with idempotency key is already processing");
+    }
+
+    try {
+        OrderResponse response = orderService.processOrder(request);
+        // Cache serialized response for identical subsequent calls:
+        redisTemplate.opsForValue().set("idempotency:response:" + idempotencyKey, response, Duration.ofHours(1));
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    } catch (Exception ex) {
+        redisTemplate.delete("idempotency:" + idempotencyKey); // Clear lock on failure
+        throw ex;
+    }
+}</code></pre>
+        </section>
+
+        <!-- SECTION 8: KUBERNETES HEALTH PROBES -->
+        <section>
+          <h2>8. Custom Health Checks & Kubernetes Probes</h2>
+          <p>
+            In cloud-native Kubernetes environments, Actuator separates health into two separate operational probes:
+          </p>
+          <ul>
+            <li><strong>Liveness Probe (<code>/actuator/health/liveness</code>):</strong> Tells K8s if the JVM is alive. If this fails (e.g. fatal deadlock), Kubernetes <strong>kills and restarts</strong> the container.</li>
+            <li><strong>Readiness Probe (<code>/actuator/health/readiness</code>):</strong> Tells K8s if the application is ready to accept HTTP traffic. If this fails (e.g. database connection pool warming up), Kubernetes <strong>stops routing traffic</strong> to the pod without killing it.</li>
+          </ul>
+
+          <div class="code-header">
+            <span>Custom HealthIndicator for External Payment Gateway</span>
+            <span>Java</span>
+          </div>
+          <pre><code>@Component
+public class PaymentGatewayHealthIndicator implements HealthIndicator {
+    private final PaymentClient paymentClient;
+
+    public PaymentGatewayHealthIndicator(PaymentClient paymentClient) {
+        this.paymentClient = paymentClient;
+    }
+
+    @Override
+    public Health health() {
+        try {
+            boolean isUp = paymentClient.ping();
+            if (isUp) {
+                return Health.up().withDetail("gateway", "Operational").build();
+            }
+            return Health.down().withDetail("gateway", "Latency Degraded").build();
+        } catch (Exception ex) {
+            return Health.down(ex).withDetail("gateway", "Unreachable").build();
+        }
+    }
+}</code></pre>
+        </section>
+
+        <!-- SECTION 9: REAL-TIME PRODUCTION ISSUES -->
+        <section>
+          <h2>9. Real-Time Production Issues & Post-Mortems</h2>
+
+          <!-- Incident 1 -->
+          <div class="callout callout-production">
+            <div class="callout-title">🚨 Incident 1: Sensitive Database Credentials Leaked via Actuator /env Endpoint</div>
+            <p><strong>Scenario:</strong> A security audit revealed that an e-commerce microservice exposed production PostgreSQL credentials, AWS access keys, and JWT signing secrets over the public internet at <code>https://api.company.com/actuator/env</code>.</p>
+          </div>
+
+          <div class="callout callout-warning">
+            <div class="callout-title">🔍 Root Cause Analysis (RCA)</div>
+            <p>
+              The application configured <code>management.endpoints.web.exposure.include=*</code> in <code>application.yml</code> for debugging purposes and forgot to restrict exposure in production. Spring Boot Actuator's default behavior exposed all configuration properties and system environment variables.
+            </p>
+          </div>
+
+          <div class="callout callout-solution">
+            <div class="callout-title">💡 Production Resolution</div>
+            <ul>
+              <li>Configured minimal public exposure: <code>management.endpoints.web.exposure.include=health,info,prometheus</code>.</li>
+              <li>Enabled property masking for sensitive patterns: <code>management.endpoint.env.keys-to-sanitize=password,secret,key,token</code>.</li>
+              <li>Routed Actuator to an internal management port not exposed to external ingresses: <code>management.server.port=8081</code>.</li>
+            </ul>
+          </div>
+
+          <!-- Incident 2 -->
+          <div class="callout callout-production">
+            <div class="callout-title">🚨 Incident 2: Database CPU Spikes to 100% via Page<T> count(*) Queries</div>
+            <p><strong>Scenario:</strong> As an orders table grew to 15 million records, the admin dashboard's order search endpoint p99 latency spiked from 40ms to 8,500ms, driving PostgreSQL CPU to 100%.</p>
+          </div>
+
+          <div class="callout callout-warning">
+            <div class="callout-title">🔍 Root Cause Analysis (RCA)</div>
+            <p>
+              The query method returned a <code>Page&lt;Order&gt;</code>:
+              <code>Page&lt;Order&gt; findByStatus(OrderStatus status, Pageable pageable);</code>.
+              Every request generated two queries: <code>SELECT ... LIMIT 20</code> (took 5ms) AND <code>SELECT count(*) FROM orders WHERE status = 'COMPLETED'</code>. The <code>count(*)</code> scanned 12 million index rows, locking database memory pages.
+            </p>
+          </div>
+
+          <div class="callout callout-solution">
+            <div class="callout-title">💡 Production Resolution</div>
+            <p>Switched the return type to <strong><code>Slice&lt;Order&gt;</code></strong>, which eliminates the <code>count(*)</code> query completely, reducing latency from 8,500ms back to 6ms!</p>
+          </div>
+        </section>
+
+        <!-- SECTION 10: SENIOR INTERVIEW Q&A -->
+        <section>
+          <h2>10. Senior / Staff Technical Interview Q&A</h2>
+
+          <div class="callout callout-interview">
+            <div class="callout-title">🎯 Q1: What is the exact difference between @Controller and @RestController?</div>
+            <p><strong>Answer:</strong> <code>@Controller</code> is the traditional Spring MVC annotation designed for returning HTML views (JSP, Thymeleaf). To return JSON from a <code>@Controller</code> method, you must explicitly annotate the method with <code>@ResponseBody</code>. <code>@RestController</code> is a convenience composite annotation combining <code>@Controller</code> and <code>@ResponseBody</code> at the class level; every method automatically serializes return values directly into the HTTP response body via configured <code>HttpMessageConverter</code> instances (such as Jackson).</p>
+          </div>
+
+          <div class="callout callout-interview">
+            <div class="callout-title">🎯 Q2: How does Spring Boot resolve properties when defined in multiple sources?</div>
+            <p><strong>Answer:</strong> Spring Boot uses a strict, deterministic property precedence order (highest to lowest):
+              <br>
+              1. <strong>Command Line Arguments</strong> (<code>--server.port=9090</code>)
+              <br>
+              2. <strong>JVM System Properties</strong> (<code>-Dserver.port=9090</code>)
+              <br>
+              3. <strong>OS Environment Variables</strong> (<code>SERVER_PORT=9090</code>)
+              <br>
+              4. <strong>Profile-specific configuration files outside packaged JAR</strong> (<code>file:./config/application-prod.yml</code>)
+              <br>
+              5. <strong>Profile-specific configuration files inside JAR</strong> (<code>classpath:application-prod.yml</code>)
+              <br>
+              6. <strong>Default <code>application.yml</code> inside packaged JAR</strong>.
+            </p>
+          </div>
+
+          <div class="callout callout-interview">
+            <div class="callout-title">🎯 Q3: Why is Keyset / Cursor Pagination superior to Offset Pagination for large datasets?</div>
+            <p><strong>Answer:</strong> Offset pagination (<code>OFFSET 1000000 LIMIT 20</code>) forces the database engine to scan and discard 1,000,000 index rows before returning 20 rows, degrading at $O(N)$ time. Keyset pagination (Cursor pagination) uses an indexed predicate: <code>WHERE id &lt; last_seen_id ORDER BY id DESC LIMIT 20</code>. The database performs an immediate $O(\log N)$ B-tree index seek to jump directly to the target record, maintaining constant-time sub-millisecond query performance regardless of how deep the user paginates.</p>
+          </div>
+        </section>
+
+      </main>
+    </div>
+  </div>
+
+  <footer>
+    <p>Interview A-Z Handbook &bull; Built for GitHub Pages &bull; Production Grade Interview Prep</p>
+  </footer>
+
+  <script src="../../assets/js/main.js"></script>
+</body>
+</html>

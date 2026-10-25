@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Module 1: Modern Java (11 - 21+) Deep Dive | Interview A-Z</title>
+  <link rel="stylesheet" href="../../assets/css/style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+</head>
+<body>
+
+  <!-- Top Navigation -->
+  <nav class="navbar">
+    <div class="brand">
+      <span class="brand-badge">Interview A-Z</span>
+      <span>Engineering & Architecture Handbook</span>
+    </div>
+    <div class="nav-links">
+      <a href="../../index.html" class="nav-link">Home</a>
+      <a href="../../index.html#topics" class="nav-link">Topic Catalog</a>
+      <a href="https://github.com" target="_blank" class="nav-link">GitHub</a>
+    </div>
+  </nav>
+
+  <div class="container">
+    <div class="article-layout">
+      <!-- Sticky Sidebar Table of Contents -->
+      <aside class="sidebar-toc">
+        <h3>On This Page</h3>
+        <ul class="toc-links" id="dynamic-toc">
+          <!-- Dynamically populated via main.js -->
+        </ul>
+      </aside>
+
+      <!-- Main Article Content -->
+      <main class="article-content">
+        <!-- Breadcrumb -->
+        <nav class="breadcrumb">
+          <a href="../../index.html">Home</a>
+          <span>/</span>
+          <span>Core Java</span>
+          <span>/</span>
+          <span style="color: #fff;">Modern Java (11 - 21+)</span>
+        </nav>
+
+        <!-- Article Header -->
+        <header class="article-header">
+          <h1>Module 1: Modern Java Features (Java 11 - 21+ LTS)</h1>
+          <div class="article-meta">
+            <span class="badge badge-core">Modern Java</span>
+            <span class="badge badge-advanced">Java 21 LTS</span>
+            <span class="badge badge-prod">Project Loom & Virtual Threads</span>
+            <span>⏱️ 50 min deep dive</span>
+            <span>Target Roles: SDE-2, SDE-3, Staff Engineer, Architect</span>
+          </div>
+        </header>
+
+        <!-- SECTION 1: RECORDS -->
+        <section>
+          <h2>1. Records (Java 14 - 16 LTS): Immutability & Serialization Safety</h2>
+          
+          <h3>1.1 What is a Record?</h3>
+          <p>
+            A <strong>Record</strong> is a transparent, shallowly immutable carrier for data. Declaring a record automatically synthesizes a private final field for each component, a public canonical constructor, component getter methods (named identically to the components, e.g. <code>id()</code> instead of <code>getId()</code>), and deterministic <code>equals()</code>, <code>hashCode()</code>, and <code>toString()</code> methods.
+          </p>
+
+          <div class="code-header">
+            <span>Modern Record with Compact Constructor</span>
+            <span>Java</span>
+          </div>
+          <pre><code>public record OrderItem(String sku, int quantity, double unitPrice) {
+    // Compact Constructor: Used for validation & normalization without field re-assignment
+    public OrderItem {
+        Objects.requireNonNull(sku, "SKU must not be null");
+        if (quantity &lt;= 0) {
+            throw new IllegalArgumentException("Quantity must be positive: " + quantity);
+        }
+        if (unitPrice &lt; 0.0) {
+            throw new IllegalArgumentException("Price cannot be negative");
+        }
+        sku = sku.toUpperCase().trim(); // Field assignment happens automatically at the end!
+    }
+
+    // Custom helper method
+    public double totalCost() {
+        return quantity * unitPrice;
+    }
+}</code></pre>
+
+          <h3>1.2 Architectural Constraints & Serialization Security</h3>
+          <ul>
+            <li><strong>Inheritance Restrictions:</strong> Every record implicitly extends <code>java.lang.Record</code> and is implicitly <code>final</code>. It <strong>cannot extend any other class</strong>, but it can implement interfaces.</li>
+            <li><strong>Immutability Guarantee:</strong> All component fields are <code>private final</code>. Instance fields cannot be added outside the header; only <code>static</code> fields are permitted.</li>
+            <li><strong>Serialization Superiority:</strong> Traditional Java serialization is notoriously insecure because it bypasses constructors, instantiating objects by reflection and injecting byte streams directly into memory. <strong>Records fix this vulnerability</strong>: during deserialization, the JVM <em>must</em> invoke the canonical constructor, ensuring invariant validations can never be bypassed!</li>
+          </ul>
+        </section>
+
+        <!-- SECTION 2: SEALED CLASSES -->
+        <section>
+          <h2>2. Sealed Classes & Interfaces (Java 15 - 17 LTS)</h2>
+
+          <h3>2.1 Exhaustive Domain Modeling & The <code>permits</code> Clause</h3>
+          <p>
+            Historically, Java provided only two extremes for inheritance: open to everyone (<code>public</code>) or closed to everyone (<code>final</code>). <strong>Sealed Classes</strong> allow an author to explicitly declare which classes or interfaces are permitted to extend or implement them.
+          </p>
+
+          <div class="code-header">
+            <span>Algebraic Data Types with Sealed Interfaces</span>
+            <span>Java</span>
+          </div>
+          <pre><code>// Top of the hierarchy: permits ONLY these three concrete records
+public sealed interface PaymentMethod 
+    permits CreditCardPayment, UpiPayment, CryptoPayment {}
+
+public record CreditCardPayment(String cardNumber, String cvv, String expiry) implements PaymentMethod {}
+public record UpiPayment(String upiId, String bankRef) implements PaymentMethod {}
+public record CryptoPayment(String walletAddress, String transactionHash) implements PaymentMethod {}</code></pre>
+
+          <h3>2.2 Constraints on Permitted Subclasses</h3>
+          <p>Every permitted subclass must directly extend the sealed class and specify exactly one of three modifiers:</p>
+          <ul>
+            <li><code>final</code>: Cannot be extended any further (e.g. records are implicitly final).</li>
+            <li><code>sealed</code>: Continues the restricted inheritance hierarchy with its own <code>permits</code> list.</li>
+            <li><code>non-sealed</code>: Re-opens the hierarchy to arbitrary subclasses.</li>
+          </ul>
+        </section>
+
+        <!-- SECTION 3: PATTERN MATCHING & SWITCH EXPRESSIONS -->
+        <section>
+          <h2>3. Pattern Matching & Switch Expressions (Java 14 - 21 LTS)</h2>
+
+          <h3>3.1 Pattern Matching for <code>instanceof</code> (Java 16)</h3>
+          <p>Eliminates redundant casting boilerplate and prevents <code>ClassCastException</code>:</p>
+          <pre><code>// Old Boilerplate:
+if (obj instanceof Order) {
+    Order o = (Order) obj; // Manual casting
+    System.out.println(o.getOrderId());
+}
+
+// Modern Pattern Matching for instanceof:
+if (obj instanceof Order o &amp;&amp; o.totalAmount() &gt; 1000) {
+    System.out.println("High value order: " + o.orderId()); // 'o' is scoped to this block
+}</code></pre>
+
+          <h3>3.2 Switch Expressions & <code>yield</code> (Java 14)</h3>
+          <p>
+            Switch statements were upgraded into <strong>expressions</strong> that return values, using arrow syntax (<code>-&gt;</code>) to eliminate fall-through bugs without needing <code>break</code> statements:
+          </p>
+          <pre><code>int httpStatus = 200;
+String message = switch (httpStatus) {
+    case 200, 201 -&gt; "Success";
+    case 400, 404 -&gt; "Client Error";
+    case 500, 502, 503 -&gt; {
+        logger.error("Internal server failure observed: {}", httpStatus);
+        yield "Server Error"; // 'yield' returns a value from a multi-line block
+    }
+    default -&gt; "Unknown Status";
+};</code></pre>
+
+          <h3>3.3 Pattern Matching for <code>switch</code> & Guarded Patterns (Java 21)</h3>
+          <p>
+            Combines Sealed Classes and Pattern Matching to deliver <strong>Compiler-Enforced Exhaustiveness</strong>. Because the compiler knows all permitted subtypes of a sealed hierarchy, no <code>default</code> branch is needed:
+          </p>
+          <div class="code-header">
+            <span>Pattern Matching with 'when' Guards</span>
+            <span>Java</span>
+          </div>
+          <pre><code>public String processPayment(PaymentMethod method) {
+    return switch (method) {
+        case CreditCardPayment cc when cc.cardNumber().startsWith("4") -&gt; 
+            "Processing Visa Card: " + cc.cardNumber();
+        case CreditCardPayment cc -&gt; 
+            "Processing Standard Card: " + cc.cardNumber();
+        case UpiPayment upi -&gt; 
+            "Triggering UPI notification to: " + upi.upiId();
+        case CryptoPayment crypto -&gt; 
+            "Verifying block confirmations for: " + crypto.walletAddress();
+        case null -&gt; "No payment method supplied"; // Direct null handling in switch!
+        // No 'default' branch needed! Adding a new permitted subtype causes a compile-time error.
+    };
+}</code></pre>
+
+          <h3>3.4 Record Deconstruction Patterns (Java 21)</h3>
+          <pre><code>// Deconstructs internal record components directly in the pattern:
+if (method instanceof CreditCardPayment(String card, String cvv, String exp)) {
+    System.out.println("Extracted Card number directly: " + card);
+}</code></pre>
+        </section>
+
+        <!-- SECTION 4: TEXT BLOCKS & VAR -->
+        <section>
+          <h2>4. Text Blocks & Local Variable Type Inference (<code>var</code>)</h2>
+
+          <h3>4.1 Text Blocks (Java 15 LTS)</h3>
+          <p>
+            Multi-line string literals initiated by <code>"""</code> followed by a newline. Solves the issue of escaping JSON, SQL queries, and HTML:
+          </p>
+          <div class="code-header">
+            <span>Text Block Indentation Mechanics</span>
+            <span>Java</span>
+          </div>
+          <pre><code>String query = """
+               SELECT order_id, customer_id, total_price
+               FROM orders
+               WHERE status = 'SHIPPED'
+               ORDER BY created_at DESC
+               """;</code></pre>
+          <ul>
+            <li><strong>Incidental vs. Essential Whitespace:</strong> The compiler automatically computes the common whitespace prefix of all lines and strips it away. The position of the closing <code>"""</code> dictates indentation.</li>
+            <li><strong>Escape sequences:</strong> <code>\</code> at the end of a line suppresses the newline character; <code>\s</code> preserves an explicit single whitespace.</li>
+          </ul>
+
+          <h3>4.2 Local Variable Type Inference: <code>var</code> (Java 10)</h3>
+          <p>
+            <code>var</code> enables the compiler to infer the static type of a local variable from its initializer at compile-time. It is <strong>NOT</strong> dynamic typing (like JavaScript or Python); the resulting variable is strictly and statically typed.
+          </p>
+          <table>
+            <thead>
+              <tr>
+                <th>Where <code>var</code> IS Allowed</th>
+                <th>Where <code>var</code> is FORBIDDEN</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Local variables with explicit initializers (<code>var count = 10;</code>)</td>
+                <td>Class member instance or static fields</td>
+              </tr>
+              <tr>
+                <td>Loop indices (<code>for (var item : list)</code>)</td>
+                <td>Method parameters (e.g. <code>void execute(var x)</code>)</td>
+              </tr>
+              <tr>
+                <td>Resource declarations in try-with-resources</td>
+                <td>Method return types</td>
+              </tr>
+              <tr>
+                <td>Lambda formal parameters (e.g., <code>(@NonNull var x) -&gt; ...</code>)</td>
+                <td>Variables without immediate initializers or initialized to <code>null</code></td>
+              </tr>
+            </tbody>
+          </table>
+        </section>
+
+        <!-- SECTION 5: VIRTUAL THREADS (PROJECT LOOM) -->
+        <section>
+          <h2>5. Virtual Threads & Project Loom (Java 21 LTS)</h2>
+          
+          <h3>5.1 The Concurrency Paradigm Shift</h3>
+          <p>
+            Traditional Java threads (<strong>Platform Threads</strong>) are thin wrappers around physical Operating System (OS) kernel threads. They operate on a strict <strong>$1:1$ mapping</strong>:
+          </p>
+          <ul>
+            <li>Each platform thread consumes ~1MB of memory for its native call stack.</li>
+            <li>An OS can rarely handle more than 5,000 to 10,000 active threads before memory exhaustion and kernel context-switching overhead crashes the server.</li>
+            <li>In classic "thread-per-request" microservices, threads spend 95% of their lifecycle <strong>blocked</strong> waiting for database queries, Redis responses, or downstream microservices.</li>
+          </ul>
+
+          <h3>5.2 Virtual Threads Architecture: $M:N$ Scheduling</h3>
+          <p>
+            <strong>Virtual Threads</strong> (Project Loom) decouple Java threads from OS threads. They are lightweight, user-mode threads managed entirely by the JVM:
+          </p>
+          
+          <pre><code>+-------------------------------------------------------------------------------------+
+| VIRTUAL THREADS (Millions of lightweight tasks, ~few hundred bytes each)           |
+|  [ VT 1 ]  [ VT 2 ]  [ VT 3 ]  [ VT 4 ]  [ VT 5 ] ... [ VT 1,000,000 ]               |
++-------------------------------------------------------------------------------------+
+                               | (Mounted / Unmounted dynamically)
+                               v
++-------------------------------------------------------------------------------------+
+| CARRIER THREADS (Standard Platform Threads in ForkJoinPool, pool size = CPU cores)  |
+|  [ Carrier-1 ]          [ Carrier-2 ]          [ Carrier-3 ]          [ Carrier-4 ] |
++-------------------------------------------------------------------------------------+
+                               | (1:1 OS Thread mapping)
+                               v
++-------------------------------------------------------------------------------------+
+| OS KERNEL THREADS                                                                   |
++-------------------------------------------------------------------------------------+</code></pre>
+
+          <h3>5.3 How Virtual Threads Mount and Unmount</h3>
+          <ol>
+            <li>When a Virtual Thread executes CPU instructions, it is <strong>mounted</strong> onto a physical <strong>Carrier Thread</strong>.</li>
+            <li>When the Virtual Thread performs a <strong>blocking I/O operation</strong> (e.g., <code>Socket.read()</code>, <code>Thread.sleep()</code>, JDBC query, HTTP call):
+              <ul>
+                <li>The JVM intercepts the call and saves the virtual thread's stack frames into the <strong>Java Heap</strong> (Continuation).</li>
+                <li>The virtual thread is <strong>unmounted</strong> from the Carrier Thread.</li>
+                <li>The Carrier Thread is now completely free to execute thousands of other virtual threads!</li>
+              </ul>
+            </li>
+            <li>When the OS signals that the network packet or database response has arrived, the virtual thread is re-queued and <strong>mounted</strong> onto any available Carrier Thread to resume execution seamlessly.</li>
+          </ol>
+
+          <div class="code-header">
+            <span>Executing 100,000 Virtual Threads with Zero Overhead</span>
+            <span>Java</span>
+          </div>
+          <pre><code>// New Executor Service in Java 21: creates an ephemeral Virtual Thread per task
+try (var executor = Executors.newVirtualThreadPerTaskExecutor()) {
+    IntStream.range(0, 100_000).forEach(i -&gt; {
+        executor.submit(() -&gt; {
+            // Blocking I/O does NOT block the OS thread!
+            Thread.sleep(Duration.ofSeconds(1));
+            return "Task " + i + " completed";
+        });
+    });
+} // Executor automatically waits for all tasks to complete upon close()</code></pre>
+
+          <div class="callout callout-warning">
+            <div class="callout-title">⚠️ The Virtual Thread Pinning Gotcha (Thread Pinning)</div>
+            <p>
+              A Virtual Thread becomes <strong>pinned</strong> to its Carrier Thread (meaning it cannot be unmounted during blocking I/O) in two critical situations:
+              <br><br>
+              1. When executing a blocking operation inside a <strong><code>synchronized</code> block or method</strong>.
+              <br>
+              2. When executing a blocking call inside a <strong><code>native</code> method</strong> or foreign function call.
+              <br><br>
+              If a pinned virtual thread blocks on I/O, the underlying physical Carrier Thread is also blocked. If all carrier threads become pinned, the entire JVM stalls!
+              <br>
+              <strong>Fix:</strong> Replace legacy <code>synchronized</code> blocks guarding blocking I/O with <code>java.util.concurrent.locks.ReentrantLock</code>.
+            </p>
+          </div>
+        </section>
+
+        <!-- SECTION 6: REAL-TIME PRODUCTION ISSUES -->
+        <section>
+          <h2>6. Real-Time Production Issues & Post-Mortems</h2>
+
+          <!-- Incident 1 -->
+          <div class="callout callout-production">
+            <div class="callout-title">🚨 Incident 1: Total Carrier Thread Starvation Due to Synchronized JDBC Driver Pinning</div>
+            <p><strong>Scenario:</strong> A fintech payment gateway migrated from Java 17 to Java 21 and switched Tomcat to use <code>Executors.newVirtualThreadPerTaskExecutor()</code>. Under moderate load (2,000 req/sec), throughput collapsed, p99 latency spiked from 30ms to 45,000ms, and CPU dropped to near 0%.</p>
+          </div>
+
+          <div class="callout callout-warning">
+            <div class="callout-title">🔍 Root Cause Analysis (RCA)</div>
+            <p>
+              The service used an outdated database connection pool / JDBC driver where connection acquisition and statement execution wrapped socket calls in <code>synchronized(this) { ... socket.read(); }</code> blocks.
+              <br><br>
+              Because of <code>synchronized</code>, every virtual thread executing a SQL query <strong>pinned its carrier thread</strong>. The JVM's carrier pool (defaulting to 8 carrier threads on an 8-core CPU) became completely pinned and blocked on socket I/O. As thousands of incoming HTTP virtual threads queued up, zero carrier threads were available to schedule them, freezing the application.
+            </p>
+          </div>
+
+          <div class="callout callout-solution">
+            <div class="callout-title">💡 Production Resolution</div>
+            <ul>
+              <li><strong>Diagnosed via JVM Flag:</strong> Enabled pinning detection: <code>-Djdk.tracePinnedThreads=full</code> to output the exact stack traces causing thread pinning.</li>
+              <li><strong>Driver Upgrade:</strong> Upgraded the JDBC driver and connection pool (HikariCP 5.1+) which replaced all internal <code>synchronized</code> locks with <code>ReentrantLock</code>.</li>
+            </ul>
+          </div>
+
+          <!-- Incident 2 -->
+          <div class="callout callout-production">
+            <div class="callout-title">🚨 Incident 2: Heap OOM from ThreadLocal Pooling Anti-Pattern in Virtual Threads</div>
+            <p><strong>Scenario:</strong> An enterprise logging interceptor maintained a <code>ThreadLocal&lt;byte[]&gt;</code> buffer of 2MB to serialize JSON logs. With platform threads (200 threads), heap usage was 400MB. When migrated to virtual threads under a spike of 50,000 concurrent requests, the JVM crashed with <code>java.lang.OutOfMemoryError: Java heap space</code>.</p>
+          </div>
+
+          <div class="callout callout-warning">
+            <div class="callout-title">🔍 Root Cause Analysis (RCA)</div>
+            <p>
+              In traditional architectures, platform threads are pooled and reused (e.g. 200 threads). When using virtual threads, threads are <strong>ephemeral</strong>—you create a new virtual thread per request. 50,000 concurrent virtual threads each allocating a 2MB <code>ThreadLocal</code> buffer consumed $50,000 \times 2\text{MB} = 100\text{GB}$ of heap memory!
+            </p>
+          </div>
+
+          <div class="callout callout-solution">
+            <div class="callout-title">💡 Production Resolution</div>
+            <ul>
+              <li><strong>Rule:</strong> Never pool Virtual Threads! They are meant to be created and discarded.</li>
+              <li><strong>Replacement:</strong> Migrated from heavy <code>ThreadLocal</code> instances to <strong>Scoped Values (JEP 446 / Java 21 preview)</strong>, which allow immutable, lightweight data sharing across threads without retaining heap buffers.</li>
+            </ul>
+          </div>
+        </section>
+
+        <!-- SECTION 7: PRODUCTION DIAGNOSTICS TOOLKIT -->
+        <section>
+          <h2>7. Production Triage & Inspection Toolkit</h2>
+
+          <div class="code-header">
+            <span>Diagnosing Virtual Threads & Pinning in Live Production</span>
+            <span>Bash</span>
+          </div>
+          <pre><code># 1. Enable Virtual Thread Pinning Trace on JVM Launch
+java -Djdk.tracePinnedThreads=full -jar myapp.jar
+
+# Pinning alert output example:
+# Thread[#28,ForkJoinPool-1-worker-1,5,CarrierThreads]
+#   java.base/java.lang.VirtualThread$VThreadContinuation.onPinned(VirtualThread.java:183)
+#   com.legacy.pool.ConnectionPool.getConnection(ConnectionPool.java:45) &lt;== synchronized monitor!
+
+# 2. Dump Virtual Threads to a JSON/Text file without pausing the JVM
+jcmd &lt;PID&gt; Thread.dump_to_file -format=json /var/log/vthread_dump.json
+
+# 3. Monitor Carrier Thread Pool Utilization via JConsole or JFR
+# Profile the jdk.VirtualThreadPinned and jdk.VirtualThreadSubmitFailed events in JFR:
+jcmd &lt;PID&gt; JFR.start name=vthread_profile settings=profile.jfc duration=60s filename=vthreads.jfr</code></pre>
+        </section>
+
+        <!-- SECTION 8: SENIOR INTERVIEW Q&A -->
+        <section>
+          <h2>8. Senior / Staff Technical Interview Q&A</h2>
+
+          <div class="callout callout-interview">
+            <div class="callout-title">🎯 Q1: Should you pool Virtual Threads like Platform Threads?</div>
+            <p><strong>Answer:</strong> <strong>Absolutely not.</strong> Pooling threads was an architectural workaround created solely because platform threads are expensive OS resources ($1\text{MB}$ stack, kernel context switching). Virtual threads, by contrast, are cheap Java objects allocated on the heap (costing a few hundred bytes) that are collected by the GC when finished. Pooling virtual threads wastes memory, prevents carrier unmounting, and breaks thread-per-request concurrency models.</p>
+          </div>
+
+          <div class="callout callout-interview">
+            <div class="callout-title">🎯 Q2: Do Virtual Threads make CPU-bound tasks (e.g. video rendering or cryptography) faster?</div>
+            <p><strong>Answer:</strong> No. Virtual threads provide massive throughput improvements only for <strong>I/O-bound tasks</strong> (database queries, network requests, disk I/O) where threads spend significant time waiting. For CPU-bound tasks, the physical CPU cores are already saturated at 100%; virtual threads cannot create more compute capacity and introduce slight scheduling overhead compared to a fixed pool sized to available CPU cores.</p>
+          </div>
+
+          <div class="callout callout-interview">
+            <div class="callout-title">🎯 Q3: Why is deserialization of Records considered fundamentally safer than normal classes?</div>
+            <p><strong>Answer:</strong> In standard classes, Java serialization bypasses constructors completely, initializing memory reflectively and assigning values to fields directly from the stream. This allows malicious byte streams to inject corrupted invariants or bypass security validations. With Records, the JVM serialization protocol mandates that deserialization <strong>must invoke the canonical constructor</strong>, guaranteeing that all parameter checks and invariant validations run on deserialized objects.</p>
+          </div>
+
+          <div class="callout callout-interview">
+            <div class="callout-title">🎯 Q4: Explain the difference between sealed classes and enums. When should you choose which?</div>
+            <p><strong>Answer:</strong> An <code>enum</code> represents a fixed set of <strong>singleton instances</strong> where every constant shares the exact same state structure. A <code>sealed class</code> represents a fixed set of <strong>types / classes</strong>, where each subtype can have its own distinct fields, constructors, methods, and multiple independent instances. Use enums for simple fixed values (e.g. <code>OrderStatus: PENDING, APPROVED</code>); use sealed classes for rich domain models / Algebraic Data Types (e.g. <code>PaymentMethod: CreditCard(card, cvv) vs Cash(amount)</code>).</p>
+          </div>
+        </section>
+
+      </main>
+    </div>
+  </div>
+
+  <footer>
+    <p>Interview A-Z Handbook &bull; Built for GitHub Pages &bull; Production Grade Interview Prep</p>
+  </footer>
+
+  <script src="../../assets/js/main.js"></script>
+</body>
+</html>

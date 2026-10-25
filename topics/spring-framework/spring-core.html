@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Module 3: Spring Framework Core, IoC, Bean Lifecycle & AOP | Interview A-Z</title>
+  <link rel="stylesheet" href="../../assets/css/style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+</head>
+<body>
+
+  <!-- Top Navigation -->
+  <nav class="navbar">
+    <div class="brand">
+      <span class="brand-badge">Interview A-Z</span>
+      <span>Engineering & Architecture Handbook</span>
+    </div>
+    <div class="nav-links">
+      <a href="../../index.html" class="nav-link">Home</a>
+      <a href="../../index.html#module-3" class="nav-link">Module Catalog</a>
+      <a href="https://github.com" target="_blank" class="nav-link">GitHub</a>
+    </div>
+  </nav>
+
+  <div class="container">
+    <div class="article-layout">
+      <!-- Sticky Sidebar Table of Contents -->
+      <aside class="sidebar-toc">
+        <h3>On This Page</h3>
+        <ul class="toc-links" id="dynamic-toc">
+          <!-- Dynamically populated via main.js -->
+        </ul>
+      </aside>
+
+      <!-- Main Article Content -->
+      <main class="article-content">
+        <!-- Breadcrumb -->
+        <nav class="breadcrumb">
+          <a href="../../index.html">Home</a>
+          <span>/</span>
+          <span>Module 3: Spring Framework</span>
+          <span>/</span>
+          <span style="color: #fff;">Spring Core & AOP</span>
+        </nav>
+
+        <!-- Article Header -->
+        <header class="article-header">
+          <h1>Module 3: Spring Core Framework, IoC Container, Bean Lifecycle & AOP</h1>
+          <div class="article-meta">
+            <span class="badge badge-core">Spring Framework</span>
+            <span class="badge badge-advanced">Container Internals</span>
+            <span class="badge badge-prod">AOP Proxy Pitfalls</span>
+            <span>⏱️ 55 min deep dive</span>
+            <span>Target Roles: SDE-2, SDE-3, Spring Boot Lead, Backend Architect</span>
+          </div>
+        </header>
+
+        <!-- SECTION 1: IOC & DI FOUNDATIONS -->
+        <section>
+          <h2>1. Inversion of Control (IoC) & Dependency Injection (DI)</h2>
+
+          <h3>1.1 The Hollywood Principle: Inversion of Control</h3>
+          <p>
+            In traditional imperative programming, application code directly controls execution flow and resource lifecycles by invoking <code>new OrderServiceImpl()</code>.
+          </p>
+          <p>
+            <strong>Inversion of Control (IoC)</strong> flips this responsibility (the "Hollywood Principle": <em>"Don't call us, we'll call you"</em>). The framework acts as the orchestrator: it instantiates objects, binds their dependencies, manages their complete lifecycles, and invokes application hooks when necessary.
+          </p>
+
+          <h3>1.2 Dependency Injection (DI) Pattern</h3>
+          <p>
+            <strong>Dependency Injection</strong> is the specific design pattern used by Spring to implement IoC. Instead of a component instantiating its collaborators or looking them up from a JNDI registry, collaborators are <em>injected</em> into the component at runtime by the IoC container.
+          </p>
+
+          <h3>1.3 What is a Spring Bean?</h3>
+          <p>
+            A <strong>Spring Bean</strong> is simply a plain Java object (POJO) that is instantiated, assembled, and managed by the Spring IoC container based on configuration metadata represented internally by <strong><code>BeanDefinition</code></strong> structures.
+          </p>
+        </section>
+
+        <!-- SECTION 2: APPLICATIONCONTEXT VS BEANFACTORY -->
+        <section>
+          <h2>2. BeanFactory vs. ApplicationContext Container Architecture</h2>
+
+          <pre><code>                     org.springframework.beans.factory.BeanFactory (Root Container Interface)
+                                              |
+                        org.springframework.beans.factory.HierarchicalBeanFactory
+                                              |
+                     org.springframework.context.ApplicationContext (Enterprise Container)
+                                              |
+       +--------------------------------------+--------------------------------------+
+       |                                      |                                      |
+AnnotationConfigApplicationContext   ClassPathXmlApplicationContext        WebApplicationContext</code></pre>
+
+          <table>
+            <thead>
+              <tr>
+                <th>Feature Dimension</th>
+                <th><code>BeanFactory</code></th>
+                <th><code>ApplicationContext</code></th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Bean Initialization</strong></td>
+                <td><strong>Lazy initialization</strong> (beans instantiated only when <code>getBean()</code> is called)</td>
+                <td><strong>Eager pre-instantiation</strong> of all singleton beans at startup (detects configuration errors immediately)</td>
+              </tr>
+              <tr>
+                <td><strong>Enterprise Features</strong></td>
+                <td>Basic DI and lifecycle callbacks only</td>
+                <td>AOP integration, <code>MessageSource</code> (i18n), Event Publishing (<code>ApplicationEventPublisher</code>), Environment property resolution</td>
+              </tr>
+              <tr>
+                <td><strong>BeanPostProcessor Registration</strong></td>
+                <td>Must be registered programmatically</td>
+                <td>Automatically discovers and registers all <code>BeanPostProcessor</code> and <code>BeanFactoryPostProcessor</code> implementations</td>
+              </tr>
+              <tr>
+                <td><strong>Target Deployment</strong></td>
+                <td>Memory-constrained edge devices / mobile (rarely used directly)</td>
+                <td>Standard runtime for all enterprise web services and Spring Boot applications</td>
+              </tr>
+            </tbody>
+          </table>
+        </section>
+
+        <!-- SECTION 3: COMPONENT SCANNING & STEREOTYPES -->
+        <section>
+          <h2>3. Component Scanning & Stereotype Annotations</h2>
+
+          <h3>3.1 Component Scanning Mechanics (ASM Bytecode Scanning)</h3>
+          <p>
+            When <code>@ComponentScan(basePackages = "com.myapp")</code> is declared, Spring does <strong>not</strong> load every <code>.class</code> file into the JVM using the ClassLoader (which would consume excessive Metaspace).
+          </p>
+          <p>
+            Instead, Spring uses the low-level <strong>ASM bytecode manipulation library</strong> via <code>ClassPathScanningCandidateComponentProvider</code>. It parses the raw compiled bytecode files on disk directly into an AST, checks if class annotations match <code>@Component</code> or its meta-annotations, and registers a <code>BeanDefinition</code> without initializing the class!
+          </p>
+
+          <h3>3.2 Stereotype Annotations Hierarchy</h3>
+          <ul>
+            <li><strong><code>@Component</code>:</strong> General-purpose stereotype annotation for any Spring-managed component.</li>
+            <li><strong><code>@Service</code>:</strong> Marks a service layer component containing core business transactions and logic. Semantically indicates a domain facade.</li>
+            <li><strong><code>@Repository</code>:</strong> Marks persistence/DAO components. <strong>Critical feature:</strong> Automatically applies <strong>Exception Translation</strong> via <code>PersistenceExceptionTranslationPostProcessor</code>, translating vendor-specific JDBC or Hibernate exceptions (e.g., <code>SQLException</code>, <code>HibernateException</code>) into Spring's unified, unchecked <code>DataAccessException</code> hierarchy!</li>
+            <li><strong><code>@Controller</code> / <code>@RestController</code>:</strong> Presentation tier handling HTTP requests in Spring MVC / REST endpoints.</li>
+            <li><strong><code>@Configuration</code>:</strong> Declares classes that define beans via <code>@Bean</code> methods. <strong>CGLIB Proxying:</strong> By default (<code>proxyBeanMethods = true</code>), Spring subclasses configuration classes with CGLIB to ensure direct calls between <code>@Bean</code> methods return the cached singleton instance instead of instantiating new objects.</li>
+          </ul>
+        </section>
+
+        <!-- SECTION 4: THE 12-STEP BEAN LIFECYCLE -->
+        <section>
+          <h2>4. The Complete Spring Bean Lifecycle</h2>
+          <p>
+            Senior interviewers frequently test the precise order of events from instantiation to destruction:
+          </p>
+
+          <pre><code>+-----------------------------------------------------------------------------------------+
+|                               SPRING BEAN LIFECYCLE PHASES                              |
++-----------------------------------------------------------------------------------------+
+|  1. Instantiation                                                                       |
+|     - Spring invokes constructor via reflection (or CGLIB factory)                      |
+|                                                                                         |
+|  2. Populate Properties (Dependency Injection)                                          |
+|     - Injects collaborators via setter/field/constructor injection                       |
+|                                                                                         |
+|  3. Aware Interfaces Callbacks (Spring Infrastructure Awareness)                       |
+|     - setBeanName(String name)                                                          |
+|     - setBeanClassLoader(ClassLoader cl)                                                |
+|     - setBeanFactory(BeanFactory bf)                                                    |
+|     - setApplicationContext(ApplicationContext ctx)                                     |
+|                                                                                         |
+|  4. BeanPostProcessor: postProcessBeforeInitialization(bean, beanName)                  |
+|     - Scans for custom annotations, validates state, injects resources                  |
+|                                                                                         |
+|  5. Initialization Callbacks (In order):                                                |
+|     a. @PostConstruct annotated method (JSR-250)                                        |
+|     b. InitializingBean.afterPropertiesSet() interface method                           |
+|     c. Custom initMethod specified via @Bean(initMethod = "customInit")                 |
+|                                                                                         |
+|  6. BeanPostProcessor: postProcessAfterInitialization(bean, beanName)                   |
+|     - CRITICAL: AOP proxies (CGLIB / JDK Dynamic) wrap the bean HERE!                   |
+|                                                                                         |
+|  7. BEAN IS FULLY INITIALIZED AND READY FOR USE IN APPLICATION                         |
+|                                                                                         |
+|  8. Destruction Callbacks (During ApplicationContext.close()):                          |
+|     a. @PreDestroy annotated method (JSR-250)                                           |
+|     b. DisposableBean.destroy() interface method                                        |
+|     c. Custom destroyMethod specified via @Bean(destroyMethod = "customCleanup")        |
++-----------------------------------------------------------------------------------------+</code></pre>
+        </section>
+
+        <!-- SECTION 5: BEAN SCOPES & PROTOTYPE GOTCHA -->
+        <section>
+          <h2>5. Bean Scopes & The Prototype Injection Hazard</h2>
+
+          <h3>5.1 The 4 Primary Bean Scopes</h3>
+          <ul>
+            <li><strong><code>singleton</code> (Default):</strong> Exactly one shared instance per Spring IoC container. Stateless, thread-safe design is mandatory.</li>
+            <li><strong><code>prototype</code>:</strong> A new bean instance is created <em>every single time</em> the bean is requested from the container (via <code>getBean()</code> or injection). <strong>Critical Warning:</strong> Spring manages the initialization of prototype beans, but <strong>does NOT manage their destruction</strong>! The client code must clean up prototype resources manually.</li>
+            <li><strong><code>request</code> (Web-aware):</strong> One instance created per HTTP request lifecycle; discarded when the HTTP request completes.</li>
+            <li><strong><code>session</code> (Web-aware):</strong> One instance created per user HTTP session.</li>
+          </ul>
+
+          <h3>5.2 The Prototype-Injected-into-Singleton Hazard</h3>
+          <p>
+            When a <code>prototype</code> bean is injected into a <code>singleton</code> bean:
+          </p>
+          <pre><code>@Component
+@Scope("singleton")
+public class OrderService {
+    @Autowired
+    private TokenGenerator tokenGenerator; // TokenGenerator is @Scope("prototype")!
+}</code></pre>
+          <p>
+            Because the singleton <code>OrderService</code> is instantiated only once at startup, its dependencies are also injected <strong>only once</strong>! The prototype <code>TokenGenerator</code> is never re-created for subsequent requests, effectively turning it into a singleton and leaking user state!
+          </p>
+          <div class="code-header">
+            <span>Resolving Prototype Injection via ObjectProvider or @Lookup</span>
+            <span>Java</span>
+          </div>
+          <pre><code>@Component
+@Scope("singleton")
+public class OrderService {
+    @Autowired
+    private ObjectProvider&lt;TokenGenerator&gt; tokenProvider; // Solution 1: ObjectProvider
+
+    public void createOrder() {
+        TokenGenerator token = tokenProvider.getObject(); // Returns a brand new prototype instance!
+        token.process();
+    }
+}
+
+// Solution 2: Scoped Proxy in the Prototype Definition:
+@Component
+@Scope(value = "prototype", proxyMode = ScopedProxyMode.TARGET_CLASS)
+public class TokenGenerator { ... }</code></pre>
+        </section>
+
+        <!-- SECTION 6: INJECTION TYPES: CONSTRUCTOR VS SETTER VS FIELD -->
+        <section>
+          <h2>6. Dependency Injection Styles: Why Field Injection is an Anti-Pattern</h2>
+
+          <h3>6.1 Comparison of DI Styles</h3>
+          <table>
+            <thead>
+              <tr>
+                <th>Dimension</th>
+                <th>Constructor Injection</th>
+                <th>Setter Injection</th>
+                <th>Field Injection (<code>@Autowired</code> on field)</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Immutability</strong></td>
+                <td><strong>YES</strong> (fields declared <code>final</code>)</td>
+                <td>No (mutable after creation)</td>
+                <td>No</td>
+              </tr>
+              <tr>
+                <td><strong>Unit Testing</strong></td>
+                <td><strong>Trivial</strong> (can pass POJO mocks directly without Spring)</td>
+                <td>Easy via public setters</td>
+                <td><strong>Extremely difficult</strong> (requires Reflection or Spring runner)</td>
+              </tr>
+              <tr>
+                <td><strong>Circular Dependencies</strong></td>
+                <td><strong>Fails fast at startup</strong> (immediate exception)</td>
+                <td>Masks circular dependencies</td>
+                <td>Masks circular dependencies until runtime</td>
+              </tr>
+              <tr>
+                <td><strong>Null Safety</strong></td>
+                <td>Guaranteed non-null at construction</td>
+                <td>Risk of NPE before setter runs</td>
+                <td>Risk of NPE outside Spring context</td>
+              </tr>
+              <tr>
+                <td><strong>Industry Standard</strong></td>
+                <td><strong>Mandatory Best Practice</strong></td>
+                <td>Used only for optional configs</td>
+                <td><strong>Flagged as Anti-Pattern by SonarQube</strong></td>
+              </tr>
+            </tbody>
+          </table>
+        </section>
+
+        <!-- SECTION 7: PROFILES, PROPERTIES & ENVIRONMENT -->
+        <section>
+          <h2>7. Profiles, Properties & Environment Abstraction</h2>
+          <ul>
+            <li><strong><code>@Profile("prod")</code>:</strong> Restricts bean registration or configuration classes to specific active runtime profiles (activated via <code>spring.profiles.active=prod</code>).</li>
+            <li><strong><code>@Value("${payment.timeout:5000}")</code>:</strong> Injects individual property values from property files with optional default fallbacks.</li>
+            <li><strong><code>@ConfigurationProperties(prefix = "payment")</code>:</strong> Type-safe hierarchical binding of configuration trees into validated Java records/beans with Hibernate Validator support.</li>
+            <li><strong><code>Environment</code> Abstraction:</strong> Represents the current execution profile and external properties source hierarchy (Command Line Arguments $\rightarrow$ JVM System Properties $\rightarrow$ OS Environment Variables $\rightarrow$ Application Properties).</li>
+          </ul>
+        </section>
+
+        <!-- SECTION 8: AOP ARCHITECTURE & PROXY INTERNALS -->
+        <section>
+          <h2>8. Aspect-Oriented Programming (AOP) & Proxy Internals</h2>
+
+          <h3>8.1 Core AOP Terminology</h3>
+          <ul>
+            <li><strong>Aspect:</strong> A modularization of a cross-cutting concern (e.g. logging, transactions, security) defined with <code>@Aspect</code>.</li>
+            <li><strong>Join Point:</strong> A specific execution point in the application (in Spring AOP, always a method execution).</li>
+            <li><strong>Pointcut:</strong> A predicate expression matching join points: <code>@Pointcut("execution(* com.myapp.service.*.*(..))")</code>.</li>
+            <li><strong>Advice:</strong> Action taken at a join point:
+              <ul>
+                <li><code>@Before</code>: Executes prior to the join point.</li>
+                <li><code>@AfterReturning</code>: Executes after normal return without exceptions.</li>
+                <li><code>@AfterThrowing</code>: Executes if method throws an exception.</li>
+                <li><code>@After</code>: Executes finally regardless of outcome.</li>
+                <li><code>@Around</code>: Most powerful advice; wraps the method invocation using <code>ProceedingJoinPoint.proceed()</code> to measure latency or modify arguments/return values.</li>
+              </ul>
+            </li>
+          </ul>
+
+          <h3>8.2 Spring AOP Proxy Mechanics: JDK Dynamic vs. CGLIB</h3>
+          <p>
+            Spring AOP is <strong>proxy-based</strong>. When a bean is targeted by an aspect (or <code>@Transactional</code>, <code>@Async</code>, <code>@Cacheable</code>), the container does not return the raw target bean. It returns a dynamically generated <strong>Proxy wrapper</strong>:
+          </p>
+          <ul>
+            <li><strong>JDK Dynamic Proxy:</strong> Used when the target class implements an interface. Creates dynamic proxies using native Java reflection (<code>java.lang.reflect.Proxy</code>).</li>
+            <li><strong>CGLIB Proxy:</strong> Generates a runtime subclass of the target class using bytecode enhancement. Since <strong>Spring Boot 2.x+</strong>, CGLIB is the <strong>default proxying mechanism</strong> (<code>spring.aop.proxy-target-class=true</code>), eliminating class-casting issues.</li>
+          </ul>
+        </section>
+
+        <!-- SECTION 9: REAL-TIME PRODUCTION ISSUES -->
+        <section>
+          <h2>9. Real-Time Production Issues & Post-Mortems</h2>
+
+          <!-- Incident 1 -->
+          <div class="callout callout-production">
+            <div class="callout-title">🚨 Incident 1: Silent @Transactional Failure via Internal Self-Invocation</div>
+            <p><strong>Scenario:</strong> In an order checkout pipeline, a database query succeeded but subsequent ledger debits threw a <code>NullPointerException</code>. Database records were partially committed, violating ACID atomicity, even though the method had <code>@Transactional</code>!</p>
+          </div>
+
+          <div class="callout callout-warning">
+            <div class="callout-title">🔍 Root Cause Analysis (RCA)</div>
+            <p>
+              The developer invoked the transactional method internally from within the same class:
+            </p>
+            <pre><code>@Service
+public class OrderService {
+    public void processOrder(Order order) {
+        // ... some preliminary steps
+        this.saveOrderWithTransaction(order); // CRITICAL BUG: Self-invocation via 'this'!
+    }
+
+    @Transactional // AOP aspect never intercepts this call!
+    public void saveOrderWithTransaction(Order order) {
+        orderRepo.save(order);
+        ledgerRepo.debit(order.getAmount());
+    }
+}</code></pre>
+            <p>
+              Because Spring AOP works via <strong>proxies</strong>, when an external caller invokes <code>orderService.processOrder()</code>, it calls the outer proxy. However, inside <code>processOrder()</code>, calling <code>this.saveOrderWithTransaction()</code> bypasses the proxy and executes on the <strong>raw target object</strong>! The transaction interceptor was never triggered, leaving database auto-commit active.
+            </p>
+          </div>
+
+          <div class="callout callout-solution">
+            <div class="callout-title">💡 Production Resolution</div>
+            <ul>
+              <li><strong>Architectural Separation (Recommended):</strong> Move <code>saveOrderWithTransaction()</code> to a separate collaborator bean (e.g., <code>OrderPersistenceService</code>) so calls always pass through the Spring proxy.</li>
+              <li><strong>Self-Injection:</strong> Inject the proxy into itself via <code>@Lazy private OrderService self;</code> and invoke <code>self.saveOrderWithTransaction()</code>.</li>
+            </ul>
+          </div>
+
+          <!-- Incident 2 -->
+          <div class="callout callout-production">
+            <div class="callout-title">🚨 Incident 2: Circular Dependency Boot Failure via Constructor Injection</div>
+            <p><strong>Scenario:</strong> A microservice failed to start in production with <code>BeanCurrentlyInCreationException: Error creating bean with name 'orderService': Requested bean is currently in creation: Is there an unresolvable circular reference?</code></p>
+          </div>
+
+          <div class="callout callout-warning">
+            <div class="callout-title">🔍 Root Cause Analysis (RCA)</div>
+            <p>
+              <code>OrderService</code> required <code>PaymentService</code> in its constructor, while <code>PaymentService</code> required <code>OrderService</code> in its constructor. While Spring's 3-level cache (singletonFactories) can resolve circular references for setter or field injection, <strong>it is mathematically impossible to instantiate either bean via constructor injection</strong> because neither constructor can complete without the other instance already existing!
+            </p>
+          </div>
+
+          <div class="callout callout-solution">
+            <div class="callout-title">💡 Production Resolution</div>
+            <ul>
+              <li><strong>Refactor (Best Practice):</strong> Break the circular dependency by introducing a third mediating service (e.g., <code>PaymentNotificationCoordinator</code>) or an event-driven <code>ApplicationEventPublisher</code>.</li>
+              <li><strong>Temporary Hotfix:</strong> Add <code>@Lazy</code> to one constructor parameter (e.g. <code>public OrderService(@Lazy PaymentService payment)</code>) so Spring injects a dynamic proxy instead of the real bean at startup.</li>
+            </ul>
+          </div>
+        </section>
+
+        <!-- SECTION 10: PRODUCTION DIAGNOSTICS TOOLKIT -->
+        <section>
+          <h2>10. Production Triage & Inspection Toolkit</h2>
+
+          <div class="code-header">
+            <span>Auditing Spring Beans & Environments in Live Production</span>
+            <span>Bash</span>
+          </div>
+          <pre><code># 1. Inspect all registered Spring Beans & their concrete class / proxy types via Actuator
+curl -s http://localhost:8080/actuator/beans | jq '.contexts.application.beans | to_entries[] | {name: .key, type: .value.type, scope: .value.scope}'
+
+# 2. Inspect active Profiles and Property Resolution Hierarchy
+curl -s http://localhost:8080/actuator/env | jq '.activeProfiles, .propertySources[0].name'
+
+# 3. Enable Spring Core Bean Initialization Debug Logging in application.yml
+logging:
+  level:
+    org.springframework.beans.factory: DEBUG
+    org.springframework.context.annotation: TRACE
+    org.springframework.aop.framework: DEBUG</code></pre>
+        </section>
+
+        <!-- SECTION 11: SENIOR INTERVIEW Q&A -->
+        <section>
+          <h2>11. Senior / Staff Technical Interview Q&A</h2>
+
+          <div class="callout callout-interview">
+            <div class="callout-title">🎯 Q1: How does Spring resolve circular dependencies using the Three-Level Cache?</div>
+            <p><strong>Answer:</strong> In <code>DefaultSingletonBeanRegistry</code>, Spring maintains 3 maps:
+              <br>
+              1. <code>singletonObjects</code> (Level 1): Fully initialized beans ready for production.
+              <br>
+              2. <code>earlySingletonObjects</code> (Level 2): Raw instantiated objects exposed before property injection (often for early proxy resolution).
+              <br>
+              3. <code>singletonFactories</code> (Level 3): Holds <code>ObjectFactory</code> lambdas capable of generating early bean references or wrapping beans in AOP proxies if circular dependencies exist.
+              <br>
+              When Bean A is instantiated, its factory is placed in Level 3. While injecting Bean B, B looks for A; it finds A's factory in Level 3, moves A to Level 2, injects it into B, and finishes B. Then A completes and moves to Level 1.
+            </p>
+          </div>
+
+          <div class="callout callout-interview">
+            <div class="callout-title">🎯 Q2: Why will @Async or @Transactional fail silently if placed on a private method?</div>
+            <p><strong>Answer:</strong> Spring AOP proxies operate by either subclassing the target (CGLIB) or implementing its interfaces (JDK dynamic proxy). A subclass cannot override a <code>private</code> method. When an external or internal caller invokes the method, the call bypasses the proxy entirely or cannot be overridden in the dynamic subclass, so the transaction interceptor or async executor advice is never invoked.</p>
+          </div>
+
+          <div class="callout callout-interview">
+            <div class="callout-title">🎯 Q3: What is the purpose of proxyBeanMethods = true in @Configuration?</div>
+            <p><strong>Answer:</strong> When <code>proxyBeanMethods = true</code> (the default), Spring enhances the <code>@Configuration</code> class with CGLIB at startup. If one <code>@Bean</code> method invokes another <code>@Bean</code> method directly in code (e.g. <code>dataSource()</code> called by <code>transactionManager()</code>), the CGLIB proxy intercepts the method call, checks the <code>ApplicationContext</code> cache, and returns the existing singleton bean rather than instantiating a second duplicate instance.</p>
+          </div>
+        </section>
+
+      </main>
+    </div>
+  </div>
+
+  <footer>
+    <p>Interview A-Z Handbook &bull; Built for GitHub Pages &bull; Production Grade Interview Prep</p>
+  </footer>
+
+  <script src="../../assets/js/main.js"></script>
+</body>
+</html>
