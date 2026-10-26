@@ -106,13 +106,23 @@
         </li>
 
         <!-- Module 6 Accordion Item -->
-        <li class="module-tree-item expanded" data-module-target="module-6">
+        <li class="module-tree-item" data-module-target="module-6">
           <div class="module-tree-header">
             <span class="module-name"><span>🛡️</span> Module 6: Spring Security</span>
             <span class="toggle-icon">▶</span>
           </div>
           <ul class="module-subtopics">
             <li><a href="topics/spring-security/spring-security-core.html">Spring Security Core & Defense</a></li>
+          </ul>
+        </li>
+        <!-- Module 7 Accordion Item -->
+        <li class="module-tree-item expanded" data-module-target="module-7">
+          <div class="module-tree-header">
+            <span class="module-name"><span>💾</span> Module 7: SQL & Database</span>
+            <span class="toggle-icon">▶</span>
+          </div>
+          <ul class="module-subtopics">
+            <li><a href="topics/database-sql/sql-core.html">SQL Mastery & Internals</a></li>
           </ul>
         </li>
       </ul>
@@ -128,12 +138,13 @@
         <!-- Search Input -->
         <div class="search-box-container">
           <span class="search-icon">🔍</span>
-          <input type="text" id="topic-search" class="search-input" placeholder="Search topics, Spring Security, JWT, OAuth2, BCrypt, JPA, Hibernate, Spring Boot, Multithreading, RCA...">
+          <input type="text" id="topic-search" class="search-input" placeholder="Search topics, SQL, Window Functions, Joins, CTE, Spring Security, JWT, JPA, Hibernate, Multithreading, RCA...">
         </div>
 
         <!-- Quick Category Filters -->
         <div class="filter-tags">
           <button class="tag-btn active" data-filter="all">All Topics</button>
+          <button class="tag-btn" data-filter="sql">SQL & Database</button>
           <button class="tag-btn" data-filter="security">Spring Security</button>
           <button class="tag-btn" data-filter="jpa">JPA & Hibernate</button>
           <button class="tag-btn" data-filter="spring-boot">Spring Boot</button>
@@ -149,6 +160,46 @@
 
       <!-- Topic Catalog Container -->
       <div id="topics">
+
+        <!-- ============================================== -->
+        <!-- MODULE 7: SQL & DATABASE -->
+        <!-- ============================================== -->
+        <section class="topic-group-section" id="module-7">
+          <div class="topic-group-header">
+            <div class="topic-group-title">
+              <span>💾 Module 7: SQL & Database</span>
+            </div>
+            <span class="topic-count">1 Comprehensive Master Module Active</span>
+          </div>
+
+          <div class="cards-grid">
+            <!-- Card 1: SQL Engine Internals, Joins & Window Functions -->
+            <div class="card" data-tags="sql database queries performance production">
+              <div class="card-top">
+                <span class="badge badge-advanced">SQL Internals</span>
+                <span class="badge badge-prod">Execution Plans & Windowing</span>
+              </div>
+              <h2 class="card-title">SQL Query Mastery, CBO Optimization & Window Functions</h2>
+              <p class="card-desc">Comprehensive architectural deep dive into relational database query engines: 10-step Logical Query Execution Order, WHERE vs HAVING index mechanics, physical join algorithms (Nested Loop, Hash Join, Merge Join), Correlated Subqueries, Recursive CTEs, Three-Valued Logic (NULL in NOT IN vs NOT EXISTS), UNION vs UNION ALL memory impact, and advanced Window Functions (ROW_NUMBER, RANK, DENSE_RANK, LAG, LEAD, moving frame aggregation).</p>
+              
+              <ul class="subtopics-list">
+                <li class="subtopic-item"><strong>Logical Query Processing:</strong> Exact 10-step sequence (FROM &rarr; ON &rarr; JOIN &rarr; WHERE &rarr; GROUP BY &rarr; HAVING &rarr; SELECT &rarr; DISTINCT &rarr; ORDER BY &rarr; LIMIT) and why aliases fail in WHERE</li>
+                <li class="subtopic-item"><strong>Row & Group Filtering:</strong> WHERE B-Tree index scan pruning vs HAVING post-aggregation group filtering</li>
+                <li class="subtopic-item"><strong>DISTINCT & CASE:</strong> Hash Aggregate and external sort-distinct memory/spill mechanics, Searched CASE conditional aggregation & pivoting</li>
+                <li class="subtopic-item"><strong>Physical Join Engine:</strong> Nested Loop ($O(N \log M)$), In-memory Hash Join ($O(N + M)$), Sort-Merge Join, Self-Joins for tree hierarchies</li>
+                <li class="subtopic-item"><strong>Subqueries & CTEs:</strong> Scalar vs Correlated Subqueries, RECURSIVE Common Table Expressions for organizational trees</li>
+                <li class="subtopic-item"><strong>Set Operations & Logic:</strong> UNION ALL ($O(1)$ stream) vs UNION (sort/hash deduplication), 3-Valued Logic trap (NOT IN with NULL disaster vs NOT EXISTS anti-semi-join)</li>
+                <li class="subtopic-item"><strong>Window Functions:</strong> OVER(), PARTITION BY, ORDER BY, ROW_NUMBER vs RANK vs DENSE_RANK, LAG/LEAD MoM growth, ROWS vs RANGE frame windowing</li>
+                <li class="subtopic-item"><strong>Production Post-Mortems:</strong> 300GB disk spill from DISTINCT hiding a Cartesian fanout, 100% DB CPU lockup from correlated scalar subqueries</li>
+              </ul>
+
+              <div class="card-footer">
+                <span style="font-size: 0.82rem; color: var(--text-muted);">13 Core Subtopics Covered</span>
+                <a href="topics/database-sql/sql-core.html" class="card-link">Explore Deep Dive &rarr;</a>
+              </div>
+            </div>
+          </div>
+        </section>
 
         <!-- ============================================== -->
         <!-- MODULE 6: SPRING SECURITY -->

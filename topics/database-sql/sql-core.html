@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Module 7: SQL Mastery, Execution Plans & Window Functions | Interview A-Z</title>
+  <link rel="stylesheet" href="../../assets/css/style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+</head>
+<body>
+
+  <!-- Top Navigation -->
+  <nav class="navbar">
+    <div class="brand">
+      <span class="brand-badge">Interview A-Z</span>
+      <span>Engineering & Architecture Handbook</span>
+    </div>
+    <div class="nav-links">
+      <a href="../../index.html" class="nav-link">Home</a>
+      <a href="../../index.html#module-7" class="nav-link">Module Catalog</a>
+      <a href="https://github.com" target="_blank" class="nav-link">GitHub</a>
+    </div>
+  </nav>
+
+  <div class="container">
+    <div class="article-layout">
+      <!-- Sticky Sidebar Table of Contents -->
+      <aside class="sidebar-toc">
+        <h3>On This Page</h3>
+        <ul class="toc-links" id="dynamic-toc">
+          <!-- Dynamically populated via main.js -->
+        </ul>
+      </aside>
+
+      <!-- Main Article Content -->
+      <main class="article-content">
+        <!-- Breadcrumb -->
+        <nav class="breadcrumb">
+          <a href="../../index.html">Home</a>
+          <span>/</span>
+          <span>Module 7: SQL & Databases</span>
+          <span>/</span>
+          <span style="color: #fff;">SQL Engine Internals & Query Mastery</span>
+        </nav>
+
+        <!-- Article Header -->
+        <header class="article-header">
+          <h1>Module 7 (Part 1): SQL Internals, Execution Order, Complex Joins & Window Functions</h1>
+          <div class="article-meta">
+            <span class="badge badge-spring">SQL Internals</span>
+            <span class="badge badge-advanced">Cost-Based Optimizer</span>
+            <span class="badge badge-prod">Query Tuning & Post-Mortems</span>
+            <span>⏱️ 60 min deep dive</span>
+            <span>Target Roles: SDE-2, SDE-3, Data Engineer & System Architect</span>
+          </div>
+        </header>
+
+        <!-- SECTION 1: LOGICAL QUERY PROCESSING ORDER -->
+        <section>
+          <h2>1. The 10-Step Logical Query Processing Order</h2>
+
+          <h3>1.1 Syntactic Writing Order vs Logical Execution Order</h3>
+          <p>
+            Unlike imperative languages (Java, C++) which execute top-to-bottom, SQL is a <strong>declarative language</strong>. You specify <em>what</em> data you want, not <em>how</em> to retrieve it. A critical senior engineer requirement is understanding that the database engine parses and executes clauses in a fundamentally different sequence from how they are written:
+          </p>
+
+          <table style="width:100%; border-collapse:collapse; margin: 1.5rem 0;">
+            <thead>
+              <tr style="background: rgba(255,255,255,0.05); text-align: left;">
+                <th style="padding: 10px; border: 1px solid var(--border-color);">Step</th>
+                <th style="padding: 10px; border: 1px solid var(--border-color);">Clause</th>
+                <th style="padding: 10px; border: 1px solid var(--border-color);">Engine Operation & Intermediate Virtual Table</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td style="padding: 10px; border: 1px solid var(--border-color);">1</td>
+                <td style="padding: 10px; border: 1px solid var(--border-color);"><strong>FROM</strong></td>
+                <td style="padding: 10px; border: 1px solid var(--border-color);">Identifies source tables, resolves aliases, performs Cartesian products for joins.</td>
+              </tr>
+              <tr>
+                <td style="padding: 10px; border: 1px solid var(--border-color);">2</td>
+                <td style="padding: 10px; border: 1px solid var(--border-color);"><strong>ON</strong></td>
+                <td style="padding: 10px; border: 1px solid var(--border-color);">Evaluates join predicates against table rows.</td>
+              </tr>
+              <tr>
+                <td style="padding: 10px; border: 1px solid var(--border-color);">3</td>
+                <td style="padding: 10px; border: 1px solid var(--border-color);"><strong>JOIN</strong></td>
+                <td style="padding: 10px; border: 1px solid var(--border-color);">Adds preserved outer rows (for LEFT, RIGHT, FULL OUTER joins).</td>
+              </tr>
+              <tr>
+                <td style="padding: 10px; border: 1px solid var(--border-color);">4</td>
+                <td style="padding: 10px; border: 1px solid var(--border-color);"><strong>WHERE</strong></td>
+                <td style="padding: 10px; border: 1px solid var(--border-color);">Filters individual rows <em>before</em> aggregation. Cannot reference SELECT aliases or aggregate functions.</td>
+              </tr>
+              <tr>
+                <td style="padding: 10px; border: 1px solid var(--border-color);">5</td>
+                <td style="padding: 10px; border: 1px solid var(--border-color);"><strong>GROUP BY</strong></td>
+                <td style="padding: 10px; border: 1px solid var(--border-color);">Collapses rows sharing identical key attributes into distinct bucket groups.</td>
+              </tr>
+              <tr>
+                <td style="padding: 10px; border: 1px solid var(--border-color);">6</td>
+                <td style="padding: 10px; border: 1px solid var(--border-color);"><strong>HAVING</strong></td>
+                <td style="padding: 10px; border: 1px solid var(--border-color);">Filters collapsed groups using aggregate conditions (e.g. <code>COUNT(*) &gt; 5</code>).</td>
+              </tr>
+              <tr>
+                <td style="padding: 10px; border: 1px solid var(--border-color);">7</td>
+                <td style="padding: 10px; border: 1px solid var(--border-color);"><strong>SELECT</strong></td>
+                <td style="padding: 10px; border: 1px solid var(--border-color);">Evaluates expressions, computes column projections, assigns column aliases.</td>
+              </tr>
+              <tr>
+                <td style="padding: 10px; border: 1px solid var(--border-color);">8</td>
+                <td style="padding: 10px; border: 1px solid var(--border-color);"><strong>DISTINCT</strong></td>
+                <td style="padding: 10px; border: 1px solid var(--border-color);">Eliminates duplicate projection rows using hashing or sorting algorithms.</td>
+              </tr>
+              <tr>
+                <td style="padding: 10px; border: 1px solid var(--border-color);">9</td>
+                <td style="padding: 10px; border: 1px solid var(--border-color);"><strong>ORDER BY</strong></td>
+                <td style="padding: 10px; border: 1px solid var(--border-color);">Sorts final result set. <em>Only step that can legally use SELECT aliases</em>.</td>
+              </tr>
+              <tr>
+                <td style="padding: 10px; border: 1px solid var(--border-color);">10</td>
+                <td style="padding: 10px; border: 1px solid var(--border-color);"><strong>LIMIT / OFFSET</strong></td>
+                <td style="padding: 10px; border: 1px solid var(--border-color);">Discards rows and caps result set cardinality before streaming to client.</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <div class="callout callout-warning">
+            <div class="callout-title">⚠️ The "Alias Unknown in WHERE" Mystery</div>
+            <p>
+              Why does <code>SELECT salary * 12 AS annual_salary FROM emp WHERE annual_salary &gt; 100000;</code> fail with <em>"column annual_salary does not exist"</em>?
+            </p>
+            <p>
+              Because <strong>WHERE (Step 4)</strong> runs <em>before</em> <strong>SELECT (Step 7)</strong>. The database has not yet evaluated the alias when filtering rows. However, <code>ORDER BY annual_salary DESC</code> succeeds because <strong>ORDER BY (Step 9)</strong> executes <em>after</em> SELECT.
+            </p>
+          </div>
+        </section>
+
+        <!-- SECTION 2: SELECT, WHERE, GROUP BY, HAVING, ORDER BY -->
+        <section>
+          <h2>2. Fundamental Clauses: Filtering, Grouping & Sorting</h2>
+
+          <h3>2.1 WHERE vs HAVING: Cardinality and Performance</h3>
+          <ul>
+            <li><strong>WHERE:</strong> Filters individual records <em>before</em> rows enter memory for aggregation. Utilizes B-Tree indexes to prune row scans. Always filter row-level conditions in WHERE.</li>
+            <li><strong>HAVING:</strong> Evaluated <em>after</em> all groups are constructed. Filters aggregated groups. Cannot utilize standard indexes on unaggregated columns without specialized grouped indexes.</li>
+          </ul>
+
+          <pre><code class="language-sql">-- BAD ARCHITECTURAL PRACTICE: Filtering row-level attributes inside HAVING
+SELECT department_id, AVG(salary) AS avg_sal
+FROM employees
+GROUP BY department_id, is_active
+HAVING is_active = TRUE AND AVG(salary) > 85000; -- Forces engine to aggregate inactive rows first!
+
+-- OPTIMAL PRODUCTION QUERY:
+SELECT department_id, AVG(salary) AS avg_sal
+FROM employees
+WHERE is_active = TRUE -- Prunes rows immediately using index on (is_active)
+GROUP BY department_id
+HAVING AVG(salary) > 85000; -- Only aggregates active rows</code></pre>
+
+          <h3>2.2 DISTINCT Internals: The Hidden Performance Tax</h3>
+          <p>
+            <code>DISTINCT</code> is not a simple flag; it triggers a heavy physical sort or hash operation:
+          </p>
+          <ul>
+            <li><strong>Hash Aggregate:</strong> The engine allocates an in-memory hash table of all projected columns. If distinct values exceed allocated memory (<code>work_mem</code> in Postgres or <code>tmp_table_size</code> in MySQL), it spills to disk temporary files (I/O bottleneck).</li>
+            <li><strong>Sort Aggregate:</strong> The engine executes an external merge sort across all rows to discard adjacent identical tuples.</li>
+          </ul>
+
+          <h3>2.3 Conditional Logic: CASE WHEN Expression</h3>
+          <p>
+            <code>CASE</code> is a scalar expression that returns a value. It evaluates sequentially from top to bottom and supports two forms:
+          </p>
+          <ul>
+            <li><strong>Simple CASE:</strong> <code>CASE status WHEN 'P' THEN 1 WHEN 'C' THEN 2 ELSE 0 END</code></li>
+            <li><strong>Searched CASE:</strong> Supports boolean predicates and conditional aggregation (pivot queries):</li>
+          </ul>
+
+          <pre><code class="language-sql">-- Conditional Aggregation (Pivoting rows into columns without vendor-specific PIVOT syntax)
+SELECT 
+    DATE_TRUNC('month', order_date) AS order_month,
+    COUNT(*) AS total_orders,
+    SUM(CASE WHEN status = 'COMPLETED' THEN amount ELSE 0 END) AS completed_revenue,
+    SUM(CASE WHEN status = 'REFUNDED'  THEN amount ELSE 0 END) AS refunded_loss,
+    ROUND(100.0 * COUNT(CASE WHEN status = 'FAILED' THEN 1 END) / COUNT(*), 2) AS failure_rate_pct
+FROM orders
+WHERE order_date >= '2026-01-01'
+GROUP BY DATE_TRUNC('month', order_date)
+ORDER BY order_month ASC;</code></pre>
+        </section>
+
+        <!-- SECTION 3: DEEP DIVE INTO JOINS & ENGINE STRATEGIES -->
+        <section>
+          <h2>3. Relational Joins & Execution Engine Mechanics</h2>
+
+          <h3>3.1 Logical Join Types</h3>
+          <pre><code>[ INNER JOIN ]       Intersection: Only tuples matching predicates in both tables.
+[ LEFT JOIN ]        Preserves ALL rows from Left table; NULLs for non-matching Right attributes.
+[ RIGHT JOIN ]       Preserves ALL rows from Right table; NULLs for Left attributes.
+[ FULL OUTER JOIN ]  Preserves all rows from both tables; NULLs wherever matching tuple is absent.
+[ CROSS JOIN ]       Cartesian product (Size = M * N). Avoid unless generating coordinate matrices.
+[ SELF JOIN ]        A table joined with itself (hierarchies, organizational trees, graph edges).</code></pre>
+
+          <h3>3.2 Under the Hood: Physical Join Algorithms</h3>
+          <p>
+            When a cost-based optimizer (CBO) plans a join, it translates logical joins into one of three physical algorithms based on statistics, cardinality, and available indexes:
+          </p>
+
+          <table style="width:100%; border-collapse:collapse; margin: 1.5rem 0;">
+            <thead>
+              <tr style="background: rgba(255,255,255,0.05); text-align: left;">
+                <th style="padding: 10px; border: 1px solid var(--border-color);">Join Algorithm</th>
+                <th style="padding: 10px; border: 1px solid var(--border-color);">Algorithm Complexity</th>
+                <th style="padding: 10px; border: 1px solid var(--border-color);">Ideal Use Case</th>
+                <th style="padding: 10px; border: 1px solid var(--border-color);">Engine Vulnerability</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td style="padding: 10px; border: 1px solid var(--border-color);"><strong>Nested Loop Join</strong></td>
+                <td style="padding: 10px; border: 1px solid var(--border-color);">$O(N \times \log M)$ with index, $O(N \times M)$ without</td>
+                <td style="padding: 10px; border: 1px solid var(--border-color);">Small outer table driving a large inner table indexed on join key.</td>
+                <td style="padding: 10px; border: 1px solid var(--border-color);">Missing index causes catastrophic $O(N \times M)$ CPU lockup.</td>
+              </tr>
+              <tr>
+                <td style="padding: 10px; border: 1px solid var(--border-color);"><strong>Hash Join</strong></td>
+                <td style="padding: 10px; border: 1px solid var(--border-color);">$O(N + M)$</td>
+                <td style="padding: 10px; border: 1px solid var(--border-color);">Joining large datasets without suitable indexes on equijoins (<code>=</code>).</td>
+                <td style="padding: 10px; border: 1px solid var(--border-color);">Hash table size exceeds RAM, causing multi-batch disk spills. Only supports equijoins.</td>
+              </tr>
+              <tr>
+                <td style="padding: 10px; border: 1px solid var(--border-color);"><strong>Merge Join (Sort-Merge)</strong></td>
+                <td style="padding: 10px; border: 1px solid var(--border-color);">$O(N \log N + M \log M)$ or $O(N + M)$ if pre-sorted</td>
+                <td style="padding: 10px; border: 1px solid var(--border-color);">Both inputs already sorted on join keys via B-Tree clustered index.</td>
+                <td style="padding: 10px; border: 1px solid var(--border-color);">If data is unsorted, upfront sort cost overwhelms benefit.</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <pre><code class="language-sql">-- Self-Join for Organizational Hierarchy
+SELECT 
+    e.employee_id,
+    e.first_name || ' ' || e.last_name AS employee_name,
+    e.job_title,
+    COALESCE(m.first_name || ' ' || m.last_name, 'TOP EXECUTIVE') AS manager_name
+FROM employees e
+LEFT JOIN employees m ON e.manager_id = m.employee_id
+ORDER BY m.employee_id NULLS FIRST;</code></pre>
+        </section>
+
+        <!-- SECTION 4: SUBQUERIES VS CTE VS EXISTS -->
+        <section>
+          <h2>4. Subqueries, CTEs, UNION & The Three-Valued Logic Trap</h2>
+
+          <h3>4.1 Subquery Types</h3>
+          <ul>
+            <li><strong>Scalar Subquery:</strong> Returns exactly one row and one column. Can be placed anywhere a value is expected (SELECT list, WHERE comparison).</li>
+            <li><strong>Multi-Row Subquery:</strong> Returns a column with multiple rows. Evaluated using <code>IN</code>, <code>ANY</code>, or <code>ALL</code>.</li>
+            <li><strong>Correlated Subquery:</strong> The inner query references columns from the outer query. It evaluates <em>once for every candidate row of the outer query</em> unless unnested by the optimizer.</li>
+          </ul>
+
+          <h3>4.2 Common Table Expressions (CTE)</h3>
+          <p>
+            Defined using the <code>WITH</code> clause. CTEs enhance readability and enable <strong>Recursive Queries</strong> (e.g. bill-of-materials, folder trees, graph traversal):
+          </p>
+
+          <pre><code class="language-sql">-- Recursive CTE: Traversing Management Hierarchy
+WITH RECURSIVE OrgChart AS (
+    -- Anchor member: Start at CEO (manager_id IS NULL)
+    SELECT employee_id, first_name, manager_id, 1 AS depth_level
+    FROM employees
+    WHERE manager_id IS NULL
+
+    UNION ALL
+
+    -- Recursive member: Join with OrgChart anchor
+    SELECT e.employee_id, e.first_name, e.manager_id, o.depth_level + 1
+    FROM employees e
+    INNER JOIN OrgChart o ON e.manager_id = o.employee_id
+)
+SELECT depth_level, LPAD(' ', (depth_level - 1) * 4) || first_name AS hierarchy
+FROM OrgChart
+ORDER BY depth_level, employee_id;</code></pre>
+
+          <h3>4.3 EXISTS vs IN: The Three-Valued Logic (NULL) Trap</h3>
+          <p>
+            In SQL, boolean logic is three-valued: <code>TRUE</code>, <code>FALSE</code>, and <code>UNKNOWN</code> (NULL).
+          </p>
+          <div class="callout callout-warning">
+            <div class="callout-title">⚠️ The Fatal NOT IN with NULL Disaster</div>
+            <p>
+              Suppose table B has records: <code>(1, 2, NULL)</code>. You execute:
+            </p>
+            <pre><code class="language-sql">SELECT * FROM table_a WHERE id NOT IN (SELECT id FROM table_b);</code></pre>
+            <p>
+              This query expands to: <code>WHERE id != 1 AND id != 2 AND id != NULL</code>.<br>
+              In SQL, <code>id != NULL</code> evaluates to <strong>UNKNOWN</strong>.<br>
+              <code>TRUE AND TRUE AND UNKNOWN</code> evaluates to <strong>UNKNOWN</strong>.<br>
+              <strong>Result: The query returns 0 rows! It silently fails to return any data at all!</strong>
+            </p>
+            <p>
+              <strong>The Enterprise Rule:</strong> Always use <strong><code>NOT EXISTS</code></strong> instead of <code>NOT IN</code>. <code>EXISTS</code> uses two-valued Boolean logic (either a matching row exists or it does not), completely immune to NULL values:
+            </p>
+            <pre><code class="language-sql">SELECT a.*
+FROM table_a a
+WHERE NOT EXISTS (
+    SELECT 1 FROM table_b b WHERE b.id = a.id
+); -- Safe, index-optimized Anti-Semi-Join!</code></pre>
+          </div>
+
+          <h3>4.4 UNION vs UNION ALL</h3>
+          <ul>
+            <li><strong><code>UNION ALL</code>:</strong> Concatenates result sets directly into the output stream. $O(1)$ additional overhead, no buffering, minimal memory consumption.</li>
+            <li><strong><code>UNION</code>:</strong> Concatenates result sets and performs an exhaustive duplicate elimination pass via an in-memory hash table or disk sort. Has massive performance and CPU cost.</li>
+            <li><em>Best Practice:</em> Never use <code>UNION</code> unless you specifically require mathematical set deduplication. Always default to <code>UNION ALL</code>.</li>
+          </ul>
+        </section>
+
+        <!-- SECTION 5: WINDOW FUNCTIONS ARCHITECTURE -->
+        <section>
+          <h2>5. Advanced Window Functions & Frame Specifications</h2>
+
+          <h3>5.1 Window Functions vs GROUP BY</h3>
+          <p>
+            While <code>GROUP BY</code> collapses multiple rows into a single summary tuple, a <strong>Window Function</strong> calculates an aggregate or ranking across a defined partition of rows <strong>while preserving every individual row's identity and detail</strong>.
+          </p>
+
+          <pre><code>Syntax Anatomy:
+FUNCTION(...) OVER (
+    [PARTITION BY partition_col1, ...]
+    [ORDER BY sort_col1 [ASC|DESC], ...]
+    [ROWS | RANGE BETWEEN frame_start AND frame_end]
+)</code></pre>
+
+          <h3>5.2 Ranking Functions Compared: ROW_NUMBER vs RANK vs DENSE_RANK</h3>
+          <p>
+            When rows share identical values for the ordering column (ties):
+          </p>
+          <ul>
+            <li><strong><code>ROW_NUMBER()</code>:</strong> Assigns a strict sequential integer (1, 2, 3, 4, 5) without regard for ties (arbitrary tie-breaker).</li>
+            <li><strong><code>RANK()</code>:</strong> Assigns identical rank to ties, but <strong>skips</strong> subsequent positions (e.g. 1, 2, 2, 4, 5).</li>
+            <li><strong><code>DENSE_RANK()</code>:</strong> Assigns identical rank to ties, but <strong>never skips</strong> subsequent ranks (e.g. 1, 2, 2, 3, 4).</li>
+          </ul>
+
+          <pre><code class="language-sql">-- Finding the Top 3 Highest Earners in Each Department (Staff Interview Classic)
+WITH RankedEmployees AS (
+    SELECT 
+        department_id,
+        employee_id,
+        salary,
+        DENSE_RANK() OVER (
+            PARTITION BY department_id 
+            ORDER BY salary DESC
+        ) AS salary_rank
+    FROM employees
+)
+SELECT department_id, employee_id, salary, salary_rank
+FROM RankedEmployees
+WHERE salary_rank <= 3
+ORDER BY department_id, salary_rank;</code></pre>
+
+          <h3>5.3 Value & Navigation Functions: LAG, LEAD, FIRST_VALUE</h3>
+          <pre><code class="language-sql">-- Month-Over-Month (MoM) Growth Analysis
+SELECT 
+    order_month,
+    revenue,
+    LAG(revenue, 1) OVER (ORDER BY order_month) AS prev_month_revenue,
+    ROUND(
+        100.0 * (revenue - LAG(revenue, 1) OVER (ORDER BY order_month)) / 
+        NULLIF(LAG(revenue, 1) OVER (ORDER BY order_month), 0), 2
+    ) AS mom_growth_pct
+FROM monthly_sales;</code></pre>
+
+          <h3>5.4 The Window Frame: ROWS vs RANGE</h3>
+          <p>
+            The frame clause dictates which subset of rows within the partition are included in the computation:
+          </p>
+          <ul>
+            <li><strong><code>ROWS BETWEEN 2 PRECEDING AND CURRENT ROW</code>:</strong> Physical count of rows.</li>
+            <li><strong><code>RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW</code>:</strong> Logical value offset based on duplicate values in the ORDER BY column. <em>Warning:</em> Default in SQL standard when ORDER BY is provided, often causing unexpected duplicate aggregations on ties!</li>
+          </ul>
+
+          <pre><code class="language-sql">-- 7-Day Moving Average of Daily Transaction Volume
+SELECT 
+    txn_date,
+    daily_amount,
+    AVG(daily_amount) OVER (
+        ORDER BY txn_date
+        ROWS BETWEEN 6 PRECEDING AND CURRENT ROW
+    ) AS moving_avg_7d,
+    SUM(daily_amount) OVER (
+        PARTITION BY DATE_TRUNC('year', txn_date)
+        ORDER BY txn_date
+        ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW
+    ) AS ytd_running_total
+FROM daily_revenue_ledger;</code></pre>
+        </section>
+
+        <!-- SECTION 6: PRODUCTION POST-MORTEMS -->
+        <section>
+          <h2>6. Real-World Production War Stories (RCA & Fixes)</h2>
+
+          <!-- POST-MORTEM 1 -->
+          <div class="callout callout-production">
+            <div class="callout-title">🚨 Incident 1: 300GB Temporary Disk Spill via DISTINCT Masking a Cartesian Join</div>
+            <p><strong>Environment:</strong> E-commerce financial reconciliation microservice running nightly against a PostgreSQL RDS cluster.</p>
+            <p><strong>The Failure:</strong> The nightly ledger query, which normally finished in 45 seconds, began taking 4 hours and crashed with: <code>ERROR: could not write to hash-join temporary file: No space left on device (300GB spilled)</code>.</p>
+            <p><strong>Root Cause Analysis (RCA):</strong></p>
+            <ul>
+              <li>A junior engineer noticed duplicate order rows appearing in a report and added <code>SELECT DISTINCT o.order_id, o.amount, p.status ...</code> as a quick fix.</li>
+              <li>Underneath, the join was: <code>FROM orders o LEFT JOIN order_items oi ON o.id = oi.order_id LEFT JOIN payments p ON o.id = p.order_id</code>.</li>
+              <li>An order with 10 order items and 5 payment retry attempts produced $10 \times 5 = 50$ Cartesian product rows per order!</li>
+              <li>Across 5 million daily orders, the query generated <strong>250 million rows</strong>. The <code>DISTINCT</code> clause attempted to deduplicate 250 million rows using an in-memory hash table, exhausted <code>work_mem</code> (64MB), and continuously spilled 300GB of intermediate runs to disk.</li>
+            </ul>
+            <p><strong>The Fix:</strong> Eliminate the Cartesian fanout by pre-aggregating payments and order items in separate CTEs or subqueries before joining:</p>
+            <pre><code class="language-sql">WITH AggPayments AS (
+    SELECT order_id, SUM(amount) AS total_paid
+    FROM payments
+    WHERE status = 'SUCCESS'
+    GROUP BY order_id
+),
+AggItems AS (
+    SELECT order_id, COUNT(*) AS item_count, SUM(price) AS items_total
+    FROM order_items
+    GROUP BY order_id
+)
+SELECT o.id, o.total_amount, p.total_paid, i.item_count
+FROM orders o
+LEFT JOIN AggPayments p ON o.id = p.order_id
+LEFT JOIN AggItems i ON o.id = i.order_id; -- Perfect 1:1 join without DISTINCT!</code></pre>
+          </div>
+
+          <!-- POST-MORTEM 2 -->
+          <div class="callout callout-production">
+            <div class="callout-title">🚨 Incident 2: 100% Database CPU Lockup via Correlated Scalar Subquery</div>
+            <p><strong>Environment:</strong> Logistics tracking platform with 20 million shipment updates.</p>
+            <p><strong>The Failure:</strong> Shipment search API latency degraded from 30ms to 45 seconds during morning dispatch, pushing database CPU to 100%.</p>
+            <p><strong>Root Cause Analysis (RCA):</strong></p>
+            <ul>
+              <li>The API query retrieved the latest status for each shipment using a correlated subquery in the SELECT clause:
+                <pre><code class="language-sql">SELECT s.id, s.tracking_number,
+    (SELECT status FROM shipment_events e 
+     WHERE e.shipment_id = s.id 
+     ORDER BY event_time DESC LIMIT 1) AS current_status
+FROM shipments s WHERE s.created_at >= CURRENT_DATE;</code></pre>
+              </li>
+              <li>For 50,000 shipments created that day, the database engine executed <strong>50,000 individual index lookups and sort operations</strong> against <code>shipment_events</code> ($O(N \times \log M)$ overhead).</li>
+            </ul>
+            <p><strong>The Fix:</strong> Rewrite using a window function (<code>ROW_NUMBER()</code>) or PostgreSQL's <code>DISTINCT ON</code> to fetch all latest events in a single scan:</p>
+            <pre><code class="language-sql">WITH RankedEvents AS (
+    SELECT shipment_id, status,
+           ROW_NUMBER() OVER (PARTITION BY shipment_id ORDER BY event_time DESC) as rn
+    FROM shipment_events
+)
+SELECT s.id, s.tracking_number, e.status AS current_status
+FROM shipments s
+LEFT JOIN RankedEvents e ON s.id = e.shipment_id AND e.rn = 1
+WHERE s.created_at >= CURRENT_DATE; -- Single pass hash join! CPU dropped from 100% to 4%.</code></pre>
+          </div>
+        </section>
+
+        <!-- SECTION 7: SENIOR INTERVIEW Q&A -->
+        <section>
+          <h2>7. Senior & Staff Engineer Interview Q&A</h2>
+
+          <div class="callout callout-interview">
+            <div class="callout-title">Q1: What is the fundamental execution and memory difference between UNION and UNION ALL?</div>
+            <p><strong>Answer:</strong></p>
+            <ul>
+              <li><strong><code>UNION ALL</code>:</strong> An append-only operation. The database takes the row streams from both queries and streams them directly to the client without buffering or sorting. Execution complexity is $O(N + M)$ with $O(1)$ memory.</li>
+              <li><strong><code>UNION</code>:</strong> Implies mathematical set union with deduplication. The engine must buffer all rows into memory and execute either a <strong>Hash Aggregate</strong> (building an in-memory hash table of all projected fields) or a <strong>Sort Unique</strong> (external sort). Execution complexity is $O((N+M) \log(N+M))$. If the dataset exceeds available memory, it triggers severe disk I/O spills.</li>
+            </ul>
+          </div>
+
+          <div class="callout callout-interview">
+            <div class="callout-title">Q2: Why is <code>SELECT COUNT(*)</code> different from <code>SELECT COUNT(column_name)</code>?</div>
+            <p><strong>Answer:</strong></p>
+            <ul>
+              <li><strong><code>COUNT(*)</code>:</strong> Counts the total number of <strong>rows</strong> in the table or group. It does not inspect column values and does not care about NULLs. The database optimizer can satisfy <code>COUNT(*)</code> using the smallest available index (e.g. an integer primary key or narrow secondary index B-Tree).</li>
+              <li><strong><code>COUNT(col)</code>:</strong> Counts only rows where <code>col IS NOT NULL</code>. The engine is forced to read the specific column data and evaluate each row for nullability.</li>
+            </ul>
+          </div>
+
+          <div class="callout callout-interview">
+            <div class="callout-title">Q3: How does the Cost-Based Optimizer (CBO) decide between a Nested Loop, Hash Join, and Merge Join?</div>
+            <p><strong>Answer:</strong> The CBO calculates the estimated I/O and CPU cost of each strategy using table statistics (pg_statistic / histogram buckets):</p>
+            <ol>
+              <li><strong>Nested Loop:</strong> Chosen when the driving (outer) table is very small (after WHERE filtering) and the inner table has an index on the join key. Cost $\approx C_{outer} + N_{outer} \times C_{inner\_lookup}$.</li>
+              <li><strong>Hash Join:</strong> Chosen for large tables where neither table is sorted and join condition is an equijoin (<code>=</code>). The smaller table is hashed into RAM, and the larger table probes the hash table. Cost $\approx C_{build\_hash} + C_{probe}$.</li>
+              <li><strong>Merge Join:</strong> Chosen when both inputs are already sorted on the join key (e.g. from an existing B-tree index or preceding ORDER BY) or when performing non-equijoins with inequalities. It scans both streams in lockstep without memory-intensive hashing.</li>
+            </ol>
+          </div>
+
+          <div class="callout callout-interview">
+            <div class="callout-title">Q4: What is the difference between ROW_NUMBER(), RANK(), and DENSE_RANK()?</div>
+            <p><strong>Answer:</strong> Given values <code>[100, 100, 80, 70]</code>:</p>
+            <ul>
+              <li><code>ROW_NUMBER()</code>: Yields <code>1, 2, 3, 4</code> (arbitrary ordering for ties).</li>
+              <li><code>RANK()</code>: Yields <code>1, 1, 3, 4</code> (ties share rank 1; rank 2 is skipped).</li>
+              <li><code>DENSE_RANK()</code>: Yields <code>1, 1, 2, 3</code> (ties share rank 1; subsequent ranks are consecutive without gaps).</li>
+            </ul>
+          </div>
+        </section>
+
+      </main>
+    </div>
+  </div>
+
+  <footer class="footer">
+    <div class="container">
+      <p>&copy; 2026 Interview A-Z Knowledge Base. Designed for Senior & Lead Engineering Interviews.</p>
+    </div>
+  </footer>
+
+  <script src="../../assets/js/main.js"></script>
+</body>
+</html>
