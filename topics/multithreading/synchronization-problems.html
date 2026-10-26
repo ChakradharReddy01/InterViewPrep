@@ -12,15 +12,21 @@
 <body>
 
   <!-- Top Navigation -->
-  <nav class="navbar">
+    <!-- Top Navigation -->
+    <nav class="navbar">
     <div class="brand">
-      <span class="brand-badge">Interview A-Z</span>
-      <span>Engineering & Architecture Handbook</span>
+      <a href="../../index.html" class="brand-link" style="display: flex; align-items: center; gap: 0.75rem; text-decoration: none; color: inherit;">
+        <span class="brand-badge" style="background: linear-gradient(135deg, #38bdf8, #818cf8); color: #0f172a; padding: 0.15rem 0.55rem; border-radius: 6px; font-size: 0.75rem; font-weight: 800; letter-spacing: 0.05em; text-transform: uppercase;">Interview A-Z</span>
+        <span style="font-weight: 700; font-size: 1.15rem; color: #fff;">Engineering Handbook</span>
+      </a>
     </div>
-    <div class="nav-links">
-      <a href="../../index.html" class="nav-link">Home</a>
-      <a href="../../index.html#module-2" class="nav-link">Module Catalog</a>
-      <a href="https://github.com" target="_blank" class="nav-link">GitHub</a>
+    <div class="nav-links navlinks" style="display: flex; gap: 1.25rem; align-items: center;">
+      <a href="../../index.html" class="nav-link" style="text-decoration: none; font-weight: 600; font-size: 0.95rem;">🏠 Home</a>
+      <a href="../../index.html#topics" class="nav-link" style="text-decoration: none; font-weight: 600; font-size: 0.95rem;">📚 All Modules</a>
+      <a href="https://github.com/ChakradharReddy01/InterViewPrep" target="_blank" class="nav-link" style="text-decoration: none; font-weight: 600; font-size: 0.95rem;">GitHub</a>
+      <button onclick="document.querySelectorAll('details').forEach(d=>d.open=true);window.print();" class="nav-btn-pdf" title="Save page as PDF" style="display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.35rem 0.85rem; font-size: 0.85rem; font-weight: 700; background: linear-gradient(135deg, #38bdf8, #818cf8); color: #0f172a; border: none; border-radius: 6px; cursor: pointer; transition: transform 0.15s ease, box-shadow 0.15s ease; box-shadow: 0 2px 8px rgba(56,189,248,0.25);">
+        <span>📄</span> Save to PDF
+      </button>
     </div>
   </nav>
 

@@ -1,805 +1,186 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Module 6: Spring Security Architecture, JWT, OAuth2 & Zero-Trust API Defense | Interview A-Z</title>
-  <link rel="stylesheet" href="../../assets/css/style.css">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
-</head>
-<body>
-
-  <!-- Top Navigation -->
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="description" content="Spring Security masterclass covering authentication, authorization, filters, JWT, OAuth2, OIDC, CORS, CSRF, sessions, and API security."><title>Module 9: Spring Security Masterclass | Interview A-Z</title><style>
+    :root{--bg:#0b1020;--panel:#111a2e;--panel2:#17233b;--text:#e8eefb;--muted:#a8b5cc;--line:#2b3a57;--accent:#7dd3fc;--accent2:#a7f3d0;--warn:#fbbf24;--danger:#fca5a5;--code:#080d18;--shadow:0 12px 32px #0003}
+    *{box-sizing:border-box}html{scroll-behavior:smooth;scroll-padding-top:90px}body{margin:0;background:var(--bg);color:var(--text);font:16px/1.72 Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,Arial,sans-serif}a{color:var(--accent)}.navbar{position:sticky;top:0;z-index:10;background:#0b1020ed;backdrop-filter:blur(12px);border-bottom:1px solid var(--line);padding:13px clamp(16px,4vw,54px);display:flex;align-items:center;justify-content:space-between;gap:16px}.brand{font-weight:800;letter-spacing:.02em}.brand span{color:var(--accent)}.navlinks{display:flex;gap:16px;flex-wrap:wrap;font-size:.9rem}.layout{max-width:1500px;margin:auto;display:grid;grid-template-columns:270px minmax(0,1fr);gap:30px;padding:28px clamp(16px,3vw,44px)}aside{position:sticky;top:82px;align-self:start;max-height:calc(100vh - 100px);overflow:auto;background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:18px}.toc-title{font-weight:800;margin:0 0 8px}.toc a{display:block;padding:5px 8px;color:var(--muted);text-decoration:none;border-radius:6px;font-size:.88rem}.toc a:hover{background:var(--panel2);color:var(--text)}main{min-width:0;max-width:1000px}.hero{padding:34px;border:1px solid var(--line);border-radius:20px;background:linear-gradient(140deg,#172b47,#111a2e 60%,#15243a);box-shadow:var(--shadow)}.eyebrow{text-transform:uppercase;letter-spacing:.14em;color:var(--accent);font-size:.78rem;font-weight:800}.hero h1{font-size:clamp(2rem,4vw,3.2rem);line-height:1.12;margin:.4em 0}.hero p{color:var(--muted);max-width:800px}.pills{display:flex;flex-wrap:wrap;gap:8px}.pill{border:1px solid var(--line);background:#0b1020aa;padding:5px 10px;border-radius:999px;font-size:.82rem;color:var(--accent2)}h2{font-size:1.8rem;line-height:1.25;margin-top:2.3rem;border-bottom:1px solid var(--line);padding-bottom:10px}h3{font-size:1.28rem;margin-top:1.8rem;color:#dbeafe}h4{font-size:1.05rem;margin-bottom:.3rem;color:var(--accent2)}p{margin:.7rem 0}li{margin:.3rem 0}section.topic{padding:8px 0 24px;border-bottom:1px solid var(--line)}.card,.callout,.diagram,.checkpanel{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:18px;margin:16px 0}.callout strong{color:var(--accent2)}.warning{border-left:4px solid var(--warn)}.danger{border-left:4px solid var(--danger)}.good{border-left:4px solid var(--accent2)}.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.grid.three{grid-template-columns:repeat(3,minmax(0,1fr))}.box{background:var(--panel2);border:1px solid #3a4c6b;border-radius:10px;padding:13px;text-align:center}.arrow{text-align:center;color:var(--accent);font-size:1.35rem;line-height:1.4}.muted{color:var(--muted)}table{width:100%;border-collapse:collapse;margin:16px 0;font-size:.93rem}th,td{padding:10px 12px;border:1px solid var(--line);text-align:left;vertical-align:top}th{background:var(--panel2);color:#dbeafe}tr:nth-child(even) td{background:#ffffff05}pre{background:var(--code);border:1px solid var(--line);border-radius:12px;padding:16px;overflow:auto;line-height:1.55;font-size:.88rem}code{font-family:ui-monospace,SFMono-Regular,Consolas,monospace;color:#bae6fd}p code,li code,td code{background:var(--code);padding:2px 5px;border-radius:5px}.diagram{font-family:ui-monospace,Consolas,monospace;white-space:pre;overflow:auto;color:#c7f9e9;line-height:1.45}.progressbar{height:9px;background:#26334b;border-radius:20px;overflow:hidden}.progressbar div{height:100%;background:var(--accent2);width:0;transition:width .2s}.topic-check{display:flex;align-items:flex-start;gap:10px;padding:7px 0;border-bottom:1px solid #ffffff0c}.topic-check input{margin-top:7px;accent-color:#34d399}.btn{background:#173454;color:var(--text);border:1px solid #365779;padding:9px 13px;border-radius:8px;cursor:pointer;font:inherit}.btn:hover{background:#21496e}.toolbar{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0}.qa details{border:1px solid var(--line);border-radius:10px;margin:10px 0;padding:12px 15px;background:var(--panel)}.qa summary{cursor:pointer;font-weight:700}.qa details p{color:var(--muted)}.small{font-size:.88rem}.footer{border-top:1px solid var(--line);padding:28px;text-align:center;color:var(--muted)}@media(max-width:1000px){.layout{grid-template-columns:1fr}aside{position:relative;top:auto;max-height:none}.toc{columns:2}.grid.three{grid-template-columns:1fr 1fr}}@media(max-width:620px){.navlinks{display:none}.hero{padding:22px}.grid,.grid.three{grid-template-columns:1fr}.toc{columns:1}table{display:block;overflow-x:auto}h2{font-size:1.5rem}}@media print{body{background:white;color:#111}.navbar,aside,.toolbar,.btn{display:none!important}.layout{display:block;padding:0}.hero,.card,.callout,.diagram,.checkpanel,.qa details{background:white;color:#111;box-shadow:none;break-inside:avoid;border-color:#aaa}h2,h3,h4,th,code{color:#111}p,li,.muted,.hero p,.qa details p{color:#222}pre{background:#f6f6f6;color:#111;white-space:pre-wrap}a{color:#111}}
+</style></head><body>
   <nav class="navbar">
     <div class="brand">
-      <span class="brand-badge">Interview A-Z</span>
-      <span>Engineering & Architecture Handbook</span>
+      <a href="../../index.html" class="brand-link" style="display: flex; align-items: center; gap: 0.75rem; text-decoration: none; color: inherit;">
+        <span class="brand-badge" style="background: linear-gradient(135deg, #38bdf8, #818cf8); color: #0f172a; padding: 0.15rem 0.55rem; border-radius: 6px; font-size: 0.75rem; font-weight: 800; letter-spacing: 0.05em; text-transform: uppercase;">Interview A-Z</span>
+        <span style="font-weight: 700; font-size: 1.15rem; color: #fff;">Engineering Handbook</span>
+      </a>
     </div>
-    <div class="nav-links">
-      <a href="../../index.html" class="nav-link">Home</a>
-      <a href="../../index.html#module-6" class="nav-link">Module Catalog</a>
-      <a href="https://github.com" target="_blank" class="nav-link">GitHub</a>
+    <div class="nav-links navlinks" style="display: flex; gap: 1.25rem; align-items: center;">
+      <a href="../../index.html" class="nav-link" style="text-decoration: none; font-weight: 600; font-size: 0.95rem;">🏠 Home</a>
+      <a href="../../index.html#topics" class="nav-link" style="text-decoration: none; font-weight: 600; font-size: 0.95rem;">📚 All Modules</a>
+      <a href="https://github.com/ChakradharReddy01/InterViewPrep" target="_blank" class="nav-link" style="text-decoration: none; font-weight: 600; font-size: 0.95rem;">GitHub</a>
+      <button onclick="document.querySelectorAll('details').forEach(d=>d.open=true);window.print();" class="nav-btn-pdf" title="Save page as PDF" style="display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.35rem 0.85rem; font-size: 0.85rem; font-weight: 700; background: linear-gradient(135deg, #38bdf8, #818cf8); color: #0f172a; border: none; border-radius: 6px; cursor: pointer; transition: transform 0.15s ease, box-shadow 0.15s ease; box-shadow: 0 2px 8px rgba(56,189,248,0.25);">
+        <span>📄</span> Save to PDF
+      </button>
     </div>
   </nav>
-
-  <div class="container">
-    <div class="article-layout">
-      <!-- Sticky Sidebar Table of Contents -->
-      <aside class="sidebar-toc">
-        <h3>On This Page</h3>
-        <ul class="toc-links" id="dynamic-toc">
-          <!-- Dynamically populated via main.js -->
-        </ul>
-      </aside>
-
-      <!-- Main Article Content -->
-      <main class="article-content">
-        <!-- Breadcrumb -->
-        <nav class="breadcrumb">
-          <a href="../../index.html">Home</a>
-          <span>/</span>
-          <span>Module 6: Spring Security</span>
-          <span>/</span>
-          <span style="color: #fff;">Spring Security Core & Defense</span>
-        </nav>
-
-        <!-- Article Header -->
-        <header class="article-header">
-          <h1>Module 6: Spring Security Architecture, JWT, OAuth2/OIDC & Enterprise API Defense</h1>
-          <div class="article-meta">
-            <span class="badge badge-spring">Spring Security 6.x</span>
-            <span class="badge badge-advanced">SecurityFilterChain</span>
-            <span class="badge badge-prod">Zero-Trust & Incident Post-Mortems</span>
-            <span>⏱️ 65 min deep dive</span>
-            <span>Target Roles: SDE-2, SDE-3, Security & Cloud Architect</span>
-          </div>
-        </header>
-
-        <!-- SECTION 1: AUTHENTICATION VS AUTHORIZATION & ARCHITECTURE -->
-        <section>
-          <h2>1. Authentication vs Authorization & The Core Security Model</h2>
-
-          <h3>1.1 Authentication vs Authorization</h3>
-          <p>
-            Enterprise security fundamentally bifurcates into two distinct operations:
-          </p>
-          <ul>
-            <li><strong>Authentication (AuthN):</strong> <em>"Who are you?"</em> The process of verifying the claimed identity of a principal using supplied credentials (password, bearer token, client certificate, TOTP MFA). Result: an authenticated <code>Authentication</code> object with <code>isAuthenticated() == true</code>.</li>
-            <li><strong>Authorization (AuthZ):</strong> <em>"What are you permitted to do?"</em> The process of evaluating whether an authenticated identity possesses the necessary rights (authorities, roles, scopes, attributes) to access a specific URI, method, or domain object.</li>
-          </ul>
-
-          <h3>1.2 Under the Hood: The Spring Security Authentication Subsystem</h3>
-          <p>
-            Authentication in Spring Security is handled by a chain of collaborating components. When an unauthenticated request arrives, it flows through:
-          </p>
-
-          <pre><code>[ Incoming HTTP Request ]
-          |
-          v
-[ DelegatingFilterProxy ] (Servlet Filter Bridge in web.xml / Spring context)
-          |
-          v
-[ FilterChainProxy ] (Spring bean managing SecurityFilterChains)
-          |
-          v
-[ SecurityFilterChain ] (Ordered list of ~15-30 Security Filters)
-          |
-          +---> [ Authentication Filter ] (e.g., JwtAuthenticationFilter / UsernamePasswordAuthFilter)
-                     |
-                     | Extracts credentials -> Creates unauthenticated AuthenticationToken
-                     v
-             [ AuthenticationManager ] (Interface: authenticate(Authentication))
-                     |
-                     v
-             [ ProviderManager ] (Default implementation of AuthenticationManager)
-                     |
-                     +---> Iterates over List&lt;AuthenticationProvider&gt;
-                     |        |
-                     |        +--> DaoAuthenticationProvider (checks DB / UserDetailsService)
-                     |        +--> JwtAuthenticationProvider (verifies RSA/HMAC signature)
-                     |        +--> LdapAuthenticationProvider / OAuth2AuthenticationProvider
-                     v
-             [ UserDetailsService ] (Queries DB / Cache -> returns UserDetails)
-                     |
-             [ PasswordEncoder ] (BCrypt / Argon2 matches raw password with hash)
-                     |
-                     v
-    [ Authenticated Authentication Object ] (Principal + GrantedAuthorities)
-                     |
-                     v
-    [ SecurityContextHolder ] (Stored in ThreadLocal for request duration)</code></pre>
-
-          <h3>1.3 The Core Interfaces</h3>
-          <ul>
-            <li><strong><code>Authentication</code>:</strong> Represents the token for an authentication request or for an authenticated principal. Key methods: <code>getPrincipal()</code> (user entity/DTO), <code>getCredentials()</code> (cleared after authentication), <code>getAuthorities()</code> (collection of <code>GrantedAuthority</code>), and <code>isAuthenticated()</code>.</li>
-            <li><strong><code>SecurityContext</code>:</strong> Holds the currently authenticated <code>Authentication</code> object. Associated with the current thread of execution.</li>
-            <li><strong><code>SecurityContextHolder</code>:</strong> Provides static access to the current <code>SecurityContext</code>.</li>
-            <li><strong><code>AuthenticationManager</code> & <code>ProviderManager</code>:</strong> The primary API for authentication. <code>ProviderManager</code> delegates to a list of configured <code>AuthenticationProvider</code> instances. If one provider successfully authenticates, it returns a fully populated <code>Authentication</code> object; if none can authenticate, it throws <code>AuthenticationException</code>.</li>
-          </ul>
-        </section>
-
-        <!-- SECTION 2: THE SECURITY FILTER CHAIN & DELEGATINGFILTERPROXY -->
-        <section>
-          <h2>2. The Security Filter Chain & DelegatingFilterProxy</h2>
-
-          <h3>2.1 How Spring Bridges Servlet Filters into the Spring Context</h3>
-          <p>
-            The standard Java Servlet specification does not know about the Spring IoC container. To allow Spring beans to intercept HTTP requests as standard Servlet Filters, Spring Security introduces <strong><code>DelegatingFilterProxy</code></strong>:
-          </p>
-          <ul>
-            <li><strong><code>DelegatingFilterProxy</code>:</strong> A standard Servlet filter registered with the servlet container (Tomcat/Jetty). It looks up a Spring bean named <code>springSecurityFilterChain</code> inside the <code>ApplicationContext</code> and delegates every incoming request to it.</li>
-            <li><strong><code>FilterChainProxy</code>:</strong> The Spring bean implementing <code>Filter</code>. It contains one or more <strong><code>SecurityFilterChain</code></strong> instances matched by <code>RequestMatcher</code> (e.g., one chain for <code>/api/**</code> and another for <code>/actuator/**</code>).</li>
-          </ul>
-
-          <h3>2.2 The Canonical Filter Ordering (Spring Security 6.x)</h3>
-          <p>
-            Order matters critically. If a filter executes out of order (such as checking authorization before extracting a JWT), requests fail unpredictably. Below is the standard runtime sequence:
-          </p>
-
-          <table style="width:100%; border-collapse:collapse; margin: 1.5rem 0;">
-            <thead>
-              <tr style="background: rgba(255,255,255,0.05); text-align: left;">
-                <th style="padding: 10px; border: 1px solid var(--border-color);">Order</th>
-                <th style="padding: 10px; border: 1px solid var(--border-color);">Filter Name</th>
-                <th style="padding: 10px; border: 1px solid var(--border-color);">Responsibility</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td style="padding: 10px; border: 1px solid var(--border-color);">1</td>
-                <td style="padding: 10px; border: 1px solid var(--border-color);"><code>ChannelProcessingFilter</code></td>
-                <td style="padding: 10px; border: 1px solid var(--border-color);">Enforces HTTPS / SSL redirection if configured.</td>
-              </tr>
-              <tr>
-                <td style="padding: 10px; border: 1px solid var(--border-color);">2</td>
-                <td style="padding: 10px; border: 1px solid var(--border-color);"><code>CorsFilter</code></td>
-                <td style="padding: 10px; border: 1px solid var(--border-color);">Handles preflight HTTP <code>OPTIONS</code> requests and attaches CORS response headers before security checks run.</td>
-              </tr>
-              <tr>
-                <td style="padding: 10px; border: 1px solid var(--border-color);">3</td>
-                <td style="padding: 10px; border: 1px solid var(--border-color);"><code>SecurityContextHolderFilter</code></td>
-                <td style="padding: 10px; border: 1px solid var(--border-color);">Loads existing <code>SecurityContext</code> from repository (replaces legacy <code>SecurityContextPersistenceFilter</code> in Spring Security 6).</td>
-              </tr>
-              <tr>
-                <td style="padding: 10px; border: 1px solid var(--border-color);">4</td>
-                <td style="padding: 10px; border: 1px solid var(--border-color);"><code>HeaderWriterFilter</code></td>
-                <td style="padding: 10px; border: 1px solid var(--border-color);">Attaches secure headers: <code>X-Content-Type-Options: nosniff</code>, <code>X-Frame-Options: DENY</code>, <code>HSTS</code>.</td>
-              </tr>
-              <tr>
-                <td style="padding: 10px; border: 1px solid var(--border-color);">5</td>
-                <td style="padding: 10px; border: 1px solid var(--border-color);"><code>CsrfFilter</code></td>
-                <td style="padding: 10px; border: 1px solid var(--border-color);">Generates and validates Synchronizer CSRF tokens for mutating requests (POST, PUT, DELETE).</td>
-              </tr>
-              <tr>
-                <td style="padding: 10px; border: 1px solid var(--border-color);">6</td>
-                <td style="padding: 10px; border: 1px solid var(--border-color);"><code>LogoutFilter</code></td>
-                <td style="padding: 10px; border: 1px solid var(--border-color);">Handles <code>/logout</code> requests, clears SecurityContext and invalidates sessions.</td>
-              </tr>
-              <tr>
-                <td style="padding: 10px; border: 1px solid var(--border-color);">7</td>
-                <td style="padding: 10px; border: 1px solid var(--border-color);"><code>UsernamePasswordAuthenticationFilter</code></td>
-                <td style="padding: 10px; border: 1px solid var(--border-color);">Intercepts form-login POST submissions (e.g. <code>/login</code>) and initiates authentication.</td>
-              </tr>
-              <tr>
-                <td style="padding: 10px; border: 1px solid var(--border-color);">8</td>
-                <td style="padding: 10px; border: 1px solid var(--border-color);"><em>Custom JwtAuthenticationFilter</em></td>
-                <td style="padding: 10px; border: 1px solid var(--border-color);">Intercepts <code>Authorization: Bearer &lt;token&gt;</code>, validates cryptographic signature, sets SecurityContext.</td>
-              </tr>
-              <tr>
-                <td style="padding: 10px; border: 1px solid var(--border-color);">9</td>
-                <td style="padding: 10px; border: 1px solid var(--border-color);"><code>BearerTokenAuthenticationFilter</code> / <code>OAuth2LoginAuthenticationFilter</code></td>
-                <td style="padding: 10px; border: 1px solid var(--border-color);">OAuth2 resource server / OIDC login interceptors.</td>
-              </tr>
-              <tr>
-                <td style="padding: 10px; border: 1px solid var(--border-color);">10</td>
-                <td style="padding: 10px; border: 1px solid var(--border-color);"><code>ExceptionTranslationFilter</code></td>
-                <td style="padding: 10px; border: 1px solid var(--border-color);">Catches downstream <code>AuthenticationException</code> (triggers <code>AuthenticationEntryPoint</code> 401) and <code>AccessDeniedException</code> (triggers <code>AccessDeniedHandler</code> 403).</td>
-              </tr>
-              <tr>
-                <td style="padding: 10px; border: 1px solid var(--border-color);">11</td>
-                <td style="padding: 10px; border: 1px solid var(--border-color);"><code>AuthorizationFilter</code></td>
-                <td style="padding: 10px; border: 1px solid var(--border-color);">Final gatekeeper (replaces legacy <code>FilterSecurityInterceptor</code>). Evaluates URI authorization rules against authenticated authorities.</td>
-              </tr>
-            </tbody>
-          </table>
-
-          <h3>2.3 Modern Spring Security 6.x Configuration (Lambda DSL)</h3>
-          <p>
-            In Spring Security 6.x (Spring Boot 3.x), <code>WebSecurityConfigurerAdapter</code> is completely removed. Configuration is expressed as a <code>@Bean SecurityFilterChain</code> using the lambda DSL:
-          </p>
-
-          <pre><code class="language-java">@Configuration
-@EnableWebSecurity
-@EnableMethodSecurity(prePostEnabled = true) // Enables @PreAuthorize, @PostAuthorize
-public class SecurityConfiguration {
-
-    private final JwtAuthenticationFilter jwtAuthFilter;
-    private final AuthenticationProvider authenticationProvider;
-    private final CustomAuthenticationEntryPoint authEntryPoint;
-    private final CustomAccessDeniedHandler accessDeniedHandler;
-
-    public SecurityConfiguration(JwtAuthenticationFilter jwtAuthFilter,
-                                 AuthenticationProvider authenticationProvider,
-                                 CustomAuthenticationEntryPoint authEntryPoint,
-                                 CustomAccessDeniedHandler accessDeniedHandler) {
-        this.jwtAuthFilter = jwtAuthFilter;
-        this.authenticationProvider = authenticationProvider;
-        this.authEntryPoint = authEntryPoint;
-        this.accessDeniedHandler = accessDeniedHandler;
-    }
-
-    @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        return http
-            // 1. CORS enabled with custom configuration
-            .cors(Customizer.withDefaults())
-            // 2. CSRF disabled for stateless REST APIs using JWT
-            .csrf(AbstractHttpConfigurer::disable)
-            // 3. Stateless Session Management (No HttpSession stored on server)
-            .sessionManagement(session -> 
-                session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-            // 4. Exception Handling for 401 and 403
-            .exceptionHandling(exceptions -> exceptions
-                .authenticationEntryPoint(authEntryPoint)
-                .accessDeniedHandler(accessDeniedHandler)
-            )
-            // 5. URL Authorization rules
-            .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/api/v1/auth/**", "/actuator/health", "/v3/api-docs/**").permitAll()
-                .requestMatchers(HttpMethod.GET, "/api/v1/products/**").permitAll()
-                .requestMatchers("/api/v1/admin/**").hasRole("ADMIN")
-                .requestMatchers("/api/v1/orders/**").hasAnyRole("USER", "ADMIN")
-                .anyRequest().authenticated()
-            )
-            // 6. Pluggable AuthenticationProvider
-            .authenticationProvider(authenticationProvider)
-            // 7. Insert JWT filter before UsernamePasswordAuthenticationFilter
-            .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
-            .build();
-    }
-}</code></pre>
-        </section>
-
-        <!-- SECTION 3: SECURITYCONTEXT & THREADLOCAL INTERNALS -->
-        <section>
-          <h2>3. SecurityContext & ThreadLocal Storage Strategies</h2>
-
-          <h3>3.1 How SecurityContextHolder Works Under the Hood</h3>
-          <p>
-            By default, <code>SecurityContextHolder</code> uses a <code>ThreadLocal</code> strategy to store the <code>SecurityContext</code>. When a Tomcat worker thread picks up an HTTP request, the security filter populates the thread's local map:
-          </p>
-
-          <pre><code class="language-java">// Retrieving current authenticated principal anywhere in the call stack
-Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-if (authentication != null && authentication.isAuthenticated()) {
-    String username = authentication.getName();
-    Collection&lt;? extends GrantedAuthority&gt; authorities = authentication.getAuthorities();
-    CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
-}</code></pre>
-
-          <h3>3.2 The Three Storage Modes</h3>
-          <p>
-            Configured via system property <code>spring.security.strategy</code> or <code>SecurityContextHolder.setStrategyName(...)</code>:
-          </p>
-          <ul>
-            <li><strong><code>MODE_THREADLOCAL</code> (Default):</strong> The security context is bound exclusively to the executing thread. Thread pool reuse requires explicit clearing at request termination by <code>SecurityContextHolderFilter</code>.</li>
-            <li><strong><code>MODE_INHERITABLETHREADLOCAL</code>:</strong> Spawns an <code>InheritableThreadLocal</code>. Child threads spawned directly by the parent thread inherit the security context. <em>Warning:</em> Dangerous in pooled worker environments (e.g. <code>ForkJoinPool</code> or <code>ExecutorService</code>) because threads are reused across distinct requests, leading to context bleeding.</li>
-            <li><strong><code>MODE_GLOBAL</code>:</strong> A single JVM-wide <code>SecurityContext</code>. Used strictly for standalone desktop Swing/JavaFX applications.</li>
-          </ul>
-
-          <div class="callout callout-warning">
-            <div class="callout-title">⚠️ The Async Thread Pool Pitfall (@Async & CompletableFuture)</div>
-            <p>
-              When a method annotated with <code>@Async</code> or executed via <code>CompletableFuture.supplyAsync()</code> runs, it executes on a separate worker thread from an executor pool. By default, <code>SecurityContextHolder.getContext().getAuthentication()</code> on that thread returns <strong>null</strong>!
-            </p>
-            <p>
-              <strong>The Enterprise Fix:</strong> Wrap your task executor in Spring's <code>DelegatingSecurityContextAsyncTaskExecutor</code>:
-            </p>
-            <pre><code class="language-java">@Bean(name = "applicationTaskExecutor")
-public AsyncTaskExecutor applicationTaskExecutor() {
-    ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
-    executor.setCorePoolSize(10);
-    executor.setMaxPoolSize(50);
-    executor.setThreadNamePrefix("async-sec-");
-    executor.initialize();
-    // Automatically propagates parent SecurityContext to worker thread and cleans it up
-    return new DelegatingSecurityContextAsyncTaskExecutor(executor);
-}</code></pre>
-          </div>
-        </section>
-
-        <!-- SECTION 4: USERDETAILS, USERDETAILSSERVICE & PASSWORD ENCODING -->
-        <section>
-          <h2>4. UserDetails, UserDetailsService & Password Encoding (BCrypt)</h2>
-
-          <h3>4.1 UserDetails & UserDetailsService Contract</h3>
-          <p>
-            Spring Security decouples your database ORM schema from framework security through the <code>UserDetails</code> and <code>UserDetailsService</code> interfaces:
-          </p>
-
-          <pre><code class="language-java">@Service
-public class JpaUserDetailsService implements UserDetailsService {
-
-    private final UserRepository userRepository;
-
-    public JpaUserDetailsService(UserRepository userRepository) {
-        this.userRepository = userRepository;
-    }
-
-    @Override
-    @Transactional(readOnly = true)
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        User user = userRepository.findByEmail(username)
-            .orElseThrow(() -> new UsernameNotFoundException("User not found with email: " + username));
-
-        return new SecurityUser(user);
-    }
-}
-
-// UserDetails adapter wrapping domain entity
-public class SecurityUser implements UserDetails {
-
-    private final User user;
-
-    public SecurityUser(User user) {
-        this.user = user;
-    }
-
-    @Override
-    public Collection&lt;? extends GrantedAuthority&gt; getAuthorities() {
-        return user.getRoles().stream()
-            .map(role -> new SimpleGrantedAuthority("ROLE_" + role.getName()))
-            .collect(Collectors.toSet());
-    }
-
-    @Override public String getPassword() { return user.getPasswordHash(); }
-    @Override public String getUsername() { return user.getEmail(); }
-    @Override public boolean isAccountNonExpired() { return true; }
-    @Override public boolean isAccountNonLocked() { return !user.isLocked(); }
-    @Override public boolean isCredentialsNonExpired() { return true; }
-    @Override public boolean isEnabled() { return user.isActive(); }
-}</code></pre>
-
-          <h3>4.2 Password Encoding: The Mathematics of BCrypt</h3>
-          <p>
-            Plain SHA-256 or MD5 hashes are fatally insecure for passwords because modern GPUs can compute over <strong>100 billion SHA-256 hashes per second</strong>, rendering rainbow tables and brute force trivially fast.
-          </p>
-          <p>
-            <strong>BCrypt</strong> is an adaptive, slow hashing algorithm based on the Blowfish cipher. It incorporates:
-          </p>
-          <ul>
-            <li><strong>A cryptographically random 128-bit Salt:</strong> Prevents precomputed rainbow table attacks. Each hash has a unique salt embedded in it.</li>
-            <li><strong>Adaptive Work Factor (Cost):</strong> Expressed as $2^{\text{cost}}$ iterations. A cost of 10 means $2^{10} = 1024$ rounds. A cost of 12 means $2^{12} = 4096$ rounds (4x slower).</li>
-            <li><strong>Time-Constant Comparison:</strong> <code>matches(raw, hash)</code> executes in constant time to prevent side-channel timing attacks.</li>
-          </ul>
-
-          <pre><code>BCrypt Hash Anatomy:
-$2a$12$e8kGv0jZ5L4xY3v2b1a9u.OqX8H5VnLp7k2J1s4F7d0Q3g6h9k2Lm
-\__/ \/ \____________________/\____________________________/
- |    |           |                         |
- |    |           +- 22 char 128-bit Salt   +- 31 char Blowfish Hash
- |    +- Cost Factor (12 = 4096 rounds)
- +- Algorithm Identifier ($2a, $2b, $2y)</code></pre>
-
-          <pre><code class="language-java">@Bean
-public PasswordEncoder passwordEncoder() {
-    // Work factor 12 is optimal for enterprise servers (targets ~200-300ms per verification)
-    return new BCryptPasswordEncoder(12);
-}</code></pre>
-        </section>
-
-        <!-- SECTION 5: JWT, ACCESS TOKENS & REFRESH TOKEN ROTATION -->
-        <section>
-          <h2>5. JWT Architecture, Access Tokens & Refresh Token Rotation</h2>
-
-          <h3>5.1 Anatomy of a JSON Web Token (RFC 7519)</h3>
-          <p>
-            A JWT consists of three base64url-encoded components separated by dots (<code>.</code>):
-          </p>
-          <pre><code>[ Header (Base64Url) ] . [ Payload (Claims) ] . [ Cryptographic Signature ]
-
-Header:    {"alg": "HS256", "typ": "JWT"}
-Payload:   {"sub": "user_8912", "roles": ["ROLE_ADMIN"], "iat": 1700000000, "exp": 1700000900}
-Signature: HMACSHA256(base64UrlEncode(header) + "." + base64UrlEncode(payload), secretKey)</code></pre>
-
-          <h3>5.2 Symmetric (HMAC-SHA256) vs Asymmetric (RSA/ECDSA) Signing</h3>
-          <ul>
-            <li><strong>Symmetric (HS256/HS512):</strong> A single shared secret key is used both by the Auth service to sign the token and by downstream microservices to verify it. <em>Risk:</em> Any microservice with the secret can forge valid tokens.</li>
-            <li><strong>Asymmetric (RS256/ES256):</strong> The Auth Server signs the JWT using a <strong>Private Key</strong>. All downstream resource servers verify the signature using the Auth Server's <strong>Public Key</strong> (exposed via JWKS endpoint: <code>/.well-known/jwks.json</code>). Public keys can be shared freely with zero forgery risk.</li>
-          </ul>
-
-          <h3>5.3 The Dual-Token Pattern: Access Token + Refresh Token Rotation</h3>
-          <p>
-            Stateless JWTs cannot be revoked natively until they expire. If an attacker steals a 24-hour token, they have full access for 24 hours.
-          </p>
-          <p>
-            <strong>The Enterprise Solution:</strong>
-          </p>
-          <ol>
-            <li><strong>Access Token:</strong> Short-lived (5 to 15 minutes), kept in memory (JS variable), stateless verification by microservices.</li>
-            <li><strong>Refresh Token:</strong> Long-lived (7 to 30 days), stored in an <code>HttpOnly, Secure, SameSite=Strict</code> cookie or Redis database.</li>
-            <li><strong>Automatic Token Rotation:</strong> Every time a refresh token is used to issue a new access token, the old refresh token is invalidated and a brand new refresh token is issued. If a revoked refresh token is presented, <strong>all tokens belonging to that user family are immediately purged</strong> (Breach Detection).</li>
-          </ol>
-
-          <pre><code class="language-java">@Component
-public class JwtAuthenticationFilter extends OncePerRequestFilter {
-
-    private final JwtTokenService jwtTokenService;
-    private final UserDetailsService userDetailsService;
-    private final HandlerExceptionResolver handlerExceptionResolver;
-
-    public JwtAuthenticationFilter(JwtTokenService jwtTokenService,
-                                   UserDetailsService userDetailsService,
-                                   @Qualifier("handlerExceptionResolver") HandlerExceptionResolver handlerExceptionResolver) {
-        this.jwtTokenService = jwtTokenService;
-        this.userDetailsService = userDetailsService;
-        this.handlerExceptionResolver = handlerExceptionResolver;
-    }
-
-    @Override
-    protected void doFilterInternal(HttpServletRequest request,
-                                    HttpServletResponse response,
-                                    FilterChain filterChain) throws ServletException, IOException {
-        final String authHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
-
-        // 1. Guard against non-Bearer requests
-        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-            filterChain.doFilter(request, response);
-            return;
-        }
-
-        try {
-            final String jwt = authHeader.substring(7);
-            final String userEmail = jwtTokenService.extractUsername(jwt);
-
-            // 2. Authenticate if username valid and SecurityContext is unauthenticated
-            if (userEmail != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-                UserDetails userDetails = this.userDetailsService.loadUserByUsername(userEmail);
-
-                if (jwtTokenService.isTokenValid(jwt, userDetails)) {
-                    UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
-                        userDetails,
-                        null,
-                        userDetails.getAuthorities()
-                    );
-                    authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-                    // 3. Set authenticated state into ThreadLocal SecurityContext
-                    SecurityContextHolder.getContext().setAuthentication(authToken);
-                }
-            }
-            filterChain.doFilter(request, response);
-        } catch (Exception ex) {
-            // Forward JWT expiry or signature errors directly to RestControllerAdvice
-            handlerExceptionResolver.resolveException(request, response, null, ex);
-        }
-    }
-}</code></pre>
-        </section>
-
-        <!-- SECTION 6: ROLE-BASED ACCESS CONTROL (RBAC) & METHOD SECURITY -->
-        <section>
-          <h2>6. Role-Based Access Control (RBAC) & Method Security</h2>
-
-          <h3>6.1 <code>hasRole()</code> vs <code>hasAuthority()</code></h3>
-          <p>
-            A classic senior interview question:
-          </p>
-          <ul>
-            <li><strong><code>hasAuthority("PRIVILEGE_NAME")</code>:</strong> Checks the exact string inside <code>GrantedAuthority.getAuthority()</code> with no modification. Example: <code>hasAuthority("READ_PRIVILEGES")</code>.</li>
-            <li><strong><code>hasRole("ROLE_NAME")</code>:</strong> Automatically prefixes the parameter with <code>ROLE_</code>. Example: calling <code>hasRole("ADMIN")</code> searches for authority <code>ROLE_ADMIN</code>. If your database authority is <code>ADMIN</code> without the prefix, <code>hasRole("ADMIN")</code> evaluates to <strong>false</strong>!</li>
-          </ul>
-
-          <h3>6.2 Method-Level Security: @PreAuthorize & SpEL Expressions</h3>
-          <p>
-            Enabled via <code>@EnableMethodSecurity(prePostEnabled = true)</code>. Operates using Spring AOP method interceptors (dynamic proxying) to evaluate authorization logic before or after business methods:
-          </p>
-
-          <pre><code class="language-java">@Service
-public class OrderService {
-
-    // 1. Role check
-    @PreAuthorize("hasRole('ADMIN')")
-    public void cancelAnyOrder(Long orderId) { /* ... */ }
-
-    // 2. Ownership check: evaluate method argument against authenticated principal
-    @PreAuthorize("hasRole('ADMIN') or #userId == authentication.principal.id")
-    public OrderResponse getOrderForUser(Long userId, Long orderId) {
-        return orderRepository.findByUserIdAndOrderId(userId, orderId);
-    }
-
-    // 3. Post-execution filtering: Inspect returned object before client receives it
-    @PostAuthorize("returnObject.ownerUsername == authentication.name")
-    public Order getOrderDetails(Long orderId) {
-        return orderRepository.findById(orderId).orElseThrow();
-    }
-
-    // 4. In-flight collection filtering: Remove unauthorized items from list argument
-    @PreFilter("filterObject.companyId == authentication.principal.companyId")
-    public void bulkUpdateOrders(List&lt;OrderUpdateDto&gt; orders) {
-        // Only orders matching user's company survive the filter
-    }
-}</code></pre>
-        </section>
-
-        <!-- SECTION 7: OAUTH2 & OPENID CONNECT (OIDC) -->
-        <section>
-          <h2>7. OAuth2 & OpenID Connect (OIDC) Architecture</h2>
-
-          <h3>7.1 OAuth2 vs OpenID Connect</h3>
-          <ul>
-            <li><strong>OAuth 2.0 (RFC 6749):</strong> An <strong>authorization</strong> framework that delegates access to third-party applications without sharing passwords. It issues <strong>Access Tokens</strong>. It does not standardize user identity.</li>
-            <li><strong>OpenID Connect (OIDC):</strong> An <strong>identity layer</strong> built on top of OAuth 2.0. In addition to an Access Token, it returns an <strong>ID Token</strong> (always a signed JWT) containing verified user identity claims (email, name, sub).</li>
-          </ul>
-
-          <h3>7.2 The 4 OAuth2 Roles</h3>
-          <ol>
-            <li><strong>Resource Owner:</strong> The end user who owns the data.</li>
-            <li><strong>Client:</strong> The application (e.g. React SPA, mobile app, backend service) requesting access.</li>
-            <li><strong>Authorization Server:</strong> Issues tokens upon user authentication (e.g., Keycloak, Okta, Auth0, Google Identity).</li>
-            <li><strong>Resource Server:</strong> The protected API (e.g., your Spring Boot microservices) validating tokens and serving resources.</li>
-          </ol>
-
-          <h3>7.3 Authorization Code Flow with PKCE (Proof Key for Code Exchange)</h3>
-          <p>
-            The industry standard for all clients (SPAs, mobile, and web apps):
-          </p>
-
-          <pre><code>[ Browser / Client ]       [ Authorization Server ]        [ Spring Boot API ]
-        |                              |                            |
-        | 1. Generate code_verifier    |                            |
-        |    and code_challenge (SHA256)                            |
-        | 2. GET /authorize?           |                            |
-        |    code_challenge=xyz...     |                            |
-        +----------------------------->|                            |
-        |   (User logs in & consents)  |                            |
-        | 3. Redirect back with 'code' |                            |
-        |<-----------------------------+                            |
-        |                              |                            |
-        | 4. POST /oauth/token         |                            |
-        |    (code + code_verifier)    |                            |
-        +----------------------------->|                            |
-        |   (Auth Server verifies hash)|                            |
-        | 5. Returns Access + ID Token |                            |
-        |<-----------------------------+                            |
-        |                                                           |
-        | 6. HTTP GET /api/orders (Authorization: Bearer <jwt>)     |
-        +---------------------------------------------------------->|
-        |                                                           | Verifies signature
-        |                                                           | via JWKS endpoint
-        | 7. 200 OK + JSON Response                                 |
-        |<----------------------------------------------------------+</code></pre>
-        </section>
-
-        <!-- SECTION 8: CORS & CSRF MECHANICS -->
-        <section>
-          <h2>8. CORS & CSRF Under-the-Hood Mechanics</h2>
-
-          <h3>8.1 Cross-Origin Resource Sharing (CORS)</h3>
-          <p>
-            CORS is an enforcement mechanism implemented by <strong>web browsers</strong>, not servers, according to the Same-Origin Policy (protocol, domain, and port must match).
-          </p>
-          <ul>
-            <li><strong>Preflight Request (HTTP <code>OPTIONS</code>):</strong> Sent by browsers prior to "non-simple" requests (custom headers like <code>Authorization</code>, or methods like <code>PUT</code>, <code>DELETE</code>, <code>PATCH</code>).</li>
-            <li><strong>Mandatory Response Headers:</strong>
-              <ul>
-                <li><code>Access-Control-Allow-Origin: https://app.company.com</code> (Never use <code>*</code> in production when credentials are sent!)</li>
-                <li><code>Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS</code></li>
-                <li><code>Access-Control-Allow-Headers: Authorization, Content-Type, X-Correlation-ID</code></li>
-                <li><code>Access-Control-Allow-Credentials: true</code> (Allows browser to include cookies/auth tokens)</li>
-              </ul>
-            </li>
-          </ul>
-
-          <pre><code class="language-java">@Bean
-public CorsConfigurationSource corsConfigurationSource() {
-    CorsConfiguration configuration = new CorsConfiguration();
-    configuration.setAllowedOrigins(List.of("https://app.company.com", "https://admin.company.com"));
-    configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-    configuration.setAllowedHeaders(List.of("Authorization", "Content-Type", "X-Requested-With", "X-Trace-Id"));
-    configuration.setAllowCredentials(true);
-    configuration.setMaxAge(3600L); // Cache preflight response for 1 hour
-
-    UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-    source.registerCorsConfiguration("/**", configuration);
-    return source;
-}</code></pre>
-
-          <h3>8.2 Cross-Site Request Forgery (CSRF)</h3>
-          <p>
-            CSRF exploits the browser's automatic inclusion of session cookies with every cross-site request:
-          </p>
-          <pre><code>User logs into bank.com (Session cookie stored in browser)
-  |
-User visits malicious.com in another tab
-  |
-malicious.com triggers: &lt;form action="https://bank.com/transfer" method="POST"&gt;
-  |
-Browser automatically attaches bank.com session cookie!
-  |
-bank.com executes transfer unless protected by CSRF token!</code></pre>
-
-          <div class="callout callout-solution">
-            <div class="callout-title">💡 Why disable CSRF for Stateless JWT APIs?</div>
-            <p>
-              When an API is completely stateless (<code>SessionCreationPolicy.STATELESS</code>) and clients store JWT tokens in memory or JavaScript variables, passing them via the <code>Authorization: Bearer &lt;token&gt;</code> header:
-            </p>
-            <p>
-              <strong>Browsers NEVER automatically attach custom HTTP headers to cross-site requests!</strong> A malicious site cannot force a victim's browser to send a custom <code>Authorization: Bearer</code> header. Therefore, CSRF protection is mathematically redundant and safely disabled (<code>csrf(AbstractHttpConfigurer::disable)</code>).
-            </p>
-            <p>
-              <em>Crucial Caveat:</em> If your application stores JWTs in automatic browser cookies without <code>SameSite=Strict</code>, you <strong>MUST</strong> still enable CSRF protection!
-            </p>
-          </div>
-        </section>
-
-        <!-- SECTION 9: SESSION MANAGEMENT & FIXATION -->
-        <section>
-          <h2>9. Session Management & Session Fixation Protection</h2>
-
-          <h3>9.1 Session Creation Policies</h3>
-          <ul>
-            <li><strong><code>STATELESS</code>:</strong> Spring Security will never create or use an <code>HttpSession</code>. Ideal for REST microservices and JWT authentication.</li>
-            <li><strong><code>IF_REQUIRED</code> (Default):</strong> Creates an <code>HttpSession</code> only if authentication requires one (e.g., standard web UI).</li>
-            <li><strong><code>ALWAYS</code>:</strong> Always creates an <code>HttpSession</code> if one does not exist.</li>
-            <li><strong><code>NEVER</code>:</strong> Spring Security will never create an <code>HttpSession</code>, but will use one if it already exists.</li>
-          </ul>
-
-          <h3>9.2 Session Fixation Defense</h3>
-          <p>
-            <strong>Session Fixation Attack:</strong> An attacker obtains a valid session ID from a site, tricks a victim into authenticating using that session ID, and then hijacks the authenticated session.
-          </p>
-          <p>
-            <strong>Spring's Defense:</strong> <code>sessionManagement().sessionFixation().migrateSession()</code> (default). Upon successful login, Spring immediately invalidates the old session ID, creates a brand new session ID, and migrates all existing session attributes over.
-          </p>
-
-          <h3>9.3 Concurrent Session Control</h3>
-          <pre><code class="language-java">http.sessionManagement(session -> session
-    .maximumSessions(1) // Allows only 1 active session per user account
-    .maxSessionsPreventsLogin(true) // Second login attempt rejected (or false to boot first session)
-    .sessionRegistry(sessionRegistry())
-);</code></pre>
-        </section>
-
-        <!-- SECTION 10: ZERO-TRUST API SECURITY BEST PRACTICES -->
-        <section>
-          <h2>10. Zero-Trust API Defense & Security Headers</h2>
-
-          <h3>10.1 Defense-in-Depth Best Practices</h3>
-          <ol>
-            <li><strong>Enforce Mutual TLS (mTLS):</strong> Zero Trust inside Kubernetes clusters. Envoy/Istio service meshes authenticate service-to-service communication via X.509 certificates.</li>
-            <li><strong>Rate Limiting & Throttling:</strong> Guard against brute force credential stuffing on <code>/api/v1/auth/login</code> using Redis Token Bucket (Bucket4j).</li>
-            <li><strong>Sanitize Error Payloads:</strong> Never return stack traces, DB vendor errors, or class names to the client (RFC 7807 <code>ProblemDetail</code>).</li>
-            <li><strong>Principle of Least Privilege:</strong> Microservices should only request and receive minimal OAuth2 scopes (e.g. <code>read:orders</code> instead of wildcard).</li>
-          </ol>
-
-          <h3>10.2 Mandatory Security Headers</h3>
-          <pre><code class="language-java">http.headers(headers -> headers
-    .contentSecurityPolicy(csp -> csp.policyDirectives("default-src 'self'"))
-    .frameOptions(HeadersConfigurer.FrameOptionsConfig::deny)
-    .xssProtection(HeadersConfigurer.XXssConfig::disable) // Deprecated in modern browsers, replaced by CSP
-    .httpStrictTransportSecurity(hsts -> hsts
-        .includeSubDomains(true)
-        .maxAgeInSeconds(31536000))
-);</code></pre>
-        </section>
-
-        <!-- SECTION 11: PRODUCTION POST-MORTEMS -->
-        <section>
-          <h2>11. Real-World Production War Stories (RCA & Fixes)</h2>
-
-          <!-- POST-MORTEM 1 -->
-          <div class="callout callout-production">
-            <div class="callout-title">🚨 Incident 1: Cross-Origin Preflight (OPTIONS) 401 Outage in Production</div>
-            <p><strong>Environment:</strong> React Single Page App + Spring Boot 3.2 Gateway & Microservices.</p>
-            <p><strong>The Failure:</strong> After deploying a security upgrade, all frontend cross-origin POST and PUT requests failed immediately with <code>401 Unauthorized</code> or <code>403 Forbidden</code>. GET requests mysteriously worked.</p>
-            <p><strong>Root Cause Analysis (RCA):</strong></p>
-            <ul>
-              <li>The frontend added a custom header: <code>Authorization: Bearer ...</code>. The browser automatically sent an HTTP <code>OPTIONS</code> preflight request before every mutating request.</li>
-              <li>Per W3C specs, browsers <strong>never send credentials (Authorization header) with preflight OPTIONS requests</strong>.</li>
-              <li>The Spring Security filter chain was configured with <code>.anyRequest().authenticated()</code>, but CORS was either declared in a separate MVC <code>WebMvcConfigurer</code> or ordered <em>after</em> the Spring Security filter chain.</li>
-              <li>Spring Security intercepted the unauthenticated <code>OPTIONS</code> request and promptly rejected it with <code>401 Unauthorized</code> before the CORS filter could ever evaluate it!</li>
-            </ul>
-            <p><strong>The Fix:</strong> Integrate CORS directly inside the <code>SecurityFilterChain</code> bean and register <code>CorsConfigurationSource</code>:</p>
-            <pre><code class="language-java">// Inside SecurityFilterChain definition:
-http
-    .cors(Customizer.withDefaults()) // Uses corsConfigurationSource bean FIRST
-    .authorizeHttpRequests(auth -> auth
-        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll() // Explicit permit for preflights
-        .anyRequest().authenticated()
-    );</code></pre>
-          </div>
-
-          <!-- POST-MORTEM 2 -->
-          <div class="callout callout-production">
-            <div class="callout-title">🚨 Incident 2: 100% CPU Spike & Thread Starvation via Over-Tuned BCrypt Cost Factor</div>
-            <p><strong>Environment:</strong> High-traffic e-commerce login service under a Black Friday surge.</p>
-            <p><strong>The Failure:</strong> As traffic increased to 1,500 req/sec, all Kubernetes pods spiked to 100% CPU utilization. Response times jumped from 80ms to over 25 seconds, triggering cascading gateway 504 timeouts and pod crash-loops.</p>
-            <p><strong>Root Cause Analysis (RCA):</strong></p>
-            <ul>
-              <li>A security engineer had changed the BCrypt strength to <code>new BCryptPasswordEncoder(15)</code> to comply with a paranoid compliance checklist.</li>
-              <li>BCrypt cost is logarithmic: $2^{15} = 32,768$ rounds. On production server CPUs, a single password verification took <strong>~1.4 seconds of dedicated CPU core execution</strong>.</li>
-              <li>With Tomcat configured for 200 worker threads, 200 concurrent login requests consumed 100% of the node's CPU cores for 1.4 seconds continuously. Subsequent requests queued indefinitely, exhausting thread pools and starving health-check probes.</li>
-            </ul>
-            <p><strong>The Fix:</strong> Lower the work factor to <code>10</code> or <code>12</code> (which takes ~80-150ms per verification) and deploy a Redis-based rate-limiter in front of <code>/api/v1/auth/login</code> to cap brute-force attempts without starving the JVM.</p>
-          </div>
-
-          <!-- POST-MORTEM 3 -->
-          <div class="callout callout-production">
-            <div class="callout-title">🚨 Incident 3: Critical SecurityContext Leakage Across Async Threads</div>
-            <p><strong>Environment:</strong> SaaS Banking platform processing asynchronous financial reconciliations.</p>
-            <p><strong>The Failure:</strong> Audit logs revealed that user reports generated via <code>@Async</code> methods intermittently exposed financial data belonging to completely different corporate tenants!</p>
-            <p><strong>Root Cause Analysis (RCA):</strong></p>
-            <ul>
-              <li>The developers switched the strategy to <code>SecurityContextHolder.MODE_INHERITABLETHREADLOCAL</code> thinking it would solve context sharing with <code>@Async</code> tasks.</li>
-              <li>The application utilized a pooled <code>ThreadPoolTaskExecutor</code>. In pooled thread pools, threads are <strong>never destroyed</strong>; they are returned to the pool and reused for subsequent tasks from different HTTP requests!</li>
-              <li><code>InheritableThreadLocal</code> copies the context only upon <em>thread creation</em>. When a pooled thread finished Task A (User Alice) and was later assigned Task B (User Bob), it retained Alice's old security context, causing Bob's task to execute under Alice's identity!</li>
-            </ul>
-            <p><strong>The Fix:</strong> Revert strategy to standard <code>MODE_THREADLOCAL</code> and wrap executors with <code>DelegatingSecurityContextAsyncTaskExecutor</code>, ensuring context is propagated per-task and purged upon task completion:</p>
-            <pre><code class="language-java">@Bean
-public Executor taskExecutor() {
-    ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
-    executor.initialize();
-    return new DelegatingSecurityContextAsyncTaskExecutor(executor);
-}</code></pre>
-          </div>
-        </section>
-
-        <!-- SECTION 12: SENIOR INTERVIEW Q&A -->
-        <section>
-          <h2>12. Senior & Staff Engineer Interview Q&A</h2>
-
-          <div class="callout callout-interview">
-            <div class="callout-title">Q1: How does Spring Security 6.x differ from Spring Security 5.x architecture?</div>
-            <p><strong>Answer:</strong> Key architectural shifts in version 6 (Spring Boot 3.x):</p>
-            <ol>
-              <li><strong>Removal of <code>WebSecurityConfigurerAdapter</code>:</strong> All configuration is now component-based using <code>@Bean SecurityFilterChain</code> and lambda DSL.</li>
-              <li><strong>Deprecation of <code>antMatchers()</code> and <code>authorizeRequests()</code>:</strong> Replaced by <code>authorizeHttpRequests()</code> and <code>requestMatchers()</code>, which provides unified matching across MVC patterns, regex, and DispatcherServlet paths.</li>
-              <li><strong>Replacement of <code>SecurityContextPersistenceFilter</code>:</strong> Replaced by <code>SecurityContextHolderFilter</code>, which changes context saving from implicit auto-save on request exit to explicit saving via <code>SecurityContextRepository</code>.</li>
-              <li><strong>Removal of legacy <code>FilterSecurityInterceptor</code>:</strong> Replaced by the more performant <code>AuthorizationFilter</code>.</li>
-              <li><strong>Modern Method Security:</strong> <code>@EnableGlobalMethodSecurity</code> is deprecated in favor of <code>@EnableMethodSecurity</code>.</li>
-            </ol>
-          </div>
-
-          <div class="callout callout-interview">
-            <div class="callout-title">Q2: How do you invalidate or revoke a stateless JWT before its expiration timestamp?</div>
-            <p><strong>Answer:</strong> Because JWT verification is cryptographic and decoupled from database lookups, native revoking is an architectural trade-off. Common solutions in production:</p>
-            <ul>
-              <li><strong>Token Blacklisting with Redis (TTL):</strong> When a user logs out, store the JWT ID (<code>jti</code> claim) in Redis with a TTL equal to the token's remaining lifespan. The <code>JwtAuthenticationFilter</code> checks Redis (O(1) memory lookup). If present, reject with 401.</li>
-              <li><strong>Short-lived Access Tokens (5-10 min) + Revocable Refresh Tokens:</strong> Accept that access tokens expire quickly. Invalidate only the refresh token in the database/Redis, preventing token renewals upon logout or credential reset.</li>
-              <li><strong>Token Versioning (Generation Counter):</strong> Store a <code>token_version</code> integer on the user entity and include it in the JWT payload. Incrementing the user's version in the DB immediately invalidates all tokens signed with older versions.</li>
-            </ul>
-          </div>
-
-          <div class="callout callout-interview">
-            <div class="callout-title">Q3: Why should passwords never be compared using <code>String.equals()</code>?</div>
-            <p><strong>Answer:</strong> <code>String.equals()</code> compares strings character-by-character from left to right and returns <code>false</code> as soon as a mismatch is detected (short-circuit evaluation).</p>
-            <p>
-              An attacker can measure microsecond differences in server response latency (a <strong>Side-Channel Timing Attack</strong>) to deduce how many initial characters of the password or hash were correct. Passwords and cryptographic digests must always be verified using constant-time comparison algorithms (e.g. <code>MessageDigest.isEqual()</code> or <code>BCrypt.checkpw()</code>), which always examine every byte regardless of where the mismatch occurs.
-            </p>
-          </div>
-
-          <div class="callout callout-interview">
-            <div class="callout-title">Q4: What is the difference between OAuth2 Scopes and Spring Security Roles?</div>
-            <p><strong>Answer:</strong></p>
-            <ul>
-              <li><strong>Roles (RBAC):</strong> Define what an <em>identity/user</em> is allowed to do within the system based on their job function (e.g., <code>ROLE_ADMIN</code> can delete accounts).</li>
-              <li><strong>OAuth2 Scopes:</strong> Define the <em>boundaries of permissions delegated to a third-party client application</em>. A user might be an <code>ADMIN</code>, but when authorising a mobile app with scope <code>read:profile</code>, the app is only granted read access. The resulting permission is the <strong>intersection</strong> of user privileges and granted scopes.</li>
-            </ul>
-          </div>
-        </section>
-
-      </main>
-    </div>
-  </div>
-
-  <footer class="footer">
-    <div class="container">
-      <p>&copy; 2026 Interview A-Z Knowledge Base. Designed for Senior & Lead Engineering Interviews.</p>
-    </div>
-  </footer>
-
-  <script src="../../assets/js/main.js"></script>
-</body>
-</html>
+<div class="layout"><aside><p class="toc-title">On This Page</p><div class="toc"><a href="#intro">Introduction</a><a href="#syllabus">Complete syllabus</a><a href="#authentication">1. Authentication</a><a href="#authorization">2. Authorization</a><a href="#filter-chain">3. Security Filter Chain</a><a href="#security-context">4. SecurityContext</a><a href="#user-details">5. UserDetails</a><a href="#password-encoding">6. Password Encoding</a><a href="#bcrypt">7. BCrypt</a><a href="#jwt">8. JWT</a><a href="#access-token">9. Access Token</a><a href="#refresh-token">10. Refresh Token</a><a href="#rbac">11. Role-Based Access Control</a><a href="#oauth2">12. OAuth 2.0</a><a href="#oidc">13. OpenID Connect (OIDC)</a><a href="#cors">14. CORS</a><a href="#csrf">15. CSRF</a><a href="#sessions">16. Session Management</a><a href="#method-security">17. Method Security</a><a href="#api-security">18. API Security</a><a href="#flow">End-to-end login flow</a><a href="#mistakes">Common mistakes</a><a href="#interview">Interview Q&amp;A</a><a href="#tracker">Mastery tracker</a><a href="../../index.html" class="nav-link">Home</a></div></aside><main>
+    <header class="hero" id="intro"><div class="eyebrow">Module 9 · Java Backend Security</div><h1>Spring Security Masterclass</h1><p>A beginner-friendly but technically deep guide for Java backend engineers. Every supplied topic is covered with plain-English analogies, Spring Security context, thumb rules, common mistakes, and interview-ready explanations.</p><div class="pills"><span class="pill">Spring Boot</span><span class="pill">Authentication &amp; Authorization</span><span class="pill">JWT / OAuth2 / OIDC</span><span class="pill">Production Security</span></div><div class="callout warning"><strong>Golden rule:</strong> Never trust a request merely because it reached your controller. Authenticate the caller, authorize the exact action and resource, validate input, and fail closed.</div><div class="toolbar"><button class="btn" onclick="window.print()">Print / Save as PDF</button><button class="btn" onclick="document.querySelectorAll('details').forEach(d=>d.open=true)">Expand all answers</button><button class="btn" onclick="document.querySelectorAll('details').forEach(d=>d.open=false)">Collapse answers</button></div></header>
+    <section id="syllabus"><h2>Complete syllabus — all 18 topics</h2><p>Follow this order to build understanding from identity and permissions through tokens, browser security, and production API defenses.</p><div class="checkpanel"><div style="display:flex;justify-content:space-between;gap:12px;align-items:center"><strong>Topic completion</strong><span id="progressText">0 / 18 completed</span></div><div class="progressbar"><div id="progressFill"></div></div><p class="small muted">Progress is saved in this browser when local storage is available.</p><div id="syllabusList" class="grid"><label class="topic-check"><input type="checkbox" data-topic="authentication"><span>1. Authentication</span></label><label class="topic-check"><input type="checkbox" data-topic="authorization"><span>2. Authorization</span></label><label class="topic-check"><input type="checkbox" data-topic="filter-chain"><span>3. Security Filter Chain</span></label><label class="topic-check"><input type="checkbox" data-topic="security-context"><span>4. SecurityContext</span></label><label class="topic-check"><input type="checkbox" data-topic="user-details"><span>5. UserDetails</span></label><label class="topic-check"><input type="checkbox" data-topic="password-encoding"><span>6. Password Encoding</span></label><label class="topic-check"><input type="checkbox" data-topic="bcrypt"><span>7. BCrypt</span></label><label class="topic-check"><input type="checkbox" data-topic="jwt"><span>8. JWT</span></label><label class="topic-check"><input type="checkbox" data-topic="access-token"><span>9. Access Token</span></label><label class="topic-check"><input type="checkbox" data-topic="refresh-token"><span>10. Refresh Token</span></label><label class="topic-check"><input type="checkbox" data-topic="rbac"><span>11. Role-Based Access Control</span></label><label class="topic-check"><input type="checkbox" data-topic="oauth2"><span>12. OAuth 2.0</span></label><label class="topic-check"><input type="checkbox" data-topic="oidc"><span>13. OpenID Connect (OIDC)</span></label><label class="topic-check"><input type="checkbox" data-topic="cors"><span>14. CORS</span></label><label class="topic-check"><input type="checkbox" data-topic="csrf"><span>15. CSRF</span></label><label class="topic-check"><input type="checkbox" data-topic="sessions"><span>16. Session Management</span></label><label class="topic-check"><input type="checkbox" data-topic="method-security"><span>17. Method Security</span></label><label class="topic-check"><input type="checkbox" data-topic="api-security"><span>18. API Security</span></label></div></div><div class="grid three"><div class="card"><h4>Identity</h4><p>Authentication, UserDetails, Password Encoding, BCrypt</p></div><div class="card"><h4>Spring internals</h4><p>Security Filter Chain, SecurityContext, Method Security</p></div><div class="card"><h4>Tokens &amp; identity standards</h4><p>JWT, Access Token, Refresh Token, OAuth2, OpenID Connect</p></div><div class="card"><h4>Access control</h4><p>Authorization, Role Based Access, API Security</p></div><div class="card"><h4>Browser &amp; session defenses</h4><p>CORS, CSRF, Session Management</p></div><div class="card"><h4>Interview focus</h4><p>End-to-end flow, thumb rules, common mistakes, Q&amp;A</p></div></div></section>
+    <section class="topic" id="authentication">
+        <h2>1. Authentication</h2>
+        <h3>Plain-English explanation</h3><p>Authentication answers “Who are you?” It verifies a claimed identity, such as a username/password, passkey, certificate, or identity-provider login. In Spring Security, authentication is represented by an Authentication object whose principal identifies the user and whose authorities describe granted permissions.</p>
+        <div class="callout good"><strong>Explain it like I am a kid:</strong> Think of a school guard checking that you really are the student named on your card. A successful login proves identity; it does not automatically mean you can enter every room.</div>
+        <h3>How it fits into a Spring Security application</h3><p>Understand the identity proof and the trust boundary before choosing the authentication mechanism.</p>
+        <h3>Thumb rules — remember these</h3><ul><li>Use a trusted identity store, generic login errors, throttling, MFA for sensitive accounts, secure password storage, and audit events. Never log passwords, access tokens, or refresh tokens.</li><li>Use least privilege and fail closed when a required security check cannot be completed.</li><li>Write tests for both permitted and forbidden requests; a successful happy path is not enough.</li></ul>
+        <h3>Interview answer (30–60 seconds)</h3><div class="card"><p>I separate identity verification from permissions. The client presents credentials, the server validates them, and successful authentication creates an authenticated principal for later authorization decisions.</p></div>
+    </section><section class="topic" id="authorization">
+    <h2>2. Authorization</h2>
+    <h3>Plain-English explanation</h3><p>Authorization decides whether an already identified principal may perform a particular action on a particular resource. It should be enforced server-side for every protected request, including object-level ownership checks.</p>
+    <div class="callout good"><strong>Explain it like I am a kid:</strong> A school guard knows who you are, then checks whether your card lets you enter the science lab.</div>
+    <h3>How it fits into a Spring Security application</h3><p>Make the permission decision as close as practical to the protected operation.</p>
+    <h3>Thumb rules — remember these</h3><ul><li>Default-deny, least privilege, check ownership as well as roles, and avoid trusting user IDs or roles sent in request bodies. A role check alone can still expose another user’s record.</li><li>Use least privilege and fail closed when a required security check cannot be completed.</li><li>Write tests for both permitted and forbidden requests; a successful happy path is not enough.</li></ul>
+    <h3>Interview answer (30–60 seconds)</h3><div class="card"><p>Authentication establishes who the caller is; authorization evaluates what that caller may do. I enforce authorization at request and, where appropriate, service/method and domain-resource levels.</p></div>
+</section><section class="topic" id="filter-chain">
+    <h2>3. Security Filter Chain</h2>
+    <h3>Plain-English explanation</h3><p>Spring Security’s FilterChainProxy selects a matching SecurityFilterChain and runs its ordered servlet filters before the controller. Filters can load context, handle CORS/CSRF, authenticate credentials, translate exceptions, and authorize requests. Order and matcher configuration matter.</p>
+    <div class="callout good"><strong>Explain it like I am a kid:</strong> Before a parcel reaches the right room, it passes several checkpoints in a fixed order.</div>
+    <h3>How it fits into a Spring Security application</h3><p>Treat configuration order and request matching as security-critical behavior.</p>
+    <h3>Thumb rules — remember these</h3><ul><li>Prefer the modern SecurityFilterChain bean configuration. Define explicit matchers and a final catch-all chain. Multiple chains are selected by matcher order; a request usually runs one matching chain, not every chain. Avoid casually adding custom filters at the wrong position.</li><li>Use least privilege and fail closed when a required security check cannot be completed.</li><li>Write tests for both permitted and forbidden requests; a successful happy path is not enough.</li></ul>
+    <h3>Interview answer (30–60 seconds)</h3><div class="card"><p>A request enters the servlet container, then Spring Security’s filter chain. Authentication filters establish the principal; authorization filters check access; only an allowed request proceeds to MVC/controller handling.</p></div>
+</section><section class="topic" id="security-context">
+    <h2>4. SecurityContext</h2>
+    <h3>Plain-English explanation</h3><p>SecurityContext holds the current Authentication. SecurityContextHolder exposes it to application code, commonly through a thread-local strategy during a servlet request. Spring Security’s filters manage loading, clearing, and persistence according to the configured setup.</p>
+    <div class="callout good"><strong>Explain it like I am a kid:</strong> It is the temporary badge information available to the people handling one request.</div>
+    <h3>How it fits into a Spring Security application</h3><p>Read the established security context rather than trusting identity fields supplied by the caller.</p>
+    <h3>Thumb rules — remember these</h3><ul><li>Do not assume thread-local context automatically follows work into @Async, executors, or message consumers. Use appropriate context-propagation mechanisms or pass identity/claims explicitly. Clear context to prevent leakage between reused threads.</li><li>Use least privilege and fail closed when a required security check cannot be completed.</li><li>Write tests for both permitted and forbidden requests; a successful happy path is not enough.</li></ul>
+    <h3>Interview answer (30–60 seconds)</h3><div class="card"><p>After authentication, the Authentication is stored in the SecurityContext. Application code can inspect the principal and authorities, but should not manually create a trusted authenticated identity from unverified input.</p></div>
+</section><section class="topic" id="user-details">
+    <h2>5. UserDetails</h2>
+    <h3>Plain-English explanation</h3><p>UserDetails is Spring Security’s core representation of a user for username/password authentication. It exposes username, encoded password, authorities, and account-state flags. UserDetailsService loads it by username; it is not itself the database entity or a general OAuth user model.</p>
+    <div class="callout good"><strong>Explain it like I am a kid:</strong> It is a small profile card the security system reads to verify a login and learn the user’s permissions.</div>
+    <h3>How it fits into a Spring Security application</h3><p>Load only the information required by the authentication mechanism and map permissions intentionally.</p>
+    <h3>Thumb rules — remember these</h3><ul><li>Return authorities deliberately, avoid exposing password hashes in APIs, and distinguish disabled, locked, expired, and credential-expired states. A custom UserDetailsService typically throws UsernameNotFoundException when no user exists.</li><li>Use least privilege and fail closed when a required security check cannot be completed.</li><li>Write tests for both permitted and forbidden requests; a successful happy path is not enough.</li></ul>
+    <h3>Interview answer (30–60 seconds)</h3><div class="card"><p>I keep persistence entities separate from the security-facing UserDetails model when that improves boundaries, and connect UserDetailsService to AuthenticationProvider/DaoAuthenticationProvider.</p></div>
+</section><section class="topic" id="password-encoding">
+    <h2>6. Password Encoding</h2>
+    <h3>Plain-English explanation</h3><p>Passwords should be stored as salted, computationally expensive one-way hashes, never plaintext or reversible encryption. PasswordEncoder encodes a raw password at registration and verifies a candidate during login with matches(raw, encoded).</p>
+    <div class="callout good"><strong>Explain it like I am a kid:</strong> Keep a scrambled, hard-to-reverse fingerprint—not the actual key—in the database.</div>
+    <h3>How it fits into a Spring Security application</h3><p>Use a one-way adaptive hash and the PasswordEncoder contract.</p>
+    <h3>Thumb rules — remember these</h3><ul><li>Use an adaptive password hashing algorithm, tune its work factor to your server, rehash after successful login when parameters become outdated, and never compare encoded strings directly because salts make hashes differ.</li><li>Use least privilege and fail closed when a required security check cannot be completed.</li><li>Write tests for both permitted and forbidden requests; a successful happy path is not enough.</li></ul>
+    <h3>Interview answer (30–60 seconds)</h3><div class="card"><p>Registration uses encode; login uses matches. I use Spring’s PasswordEncoder abstraction so the algorithm can evolve without changing business code.</p></div>
+</section><section class="topic" id="bcrypt">
+    <h2>7. BCrypt</h2>
+    <h3>Plain-English explanation</h3><p>BCrypt is a widely used adaptive password hashing algorithm. Its cost factor controls computational work; a random salt is included in the encoded result. Spring Security provides BCryptPasswordEncoder. The appropriate cost depends on latency and hardware and should be benchmarked.</p>
+    <div class="callout good"><strong>Explain it like I am a kid:</strong> It deliberately makes each password check slow enough to make mass guessing expensive.</div>
+    <h3>How it fits into a Spring Security application</h3><p>Benchmark the cost under realistic login traffic and monitor authentication failures.</p>
+    <h3>Thumb rules — remember these</h3><ul><li>BCrypt is not encryption and cannot be decrypted. Set a cost that is secure but acceptable under real login load; protect login endpoints against brute force. Consider Argon2 where operationally supported and suitable.</li><li>Use least privilege and fail closed when a required security check cannot be completed.</li><li>Write tests for both permitted and forbidden requests; a successful happy path is not enough.</li></ul>
+    <h3>Interview answer (30–60 seconds)</h3><div class="card"><p>I use BCryptPasswordEncoder or a suitable modern adaptive encoder, call matches for verification, benchmark the work factor, and combine it with rate limiting and breached-password controls.</p></div>
+</section><section class="topic" id="jwt">
+    <h2>8. JWT</h2>
+    <h3>Plain-English explanation</h3><p>JSON Web Token is a token format, often a signed compact set of claims. A signed JWT commonly has header.payload.signature. Signing lets a verifier detect tampering; it does not hide the payload. Validate signature, allowed algorithm, issuer, audience, expiry, not-before, and relevant claims.</p>
+    <div class="callout good"><strong>Explain it like I am a kid:</strong> It is like a tamper-evident ticket carrying a few facts. Anyone holding it may be able to read those facts, so do not put secrets inside.</div>
+    <h3>How it fits into a Spring Security application</h3><p>Use a maintained library to validate the token rather than writing JWT cryptography yourself.</p>
+    <h3>Thumb rules — remember these</h3><ul><li>Base64url is encoding, not encryption. Reject algorithm confusion, validate key rotation, keep claims minimal, use TLS, and plan revocation/compromise response. Do not trust decoded claims until signature and claims are validated.</li><li>Use least privilege and fail closed when a required security check cannot be completed.</li><li>Write tests for both permitted and forbidden requests; a successful happy path is not enough.</li></ul>
+    <h3>Interview answer (30–60 seconds)</h3><div class="card"><p>A JWT is a format, not an authentication strategy by itself. For APIs I validate its signature and required claims through a trusted resource-server configuration rather than manually decoding it.</p></div>
+</section><section class="topic" id="access-token">
+    <h2>9. Access Token</h2>
+    <h3>Plain-English explanation</h3><p>An access token authorizes calls to a resource server and is usually short-lived. It may be an opaque token or a JWT. The API validates it according to the issuer’s protocol and policy, then checks scopes/authorities and resource permissions.</p>
+    <div class="callout good"><strong>Explain it like I am a kid:</strong> It is a short-term entry pass for specific services.</div>
+    <h3>How it fits into a Spring Security application</h3><p>Send the token only to the intended resource server over TLS.</p>
+    <h3>Thumb rules — remember these</h3><ul><li>Keep expiry short enough to limit exposure but practical for clients. Send over HTTPS in the Authorization: Bearer header; avoid URLs and logs. A bearer token can be used by whoever steals it.</li><li>Use least privilege and fail closed when a required security check cannot be completed.</li><li>Write tests for both permitted and forbidden requests; a successful happy path is not enough.</li></ul>
+    <h3>Interview answer (30–60 seconds)</h3><div class="card"><p>I treat access tokens as credentials. The resource server validates them and applies authorization; the frontend should not assume possession means every endpoint is allowed.</p></div>
+</section><section class="topic" id="refresh-token">
+    <h2>10. Refresh Token</h2>
+    <h3>Plain-English explanation</h3><p>A refresh token is used with the authorization server to obtain new access tokens without asking the user to sign in again. It should be protected more strongly than an access token, stored only where appropriate, rotated where supported, and revoked on logout or suspicious reuse.</p>
+    <div class="callout good"><strong>Explain it like I am a kid:</strong> The short-term pass expires; a protected renewal slip lets you request another pass.</div>
+    <h3>How it fits into a Spring Security application</h3><p>Keep renewal credentials out of ordinary API calls and protect them as long-lived secrets.</p>
+    <h3>Thumb rules — remember these</h3><ul><li>Do not send refresh tokens to resource APIs. Use rotation and reuse detection, bind to client/session where supported, secure storage, expiration, and server-side revocation. Browser storage choices depend on the threat model; HttpOnly Secure cookies need CSRF consideration.</li><li>Use least privilege and fail closed when a required security check cannot be completed.</li><li>Write tests for both permitted and forbidden requests; a successful happy path is not enough.</li></ul>
+    <h3>Interview answer (30–60 seconds)</h3><div class="card"><p>Access tokens are presented to APIs; refresh tokens are presented to the authorization server. I use rotation/revocation and treat refresh-token theft as a session compromise.</p></div>
+</section><section class="topic" id="rbac">
+    <h2>11. Role-Based Access Control</h2>
+    <h3>Plain-English explanation</h3><p>RBAC grants permissions through roles such as USER, SUPPORT, or ADMIN. In Spring Security, authorities can be checked in request rules or method security. By convention hasRole("ADMIN") checks for ROLE_ADMIN, while hasAuthority checks the exact authority string.</p>
+    <div class="callout good"><strong>Explain it like I am a kid:</strong> A role is a bundle of permissions, like “librarian” or “teacher.”</div>
+    <h3>How it fits into a Spring Security application</h3><p>Translate business roles into narrowly scoped authorities.</p>
+    <h3>Thumb rules — remember these</h3><ul><li>Avoid a single giant ADMIN role. Keep least privilege, define role naming consistently, and add ownership/tenant checks for data access. Roles are not a substitute for business-level authorization.</li><li>Use least privilege and fail closed when a required security check cannot be completed.</li><li>Write tests for both permitted and forbidden requests; a successful happy path is not enough.</li></ul>
+    <h3>Interview answer (30–60 seconds)</h3><div class="card"><p>I map users to roles and roles to authorities, use request rules for coarse access and method/domain checks for sensitive operations, and test both allowed and denied cases.</p></div>
+</section><section class="topic" id="oauth2">
+    <h2>12. OAuth 2.0</h2>
+    <h3>Plain-English explanation</h3><p>OAuth 2.0 is an authorization framework that lets a client obtain limited access to resources with delegated authorization. It defines roles such as resource owner, client, authorization server, and resource server. It is not, by itself, a user-authentication protocol.</p>
+    <div class="callout good"><strong>Explain it like I am a kid:</strong> You let an app access only the specific things you approve, without giving that app your main password.</div>
+    <h3>How it fits into a Spring Security application</h3><p>Choose the OAuth grant based on client type and use case.</p>
+    <h3>Thumb rules — remember these</h3><ul><li>Use Authorization Code with PKCE for interactive public clients. Avoid the implicit and resource-owner-password grants for new designs. Validate redirect URIs, state, scopes, and token handling; use client credentials for service-to-service when appropriate.</li><li>Use least privilege and fail closed when a required security check cannot be completed.</li><li>Write tests for both permitted and forbidden requests; a successful happy path is not enough.</li></ul>
+    <h3>Interview answer (30–60 seconds)</h3><div class="card"><p>OAuth2 answers how delegated access is granted. If I need to know who the user is, I pair the appropriate flow with OpenID Connect rather than assuming OAuth access tokens are login identity assertions.</p></div>
+</section><section class="topic" id="oidc">
+    <h2>13. OpenID Connect (OIDC)</h2>
+    <h3>Plain-English explanation</h3><p>OIDC adds an identity layer on top of OAuth 2.0. It defines the ID Token and standard identity claims, plus discovery and user-info conventions. An ID token is for the client to learn about the authentication event; an access token is for calling APIs.</p>
+    <div class="callout good"><strong>Explain it like I am a kid:</strong> OAuth gives permission to use a service; OIDC adds a standardized identity card about the signed-in user.</div>
+    <h3>How it fits into a Spring Security application</h3><p>Use the ID token for identity and the access token for API access.</p>
+    <h3>Thumb rules — remember these</h3><ul><li>Validate ID token issuer, audience, signature, expiry, nonce when used, and flow-specific requirements. Do not send an ID token to an API as though it were an access token.</li><li>Use least privilege and fail closed when a required security check cannot be completed.</li><li>Write tests for both permitted and forbidden requests; a successful happy path is not enough.</li></ul>
+    <h3>Interview answer (30–60 seconds)</h3><div class="card"><p>For “Sign in with …” I use OIDC. The client validates the ID token under protocol rules, while APIs validate access tokens intended for them.</p></div>
+</section><section class="topic" id="cors">
+    <h2>14. CORS</h2>
+    <h3>Plain-English explanation</h3><p>Cross-Origin Resource Sharing is a browser-enforced policy that controls whether frontend JavaScript from one origin may read a response from another origin. The server expresses allowed origins, methods, headers, and credential behavior. CORS is not authentication and does not stop non-browser clients.</p>
+    <div class="callout good"><strong>Explain it like I am a kid:</strong> A website asks another website whether scripts from its address may read the response.</div>
+    <h3>How it fits into a Spring Security application</h3><p>Configure allowed browser origins separately from access-control rules.</p>
+    <h3>Thumb rules — remember these</h3><ul><li>Use specific trusted origins. Credentialed requests cannot use wildcard origin. Handle OPTIONS preflight and allow only necessary methods/headers. CORS does not replace authorization, CSRF defenses, or TLS.</li><li>Use least privilege and fail closed when a required security check cannot be completed.</li><li>Write tests for both permitted and forbidden requests; a successful happy path is not enough.</li></ul>
+    <h3>Interview answer (30–60 seconds)</h3><div class="card"><p>CORS controls browser cross-origin access. I configure it intentionally for known frontend origins and still secure every endpoint independently.</p></div>
+</section><section class="topic" id="csrf">
+    <h2>15. CSRF</h2>
+    <h3>Plain-English explanation</h3><p>Cross-Site Request Forgery tricks a browser into sending an unwanted authenticated request to a site where the victim has a session or other automatically attached credentials. CSRF defenses include synchronizer tokens, cookie settings such as SameSite, origin checks where appropriate, and avoiding unsafe state changes on GET.</p>
+    <div class="callout good"><strong>Explain it like I am a kid:</strong> A bad website tricks your browser into using the login badge it already carries.</div>
+    <h3>How it fits into a Spring Security application</h3><p>Protect state-changing requests when browsers automatically attach credentials.</p>
+    <h3>Thumb rules — remember these</h3><ul><li>CSRF is especially relevant to cookie/session authentication. Stateless bearer tokens manually added by JavaScript have a different exposure profile, but token storage and browser behavior matter. Do not blindly disable CSRF without understanding credential transport and endpoints.</li><li>Use least privilege and fail closed when a required security check cannot be completed.</li><li>Write tests for both permitted and forbidden requests; a successful happy path is not enough.</li></ul>
+    <h3>Interview answer (30–60 seconds)</h3><div class="card"><p>I first identify how credentials are sent. Cookie-based browser sessions generally need CSRF protection for state-changing requests; CORS alone is not a CSRF defense.</p></div>
+</section><section class="topic" id="sessions">
+    <h2>16. Session Management</h2>
+    <h3>Plain-English explanation</h3><p>In session-based authentication, the server tracks authenticated state and the browser typically carries a session identifier cookie. Session controls include creation, expiration, renewal, logout invalidation, fixation prevention, cookie flags, and concurrent-session policy. Distributed apps may need shared session storage.</p>
+    <div class="callout good"><strong>Explain it like I am a kid:</strong> The browser keeps a numbered claim ticket; the server uses it to find the login session.</div>
+    <h3>How it fits into a Spring Security application</h3><p>Treat the session identifier as a secret and manage its full lifecycle.</p>
+    <h3>Thumb rules — remember these</h3><ul><li>Use Secure, HttpOnly and suitable SameSite cookie attributes, rotate session ID after login/privilege change, expire idle and absolute sessions, invalidate on logout, and protect distributed session stores. Never put session IDs in URLs.</li><li>Use least privilege and fail closed when a required security check cannot be completed.</li><li>Write tests for both permitted and forbidden requests; a successful happy path is not enough.</li></ul>
+    <h3>Interview answer (30–60 seconds)</h3><div class="card"><p>I choose sessions when server-managed browser login is useful, protect the cookie and lifecycle, and account for horizontal scaling with a shared session store when required.</p></div>
+</section><section class="topic" id="method-security">
+    <h2>17. Method Security</h2>
+    <h3>Plain-English explanation</h3><p>Method security applies authorization at Spring bean method invocation, for example with @EnableMethodSecurity and annotations such as @PreAuthorize, @PostAuthorize, @Secured, or @RolesAllowed where supported/configured. It is useful for service-layer and domain-sensitive checks.</p>
+    <div class="callout good"><strong>Explain it like I am a kid:</strong> A locked front door is not enough; each important room can also check your badge.</div>
+    <h3>How it fits into a Spring Security application</h3><p>Place sensitive checks in a service method as well as appropriate HTTP rules.</p>
+    <h3>Thumb rules — remember these</h3><ul><li>Ensure calls pass through Spring proxies; self-invocation can bypass proxy-based advice. Prefer explicit expressions, test method authorization, and avoid relying only on controller annotations for critical business rules.</li><li>Use least privilege and fail closed when a required security check cannot be completed.</li><li>Write tests for both permitted and forbidden requests; a successful happy path is not enough.</li></ul>
+    <h3>Interview answer (30–60 seconds)</h3><div class="card"><p>I use HTTP rules for endpoint-level access and method security for sensitive operations. I understand proxy boundaries and keep object ownership checks close to the data/business operation.</p></div>
+</section><section class="topic" id="api-security">
+    <h2>18. API Security</h2>
+    <h3>Plain-English explanation</h3><p>API security combines transport protection, identity, authorization, input validation, abuse prevention, secret management, safe errors, logging, dependency hygiene, and operational response. Threats include broken object-level authorization, token theft, injection, replay, brute force, overexposure, and denial of service.</p>
+    <div class="callout good"><strong>Explain it like I am a kid:</strong> The whole building needs secure doors, visitor checks, cameras, and rules—not just one lock at the entrance.</div>
+    <h3>How it fits into a Spring Security application</h3><p>Combine controls because no single security feature blocks every attack.</p>
+    <h3>Thumb rules — remember these</h3><ul><li>Use HTTPS, least privilege, request validation, rate limits, quotas, timeouts, safe CORS/CSRF policy, secret rotation, security headers where applicable, audit logs without secrets, dependency updates, and negative security tests.</li><li>Use least privilege and fail closed when a required security check cannot be completed.</li><li>Write tests for both permitted and forbidden requests; a successful happy path is not enough.</li></ul>
+    <h3>Interview answer (30–60 seconds)</h3><div class="card"><p>I use defense in depth: authenticate, authorize each resource/action, validate inputs, limit abuse, protect secrets and transport, observe suspicious behavior, and test failure paths.</p></div>
+</section>
+    <section class="topic" id="flow"><h2>End-to-end login and API request flow</h2><div class="diagram">LOGIN REQUEST
+        |
+        v
+        Security Filter Chain -> Authentication filter/provider
+        |                          |
+        |                    UserDetailsService
+        |                          |
+        |                    PasswordEncoder.matches
+        |                          |
+        +------------------ successful authentication
+        |
+        v
+        SecurityContext
+        |
+        session cookie OR token response
+        |
+        v
+        LATER API REQUEST -> credentials validated -> authorization rules
+        |
+        allowed? --+-- denied
+        |             |
+        v             v
+        Controller      401 / 403 response
+        |
+        domain/resource checks</div><p><strong>Important:</strong> the exact path differs for session login, JWT resource-server APIs, OAuth2 login, and custom authentication. Do not mix every mechanism into every application; select a coherent model based on client and threat model.</p><h3>401 vs 403</h3><table><thead><tr><th>Status</th><th>Typical meaning</th><th>Example</th></tr></thead><tbody><tr><td><code>401 Unauthorized</code></td><td>Authentication is missing or invalid (despite the status wording).</td><td>Expired or absent bearer token.</td></tr><tr><td><code>403 Forbidden</code></td><td>The caller is authenticated but lacks permission, or the request is blocked by a security policy.</td><td>A normal user tries an admin-only action.</td></tr></tbody></table></section>
+    <section class="topic" id="mistakes"><h2>Common mistakes and production thumb rules</h2><div class="card"><h3>1. Treating CORS as API security</h3><p>CORS is a browser rule. A script or command-line client can still call the API, so every endpoint still needs authentication and authorization.</p></div><div class="card"><h3>2. Assuming JWT payload is secret</h3><p>Signed JWT claims are generally readable. Never place passwords, secrets, or unnecessary personal data in claims.</p></div><div class="card"><h3>3. Checking role but not record ownership</h3><p>A user role such as USER does not prove the requested order belongs to that user. Enforce tenant and object-level access checks.</p></div><div class="card"><h3>4. Disabling CSRF without analyzing cookies</h3><p>If browsers automatically attach session cookies or other credentials, state-changing endpoints may remain vulnerable. Choose controls based on the actual credential transport.</p></div><div class="card"><h3>5. Storing passwords with plain SHA-256</h3><p>Fast general-purpose hashes are unsuitable for password storage. Use an adaptive password encoder designed to make guessing expensive.</p></div><div class="card"><h3>6. Logging secrets for debugging</h3><p>Do not log passwords, bearer tokens, refresh tokens, session IDs, or authorization headers. Log safe identifiers and security outcomes instead.</p></div><div class="card"><h3>7. Relying only on controller annotations</h3><p>Service methods may be called from schedulers, message listeners, or other controllers. Put critical authorization close to the protected operation and test all entry paths.</p></div><div class="callout warning"><strong>Interview thumb rule:</strong> Explain the threat first, the control second, and the trade-off third. For example: “Cookie sessions are convenient for browser apps, but because the browser attaches cookies automatically, I include CSRF protection and secure cookie attributes.”</div></section>
+    <section class="topic qa" id="interview"><h2>Interview questions and answers</h2><p>Try answering each question aloud before opening the answer. Use a simple structure: definition → how it works → trade-off → production safeguard.</p><details><summary>Authentication vs authorization?</summary><p>Authentication verifies identity; authorization decides whether that identity may perform an action on a resource. A valid login does not imply access to every record.</p></details><details><summary>What happens in the Spring Security filter chain?</summary><p>A request is matched to a SecurityFilterChain and processed by ordered filters. Depending on configuration, filters load context, apply CORS/CSRF, authenticate, translate exceptions, and authorize before the request reaches the controller.</p></details><details><summary>Why use PasswordEncoder.matches instead of comparing hashes?</summary><p>Password hashes use salts and adaptive algorithms, so encoding the same raw password again may produce a different string. matches verifies the candidate against the stored encoded representation.</p></details><details><summary>Is a JWT encrypted?</summary><p>Not necessarily. A typical signed JWT is readable by whoever has it; the signature detects tampering but does not conceal claims. Validate signature and claims before trusting it.</p></details><details><summary>Access token vs refresh token?</summary><p>Access tokens are presented to resource APIs and are usually short-lived. Refresh tokens are presented to the authorization server to obtain new access tokens and need stronger storage, rotation, and revocation controls.</p></details><details><summary>OAuth2 vs OIDC?</summary><p>OAuth2 is for delegated authorization. OIDC adds standardized user authentication and identity claims, including an ID token.</p></details><details><summary>CORS vs CSRF?</summary><p>CORS governs whether browser JavaScript can read cross-origin responses. CSRF concerns unwanted authenticated requests caused by credentials the browser attaches automatically. They solve different problems.</p></details><details><summary>When can CSRF protection be disabled?</summary><p>Only after evaluating the actual credential transport and endpoint behavior. Cookie/session authentication usually needs CSRF protection for state-changing requests; do not disable it merely because an API is stateless or uses JSON.</p></details><details><summary>hasRole vs hasAuthority?</summary><p>hasRole("ADMIN") conventionally checks for ROLE_ADMIN; hasAuthority("invoice:read") checks the exact authority. Use a consistent naming scheme.</p></details><details><summary>Why method security if URL security exists?</summary><p>URL rules protect request paths, while method security protects service operations that may be called from multiple entry points. Critical checks should also enforce resource ownership and business constraints.</p></details><details><summary>Can SecurityContext be relied on in @Async?</summary><p>Not automatically in every setup. Thread-local context does not inherently propagate to arbitrary executor threads or message consumers. Configure supported context propagation or pass necessary identity explicitly.</p></details><details><summary>How would you secure a production API?</summary><p>Use TLS, trusted authentication, strict authorization including object ownership, validation, rate limits, safe token/session handling, secrets management, secure error/log practices, monitoring, dependency updates, and negative security tests.</p></details></section>
+    <section class="topic" id="tracker"><h2>Mastery tracker</h2><p>Check each topic after you can define it simply, explain its Spring implementation, give one production failure example, and answer a follow-up question without notes.</p><div class="checkpanel"><div style="display:flex;justify-content:space-between;gap:12px;align-items:center"><strong>Progress</strong><span id="trackerText">0 / 18 completed</span></div><div class="progressbar"><div id="trackerFill"></div></div><div id="trackerList" class="grid"><label class="topic-check"><input type="checkbox" data-topic="authentication"><span>1. Authentication</span></label><label class="topic-check"><input type="checkbox" data-topic="authorization"><span>2. Authorization</span></label><label class="topic-check"><input type="checkbox" data-topic="filter-chain"><span>3. Security Filter Chain</span></label><label class="topic-check"><input type="checkbox" data-topic="security-context"><span>4. SecurityContext</span></label><label class="topic-check"><input type="checkbox" data-topic="user-details"><span>5. UserDetails</span></label><label class="topic-check"><input type="checkbox" data-topic="password-encoding"><span>6. Password Encoding</span></label><label class="topic-check"><input type="checkbox" data-topic="bcrypt"><span>7. BCrypt</span></label><label class="topic-check"><input type="checkbox" data-topic="jwt"><span>8. JWT</span></label><label class="topic-check"><input type="checkbox" data-topic="access-token"><span>9. Access Token</span></label><label class="topic-check"><input type="checkbox" data-topic="refresh-token"><span>10. Refresh Token</span></label><label class="topic-check"><input type="checkbox" data-topic="rbac"><span>11. Role-Based Access Control</span></label><label class="topic-check"><input type="checkbox" data-topic="oauth2"><span>12. OAuth 2.0</span></label><label class="topic-check"><input type="checkbox" data-topic="oidc"><span>13. OpenID Connect (OIDC)</span></label><label class="topic-check"><input type="checkbox" data-topic="cors"><span>14. CORS</span></label><label class="topic-check"><input type="checkbox" data-topic="csrf"><span>15. CSRF</span></label><label class="topic-check"><input type="checkbox" data-topic="sessions"><span>16. Session Management</span></label><label class="topic-check"><input type="checkbox" data-topic="method-security"><span>17. Method Security</span></label><label class="topic-check"><input type="checkbox" data-topic="api-security"><span>18. API Security</span></label></div><div class="toolbar"><button class="btn" onclick="document.querySelectorAll('[data-topic]').forEach(x=>{x.checked=false});saveProgress()">Reset tracker</button></div></div></section>
+    <footer class="footer"><p>Spring Security Masterclass · Module 9 · Java Backend Interview A-Z</p><a href="../../index.html" class="nav-link">Home</a><p class="small">Use current Spring Security documentation for version-specific configuration details. Security defaults and APIs can evolve between releases.</p></footer></main></div>
+<script>
+    const KEY='springSecurityMasterclassProgressV1';
+    function allChecks(){return [...document.querySelectorAll('[data-topic]')];}
+    function saveProgress(){const checked=[...new Set(allChecks().filter(x=>x.checked).map(x=>x.dataset.topic))];try{localStorage.setItem(KEY,JSON.stringify(checked));}catch(e){};allChecks().forEach(x=>x.checked=checked.includes(x.dataset.topic));const total=18,done=checked.length,pct=total?done/total*100:0;document.getElementById('progressText').textContent=`${done} / ${total} completed`;document.getElementById('trackerText').textContent=`${done} / ${total} completed`;document.getElementById('progressFill').style.width=pct+'%';document.getElementById('trackerFill').style.width=pct+'%';}
+    function loadProgress(){let saved=[];try{saved=JSON.parse(localStorage.getItem(KEY)||'[]')}catch(e){}allChecks().forEach(x=>x.checked=saved.includes(x.dataset.topic));saveProgress();}
+    document.addEventListener('change',e=>{if(e.target.matches('[data-topic]'))saveProgress();});loadProgress();
+</script></body></html>

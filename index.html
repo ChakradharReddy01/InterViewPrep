@@ -12,18 +12,24 @@
 <body>
 
   <!-- Top Navigation -->
-  <nav class="navbar">
+    <!-- Top Navigation -->
+    <nav class="navbar">
     <div class="brand">
       <button id="mobile-sidebar-toggle" class="sidebar-mobile-toggle" aria-label="Toggle Navigation">
         <span>☰</span> Modules
       </button>
-      <span class="brand-badge">Interview A-Z</span>
-      <span>Engineering & Architecture Handbook</span>
+      <a href="index.html" class="brand-link" style="display: flex; align-items: center; gap: 0.75rem; text-decoration: none; color: inherit;">
+        <span class="brand-badge" style="background: linear-gradient(135deg, #38bdf8, #818cf8); color: #0f172a; padding: 0.15rem 0.55rem; border-radius: 6px; font-size: 0.75rem; font-weight: 800; letter-spacing: 0.05em; text-transform: uppercase;">Interview A-Z</span>
+        <span style="font-weight: 700; font-size: 1.15rem; color: #fff;">Engineering Handbook</span>
+      </a>
     </div>
-    <div class="nav-links">
-      <a href="index.html" class="nav-link active">Home</a>
-      <a href="#topics" class="nav-link">Topic Catalog</a>
-      <a href="https://github.com" target="_blank" class="nav-link">GitHub</a>
+    <div class="nav-links navlinks" style="display: flex; gap: 1.25rem; align-items: center;">
+      <a href="index.html" class="nav-link active" style="text-decoration: none; font-weight: 600; font-size: 0.95rem;">🏠 Home</a>
+      <a href="#topics" class="nav-link" style="text-decoration: none; font-weight: 600; font-size: 0.95rem;">📚 All Modules</a>
+      <a href="https://github.com/ChakradharReddy01/InterViewPrep" target="_blank" class="nav-link" style="text-decoration: none; font-weight: 600; font-size: 0.95rem;">GitHub</a>
+      <button onclick="window.print();" class="nav-btn-pdf" title="Save page as PDF" style="display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.35rem 0.85rem; font-size: 0.85rem; font-weight: 700; background: linear-gradient(135deg, #38bdf8, #818cf8); color: #0f172a; border: none; border-radius: 6px; cursor: pointer; transition: transform 0.15s ease, box-shadow 0.15s ease; box-shadow: 0 2px 8px rgba(56,189,248,0.25);">
+        <span>📄</span> Save to PDF
+      </button>
     </div>
   </nav>
 
@@ -116,7 +122,7 @@
           </ul>
         </li>
         <!-- Module 7 Accordion Item -->
-        <li class="module-tree-item expanded" data-module-target="module-7">
+        <li class="module-tree-item" data-module-target="module-7">
           <div class="module-tree-header">
             <span class="module-name"><span>💾</span> Module 7: SQL & Database</span>
             <span class="toggle-icon">▶</span>
@@ -124,6 +130,48 @@
           <ul class="module-subtopics">
             <li><a href="topics/database-sql/sql-core.html">SQL Mastery & Internals</a></li>
             <li><a href="topics/database-sql/joins-and-db-concepts.html">Joins, Keys & Normalization (1NF-BCNF)</a></li>
+            <li><a href="topics/database-sql/transactions-and-concurrency.html">Transactions, ACID & MVCC Isolation</a></li>
+            <li><a href="topics/database-sql/indexing-and-performance.html">Indexing, Query Optimization & Pools</a></li>
+          </ul>
+        </li>
+        <!-- Module 8 Accordion Item -->
+        <li class="module-tree-item" data-module-target="module-8">
+          <div class="module-tree-header">
+            <span class="module-name"><span>⚡</span> Module 8: Redis & Caching</span>
+            <span class="toggle-icon">▶</span>
+          </div>
+          <ul class="module-subtopics">
+            <li><a href="topics/redis/redis-core.html">Redis Architecture & Caching</a></li>
+          </ul>
+        </li>
+        <!-- Module 9 Accordion Item -->
+        <li class="module-tree-item" data-module-target="module-9">
+          <div class="module-tree-header">
+            <span class="module-name"><span>🌐</span> Module 9: Microservices</span>
+            <span class="toggle-icon">▶</span>
+          </div>
+          <ul class="module-subtopics">
+            <li><a href="topics/microservices/microservices-core.html">Microservices Architecture & Resilience</a></li>
+          </ul>
+        </li>
+        <!-- Module 10 Accordion Item -->
+        <li class="module-tree-item" data-module-target="module-10">
+          <div class="module-tree-header">
+            <span class="module-name"><span>📨</span> Module 10: Apache Kafka</span>
+            <span class="toggle-icon">▶</span>
+          </div>
+          <ul class="module-subtopics">
+            <li><a href="topics/kafka/kafka-core.html">Kafka Architecture & Streams</a></li>
+          </ul>
+        </li>
+        <!-- Module 11 Accordion Item -->
+        <li class="module-tree-item expanded" data-module-target="module-11">
+          <div class="module-tree-header">
+            <span class="module-name"><span>📐</span> Module 11: System Design</span>
+            <span class="toggle-icon">▶</span>
+          </div>
+          <ul class="module-subtopics">
+            <li><a href="topics/system-design/system-design-core.html">System Design & 14 Blueprints</a></li>
           </ul>
         </li>
       </ul>
@@ -139,12 +187,16 @@
         <!-- Search Input -->
         <div class="search-box-container">
           <span class="search-icon">🔍</span>
-          <input type="text" id="topic-search" class="search-input" placeholder="Search topics, SQL, Window Functions, Joins, CTE, Spring Security, JWT, JPA, Hibernate, Multithreading, RCA...">
+          <input type="text" id="topic-search" class="search-input" placeholder="Search topics, System Design, Scalability, Kafka, Microservices, Redis, SQL, Spring Security, Multithreading, RCA...">
         </div>
 
         <!-- Quick Category Filters -->
         <div class="filter-tags">
           <button class="tag-btn active" data-filter="all">All Topics</button>
+          <button class="tag-btn" data-filter="system-design">System Design</button>
+          <button class="tag-btn" data-filter="kafka">Apache Kafka</button>
+          <button class="tag-btn" data-filter="microservices">Microservices</button>
+          <button class="tag-btn" data-filter="redis">Redis & Caching</button>
           <button class="tag-btn" data-filter="sql">SQL & Database</button>
           <button class="tag-btn" data-filter="security">Spring Security</button>
           <button class="tag-btn" data-filter="jpa">JPA & Hibernate</button>
@@ -163,6 +215,163 @@
       <div id="topics">
 
         <!-- ============================================== -->
+        <!-- MODULE 11: SYSTEM DESIGN & DISTRIBUTED SYSTEMS -->
+        <!-- ============================================== -->
+        <section class="topic-group-section" id="module-11">
+          <div class="topic-group-header">
+            <div class="topic-group-title">
+              <span>📐 Module 11: System Design & Distributed Architecture</span>
+            </div>
+            <span class="topic-count">1 Comprehensive Master Module Active</span>
+          </div>
+
+          <div class="cards-grid">
+            <!-- Card 1: System Design Fundamentals, Core Components & 14 Classic Blueprints -->
+            <div class="card" data-tags="system-design distributed-systems scalability availability architecture rate-limiter payment-system chat-system production">
+              <div class="card-top">
+                <span class="badge badge-spring">System Design</span>
+                <span class="badge badge-prod">14 Production Blueprints</span>
+              </div>
+              <h2 class="card-title">System Design Fundamentals, Distributed Components & 14 Battle-Tested Blueprints</h2>
+              <p class="card-desc">Master end-to-end distributed system design for senior and staff engineering interviews. Covers core fundamentals (Scalability, High Availability, Reliability, Latency vs Throughput, CAP & PACELC, Strong vs Eventual Consistency), essential infrastructure components (Load Balancers, API Gateways, Caching Layers, Sharded Databases, Message Queues, Kafka, CDN, Object Storage, Distributed Search, Rate Limiters), and 14 comprehensive, production-grade architectural blueprints.</p>
+              
+              <ul class="subtopics-list">
+                <li class="subtopic-item"><strong>Core Fundamentals:</strong> Vertical vs Horizontal scaling, 99.999% availability calculations, MTBF/MTTR reliability, P99 tail latency, CAP theorem tradeoffs, PACELC theorem, Strong vs Eventual/Read-Your-Writes consistency</li>
+                <li class="subtopic-item"><strong>Distributed Components:</strong> L4 vs L7 Load Balancers (Consistent Hashing), API Gateway routing, Multi-tier Caching (Redis/Memcached), Database Sharding & Read Replicas, Message Queues vs Kafka event streaming, Cloudflare/Akamai Edge CDNs, MinIO/S3 Object Storage, Elasticsearch inverted indexes, Token Bucket Rate Limiting</li>
+                <li class="subtopic-item"><strong>14 Production Blueprints:</strong> URL Shortener (Base62 + KGS), Parking Lot (Slot allocation & Concurrency), Distributed Rate Limiter (Redis Lua Token Bucket), Notification System (Priority Queues + APNS/FCM), Real-Time Chat System (WebSocket Gateway + Redis Pub/Sub), Food Delivery (Geohash Spatial Sharding + Dispatcher), E-Commerce Platform (Flash Sale Inventory Reservation), Payment Gateway (Double-Entry Ledger, Idempotency & Two-Phase Settlement), Distributed File Storage (Chunking, Metadata DB & S3), Ride-Hailing Platform (H3 Hexagonal Indexing & Driver Matching), Instagram / Social Feed (Fan-out on Read vs Write), YouTube Video Streaming (Adaptive Bitrate HLS/DASH Transcoding), WhatsApp Messaging (XMPP/E2E Encryption & Offline Store-and-Forward), Distributed Job Scheduler (Timing Wheels, Leader Election & Quartz/BullMQ)</li>
+                <li class="subtopic-item"><strong>Production War Stories:</strong> Snowflake ID time-rollback collision, Redis token bucket lock contention during flash sales, Distributed payment double-charge split-brain</li>
+              </ul>
+
+              <div class="card-footer">
+                <span style="font-size: 0.82rem; color: var(--text-muted);">33 Core Subtopics Covered</span>
+                <a href="topics/system-design/system-design-core.html" class="card-link">Explore Deep Dive &rarr;</a>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ============================================== -->
+        <!-- MODULE 10: APACHE KAFKA & EVENT-DRIVEN SYSTEMS -->
+        <!-- ============================================== -->
+        <section class="topic-group-section" id="module-10">
+          <div class="topic-group-header">
+            <div class="topic-group-title">
+              <span>📨 Module 10: Apache Kafka & Event-Driven Systems</span>
+            </div>
+            <span class="topic-count">1 Comprehensive Master Module Active</span>
+          </div>
+
+          <div class="cards-grid">
+            <!-- Card 1: Kafka Architecture, EOS, Streams & Event-Driven Systems -->
+            <div class="card" data-tags="kafka streaming event-driven messaging distributed-systems production">
+              <div class="card-top">
+                <span class="badge badge-spring">Apache Kafka 3.x</span>
+                <span class="badge badge-prod">EOS, Schema Registry & DLQ</span>
+              </div>
+              <h2 class="card-title">Apache Kafka Architecture, Internals, Streams & Event-Driven Systems</h2>
+              <p class="card-desc">Comprehensive architectural deep dive into Apache Kafka: sequential disk I/O and zero-copy sendfile() mechanics, KRaft metadata mode, partition leader-follower replication (ISR, High Watermark, unclean leader election), idempotent producers and strict ordering, consumer group rebalancing (Eager vs Cooperative Sticky), consumer lag monitoring, delivery semantics (At-Most-Once, At-Least-Once, Exactly-Once EOS via transactional messaging), Dead Letter Queues (DLQ) with non-blocking retry topics, Confluent Schema Registry with Apache Avro binary evolution, and Kafka Streams KStream/KTable stateful processing.</p>
+              
+              <ul class="subtopics-list">
+                <li class="subtopic-item"><strong>Core Architecture:</strong> Zero-copy OS page cache bypass, sequential append log segments (.log, .index, .timeindex), KRaft quorum metadata</li>
+                <li class="subtopic-item"><strong>Replication & ISR:</strong> Partition Leaders/Followers, In-Sync Replicas (ISR), High Watermark (HW), min.insync.replicas zero-loss formula</li>
+                <li class="subtopic-item"><strong>Producer Guarantees:</strong> RecordAccumulator batching (batch.size, linger.ms), ACKs (0, 1, all), Idempotent Producer (PID + Sequence Numbers)</li>
+                <li class="subtopic-item"><strong>Consumer Groups & Offsets:</strong> Competing consumers, __consumer_offsets commit strategies (auto vs manual commitSync/commitAsync), Cooperative Sticky Rebalance, Consumer Lag</li>
+                <li class="subtopic-item"><strong>Delivery Semantics:</strong> At-Most-Once, At-Least-Once, Exactly-Once Semantics (EOS read-process-write loop with Kafka transactions)</li>
+                <li class="subtopic-item"><strong>Resilient Error Handling:</strong> Poison pill handling, Non-blocking retry topics with exponential delay, Dead Letter Queue (DLQ)</li>
+                <li class="subtopic-item"><strong>Schema Governance:</strong> Confluent Schema Registry magic byte wire format, Apache Avro compact binary serialization, BACKWARD/FORWARD/FULL compatibility</li>
+                <li class="subtopic-item"><strong>Stream Processing:</strong> Kafka Streams, KStream vs KTable duality, RocksDB embedded state stores, changelog topics, windowed aggregations</li>
+                <li class="subtopic-item"><strong>Production Post-Mortems:</strong> Consumer group rebalance storm from slow third-party API calls, silent data loss via acks=1 broker crash</li>
+              </ul>
+
+              <div class="card-footer">
+                <span style="font-size: 0.82rem; color: var(--text-muted);">30 Core Subtopics Covered</span>
+                <a href="topics/kafka/kafka-core.html" class="card-link">Explore Deep Dive &rarr;</a>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ============================================== -->
+        <!-- MODULE 9: MICROSERVICES ARCHITECTURE -->
+        <!-- ============================================== -->
+        <section class="topic-group-section" id="module-9">
+          <div class="topic-group-header">
+            <div class="topic-group-title">
+              <span>🌐 Module 9: Microservices Architecture</span>
+            </div>
+            <span class="topic-count">1 Comprehensive Master Module Active</span>
+          </div>
+
+          <div class="cards-grid">
+            <!-- Card 1: Microservices Architecture, Distributed Patterns & Resilience -->
+            <div class="card" data-tags="microservices distributed-systems saga outbox resilience4j circuit-breaker eureka production">
+              <div class="card-top">
+                <span class="badge badge-spring">Microservices</span>
+                <span class="badge badge-prod">Saga, Outbox & Resilience4j</span>
+              </div>
+              <h2 class="card-title">Microservices Architecture, Distributed Patterns & Resilience</h2>
+              <p class="card-desc">Architectural guide to enterprise microservices: Monolith vs Microservices trade-offs, Domain-Driven Design (Bounded Contexts & Ubiquitous Language), Strangler Fig incremental migration, Database-per-Service vs Shared DB anti-pattern, Saga pattern (Choreography vs Orchestration), Transactional Outbox Pattern with CDC, CQRS & Event Sourcing, API Gateways, Eureka Service Discovery vs Kubernetes DNS, Spring Cloud Config dynamic refresh, Resilience4j (Circuit Breakers, Retries with full jitter, Bulkheads), Distributed Tracing (W3C traceparent & SLF4J MDC), and Kubernetes probes.</p>
+              
+              <ul class="subtopics-list">
+                <li class="subtopic-item"><strong>Architecture & Domain Modeling:</strong> Monolith vs Microservices, DDD Bounded Contexts, Polysemic Domain Entities, Strangler Fig pattern</li>
+                <li class="subtopic-item"><strong>Distributed Data & Transactions:</strong> Database-per-Service, The Death of 2PC, Saga Choreography vs Orchestration (Compensating Transactions)</li>
+                <li class="subtopic-item"><strong>Eventual Consistency Patterns:</strong> Transactional Outbox Pattern (eliminating dual-write inconsistency via Debezium CDC), CQRS & Event Sourcing</li>
+                <li class="subtopic-item"><strong>Control Plane & Infrastructure:</strong> API Gateway (routing, rate limiting, BFF), Client-Side Discovery (Eureka) vs Server-Side (Kubernetes DNS), Config Server (@RefreshScope)</li>
+                <li class="subtopic-item"><strong>Fault Tolerance (Resilience4j):</strong> Circuit Breaker (CLOSED/OPEN/HALF-OPEN), Retry with exponential backoff & full jitter, Bulkhead isolation (Thread Pool vs Semaphore)</li>
+                <li class="subtopic-item"><strong>Distributed Observability:</strong> Distributed Tracing with W3C <code>traceparent</code> header, Trace ID vs Span ID, MDC logging, Liveness & Readiness health probes</li>
+                <li class="subtopic-item"><strong>Production Post-Mortems:</strong> Global outage from cascading failure on an unessential recommendation call, Eureka self-preservation routing traffic to dead pods</li>
+              </ul>
+
+              <div class="card-footer">
+                <span style="font-size: 0.82rem; color: var(--text-muted);">26 Core Subtopics Covered</span>
+                <a href="topics/microservices/microservices-core.html" class="card-link">Explore Deep Dive &rarr;</a>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ============================================== -->
+        <!-- MODULE 8: REDIS & DISTRIBUTED CACHING -->
+        <!-- ============================================== -->
+        <section class="topic-group-section" id="module-8">
+          <div class="topic-group-header">
+            <div class="topic-group-title">
+              <span>⚡ Module 8: Redis & Distributed Caching</span>
+            </div>
+            <span class="topic-count">1 Comprehensive Master Module Active</span>
+          </div>
+
+          <div class="cards-grid">
+            <!-- Card 1: Redis Architecture, In-Memory Internals & Distributed Systems -->
+            <div class="card" data-tags="redis caching nosql distributed-systems performance production">
+              <div class="card-top">
+                <span class="badge badge-spring">Redis 7.x</span>
+                <span class="badge badge-prod">Cache Consistency & Redlock</span>
+              </div>
+              <h2 class="card-title">Redis Architecture, In-Memory Internals & Distributed Systems</h2>
+              <p class="card-desc">Comprehensive deep dive into Redis in-memory architecture: single-threaded event loop and epoll I/O multiplexing, the 5 core data structures (SDS, ziplist/listpack, quicklist, skiplist internals), TTL lazy vs active 25ms periodic expiration, the 4 caching patterns (Cache-Aside, Write-Through, Write-Behind), maxmemory eviction policies (LRU/LFU), atomic distributed locks (SET NX PX + Lua script release and Redlock), Pub/Sub vs Redis Streams, RDB fork Copy-On-Write and AOF persistence, Redis Cluster 16384 hash slots, and cache stampede/penetration/avalanche mitigations.</p>
+              
+              <ul class="subtopics-list">
+                <li class="subtopic-item"><strong>Core Architecture:</strong> Single-threaded event loop (epoll_wait), zero context switching, zero lock contention, multi-threaded I/O in Redis 6.0+</li>
+                <li class="subtopic-item"><strong>5 Core Structures:</strong> SDS (Simple Dynamic String) $O(1)$ len, Hash (listpack vs progressive rehashing dict), List (quicklist), Set (intset), Sorted Set (Skip List $O(\log N)$ + Dict)</li>
+                <li class="subtopic-item"><strong>TTL & Expiration:</strong> Lazy expiration on read access + Active periodic expiration (20-key random sampling hard-capped at 25ms)</li>
+                <li class="subtopic-item"><strong>Caching Patterns:</strong> Cache-Aside (industry standard), Write-Through, Write-Behind (asynchronous DB flush), and maxmemory eviction (allkeys-lru, allkeys-lfu)</li>
+                <li class="subtopic-item"><strong>Distributed Locks:</strong> Atomic <code>SET key uuid NX PX 30000</code>, Lua script safe release, Redlock multi-master consensus debate</li>
+                <li class="subtopic-item"><strong>Messaging:</strong> Pub/Sub fire-and-forget push vs Redis Streams append-only persistent log with Consumer Groups, PEL, and <code>XACK</code></li>
+                <li class="subtopic-item"><strong>Persistence & Clustering:</strong> RDB (<code>bgsave</code> Copy-On-Write) vs AOF (<code>appendfsync everysec</code>), Redis Cluster (16,384 hash slots, hash tags <code>{user}</code>)</li>
+                <li class="subtopic-item"><strong>Cache Consistency & Anomalies:</strong> Why Cache Invalidation (Delete) beats Update, Cache Stampede (Thundering Herd distributed mutex), Penetration (Bloom filters), Avalanche (TTL Jitter)</li>
+                <li class="subtopic-item"><strong>Production Post-Mortems:</strong> Linux OOM killer termination during RDB snapshot on 80% RAM, celebrity profile cache stampede crashing PostgreSQL</li>
+              </ul>
+
+              <div class="card-footer">
+                <span style="font-size: 0.82rem; color: var(--text-muted);">22 Core Subtopics Covered</span>
+                <a href="topics/redis/redis-core.html" class="card-link">Explore Deep Dive &rarr;</a>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ============================================== -->
         <!-- MODULE 7: SQL & DATABASE -->
         <!-- ============================================== -->
         <section class="topic-group-section" id="module-7">
@@ -170,7 +379,7 @@
             <div class="topic-group-title">
               <span>💾 Module 7: SQL & Database</span>
             </div>
-            <span class="topic-count">2 Master Deep Dives Active</span>
+            <span class="topic-count">4 Master Deep Dives Active</span>
           </div>
 
           <div class="cards-grid">
@@ -222,6 +431,55 @@
               <div class="card-footer">
                 <span style="font-size: 0.82rem; color: var(--text-muted);">15 Core Subtopics Covered</span>
                 <a href="topics/database-sql/joins-and-db-concepts.html" class="card-link">Explore Deep Dive &rarr;</a>
+              </div>
+            </div>
+            <!-- Card 3: Database Transactions, ACID & MVCC Isolation -->
+            <div class="card" data-tags="sql database transactions acid mvcc isolation locking production">
+              <div class="card-top">
+                <span class="badge badge-spring">Transactions</span>
+                <span class="badge badge-prod">ACID & MVCC Internals</span>
+              </div>
+              <h2 class="card-title">Database Transactions, ACID, MVCC & Isolation Levels</h2>
+              <p class="card-desc">Comprehensive architectural deep dive into database concurrency control: physical ACID implementation (WAL redo/undo logs, fsync, buffer pools), the 3 classic read phenomena (Dirty Read, Non-Repeatable Read, Phantom Read), the 4 ANSI SQL isolation levels (Read Uncommitted, Read Committed, Repeatable Read, Serializable), Lost Update and Write Skew anomalies, and Multi-Version Concurrency Control (MVCC) internals across PostgreSQL and MySQL InnoDB.</p>
+              
+              <ul class="subtopics-list">
+                <li class="subtopic-item"><strong>ACID Under the Hood:</strong> Atomicity (Undo logs/rollback segments), Consistency (Constraints), Isolation (MVCC & 2PL), Durability (WAL sequential append & fsync)</li>
+                <li class="subtopic-item"><strong>The 3 Read Phenomena:</strong> Dirty Read (uncommitted rollback data), Non-Repeatable Read (committed row updates), Phantom Read (committed range insertions)</li>
+                <li class="subtopic-item"><strong>Advanced Anomalies:</strong> Lost Updates ($T_2$ overwriting $T_1$'s in-memory calculation) and Write Skew under Snapshot Isolation</li>
+                <li class="subtopic-item"><strong>4 ANSI Isolation Levels:</strong> Read Uncommitted, Read Committed (statement-level snapshot), Repeatable Read (transaction-level snapshot), Serializable (strict 2PL/SSI)</li>
+                <li class="subtopic-item"><strong>Why InnoDB Prevents Phantoms:</strong> Consistent non-locking MVCC snapshots + Next-Key Locking (record lock + gap lock) for locking reads</li>
+                <li class="subtopic-item"><strong>MVCC Engine Mechanics:</strong> PostgreSQL tuple headers (xmin, xmax, dead tuples, VACUUM) vs MySQL InnoDB clustered index in-place updates + undo log rollback segments</li>
+                <li class="subtopic-item"><strong>Production Post-Mortems:</strong> $140,000 wallet lost update race condition, MySQL deadlock storm via Gap Locks on foreign keys</li>
+              </ul>
+
+              <div class="card-footer">
+                <span style="font-size: 0.82rem; color: var(--text-muted);">14 Core Subtopics Covered</span>
+                <a href="topics/database-sql/transactions-and-concurrency.html" class="card-link">Explore Deep Dive &rarr;</a>
+              </div>
+            </div>
+            <!-- Card 4: Database Indexing, Query Optimization & Connection Pools -->
+            <div class="card" data-tags="sql database index btree explain optimization hikaricp deadlock production">
+              <div class="card-top">
+                <span class="badge badge-advanced">Database Performance</span>
+                <span class="badge badge-prod">B+ Tree & HikariCP</span>
+              </div>
+              <h2 class="card-title">Indexing, Query Optimization, HikariCP & Deadlocks</h2>
+              <p class="card-desc">Under-the-hood performance engineering for high-throughput relational databases: B+ Tree internal fan-out and doubly-linked leaf nodes, Clustered vs Secondary indexes, Composite index Leftmost Prefix rule, Covering Index (Index-Only Scan), EXPLAIN ANALYZE cost metric breakdowns, SARGable queries, Keyset pagination, HikariCP bytecode and pool sizing math, and directed wait-for graph deadlock resolution.</p>
+              
+              <ul class="subtopics-list">
+                <li class="subtopic-item"><strong>B+ Tree Architecture:</strong> High fan-out ($B \approx 500-1000$), shallow 3-4 level depth, non-leaf keys only, doubly-linked leaves for $O(1)$ range scans</li>
+                <li class="subtopic-item"><strong>Index Types:</strong> Clustered index (table is index) vs Secondary index (bookmark double-lookups), Partial indexes, Expression indexes</li>
+                <li class="subtopic-item"><strong>Advanced Indexing:</strong> Composite indexes (Leftmost Prefix Rule) and Covering Indexes (<code>INCLUDE</code> clause bypassing heap lookups)</li>
+                <li class="subtopic-item"><strong>EXPLAIN ANALYZE:</strong> Reading cost vs actual time, buffer hit ratio (RAM cache vs disk I/O), Index Scan vs Bitmap Heap Scan</li>
+                <li class="subtopic-item"><strong>Query Optimization:</strong> SARGability rules (why <code>YEAR(created_at)</code> breaks index scans), Keyset cursor pagination vs <code>OFFSET</code> penalty</li>
+                <li class="subtopic-item"><strong>HikariCP Internals:</strong> Connection handshake overhead (30-100ms), FastList, ConcurrentBag, pool sizing formula $((N_{cpu} \times 2) + \text{spindles})$</li>
+                <li class="subtopic-item"><strong>Database Deadlocks:</strong> Cyclic lock graphs, engine victim election, prevention via strict global resource ordering</li>
+                <li class="subtopic-item"><strong>Production Post-Mortems:</strong> 15-minute outage via non-SARGable <code>LOWER(email)</code>, HikariCP connection starvation from a slow analytics report</li>
+              </ul>
+
+              <div class="card-footer">
+                <span style="font-size: 0.82rem; color: var(--text-muted);">16 Core Subtopics Covered</span>
+                <a href="topics/database-sql/indexing-and-performance.html" class="card-link">Explore Deep Dive &rarr;</a>
               </div>
             </div>
           </div>

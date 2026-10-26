@@ -1,0 +1,795 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Professor-level Java microservices architecture, patterns, examples, diagrams, production concerns, and interview preparation.">
+    <title>Module 12: Microservices Masterclass | Interview A-Z</title>
+    <style>
+        :root{--bg:#0b1020;--panel:#111a2e;--panel2:#17233b;--text:#e8eefb;--muted:#a8b5cc;--line:#2b3a57;--accent:#7dd3fc;--accent2:#a7f3d0;--warn:#fbbf24;--danger:#fca5a5;--code:#080d18;--shadow:0 12px 32px #0003}
+        *{box-sizing:border-box}html{scroll-behavior:smooth;scroll-padding-top:90px}body{margin:0;background:var(--bg);color:var(--text);font:16px/1.72 Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,Arial,sans-serif}a{color:var(--accent)}.navbar{position:sticky;top:0;z-index:10;background:#0b1020ed;backdrop-filter:blur(12px);border-bottom:1px solid var(--line);padding:13px clamp(16px,4vw,54px);display:flex;align-items:center;justify-content:space-between;gap:16px}.brand{font-weight:800;letter-spacing:.02em}.brand span{color:var(--accent)}.navlinks{display:flex;gap:16px;flex-wrap:wrap;font-size:.9rem}.layout{max-width:1500px;margin:auto;display:grid;grid-template-columns:270px minmax(0,1fr);gap:30px;padding:28px clamp(16px,3vw,44px)}aside{position:sticky;top:82px;align-self:start;max-height:calc(100vh - 100px);overflow:auto;background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:18px}.toc-title{font-weight:800;margin:0 0 8px}.toc a{display:block;padding:5px 8px;color:var(--muted);text-decoration:none;border-radius:6px;font-size:.88rem}.toc a:hover{background:var(--panel2);color:var(--text)}main{min-width:0;max-width:1000px}.hero{padding:34px;border:1px solid var(--line);border-radius:20px;background:linear-gradient(140deg,#172b47,#111a2e 60%,#15243a);box-shadow:var(--shadow)}.eyebrow{text-transform:uppercase;letter-spacing:.14em;color:var(--accent);font-size:.78rem;font-weight:800}.hero h1{font-size:clamp(2rem,4vw,3.2rem);line-height:1.12;margin:.4em 0}.hero p{color:var(--muted);max-width:800px}.pills{display:flex;flex-wrap:wrap;gap:8px}.pill{border:1px solid var(--line);background:#0b1020aa;padding:5px 10px;border-radius:999px;font-size:.82rem;color:var(--accent2)}h2{font-size:1.8rem;line-height:1.25;margin-top:2.3rem;border-bottom:1px solid var(--line);padding-bottom:10px}h3{font-size:1.28rem;margin-top:1.8rem;color:#dbeafe}h4{font-size:1.05rem;margin-bottom:.3rem;color:var(--accent2)}p{margin:.7rem 0}li{margin:.3rem 0}section.topic{padding:8px 0 24px;border-bottom:1px solid var(--line)}.card,.callout,.diagram,.checkpanel{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:18px;margin:16px 0}.callout strong{color:var(--accent2)}.warning{border-left:4px solid var(--warn)}.danger{border-left:4px solid var(--danger)}.good{border-left:4px solid var(--accent2)}.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.grid.three{grid-template-columns:repeat(3,minmax(0,1fr))}.box{background:var(--panel2);border:1px solid #3a4c6b;border-radius:10px;padding:13px;text-align:center}.arrow{text-align:center;color:var(--accent);font-size:1.35rem;line-height:1.4}.muted{color:var(--muted)}table{width:100%;border-collapse:collapse;margin:16px 0;font-size:.93rem}th,td{padding:10px 12px;border:1px solid var(--line);text-align:left;vertical-align:top}th{background:var(--panel2);color:#dbeafe}tr:nth-child(even) td{background:#ffffff05}pre{background:var(--code);border:1px solid var(--line);border-radius:12px;padding:16px;overflow:auto;line-height:1.55;font-size:.88rem}code{font-family:ui-monospace,SFMono-Regular,Consolas,monospace;color:#bae6fd}p code,li code,td code{background:var(--code);padding:2px 5px;border-radius:5px}.diagram{font-family:ui-monospace,Consolas,monospace;white-space:pre;overflow:auto;color:#c7f9e9;line-height:1.45}.progressbar{height:9px;background:#26334b;border-radius:20px;overflow:hidden}.progressbar div{height:100%;background:var(--accent2);width:0;transition:width .2s}.topic-check{display:flex;align-items:flex-start;gap:10px;padding:7px 0;border-bottom:1px solid #ffffff0c}.topic-check input{margin-top:7px;accent-color:#34d399}.btn{background:#173454;color:var(--text);border:1px solid #365779;padding:9px 13px;border-radius:8px;cursor:pointer;font:inherit}.btn:hover{background:#21496e}.toolbar{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0}.qa details{border:1px solid var(--line);border-radius:10px;margin:10px 0;padding:12px 15px;background:var(--panel)}.qa summary{cursor:pointer;font-weight:700}.qa details p{color:var(--muted)}.small{font-size:.88rem}.footer{border-top:1px solid var(--line);padding:28px;text-align:center;color:var(--muted)}@media(max-width:1000px){.layout{grid-template-columns:1fr}aside{position:relative;top:auto;max-height:none}.toc{columns:2}.grid.three{grid-template-columns:1fr 1fr}}@media(max-width:620px){.navlinks{display:none}.hero{padding:22px}.grid,.grid.three{grid-template-columns:1fr}.toc{columns:1}table{display:block;overflow-x:auto}h2{font-size:1.5rem}}@media print{body{background:white;color:#111}.navbar,aside,.toolbar,.btn{display:none!important}.layout{display:block;padding:0}.hero,.card,.callout,.diagram,.checkpanel,.qa details{background:white;color:#111;box-shadow:none;break-inside:avoid;border-color:#aaa}h2,h3,h4,th,code{color:#111}p,li,.muted,.hero p,.qa details p{color:#222}pre{background:#f6f6f6;color:#111;white-space:pre-wrap}a{color:#111}}
+    </style>
+</head>
+<body>
+  <!-- Top Navigation -->
+    <nav class="navbar">
+    <div class="brand">
+      <a href="../../index.html" class="brand-link" style="display: flex; align-items: center; gap: 0.75rem; text-decoration: none; color: inherit;">
+        <span class="brand-badge" style="background: linear-gradient(135deg, #38bdf8, #818cf8); color: #0f172a; padding: 0.15rem 0.55rem; border-radius: 6px; font-size: 0.75rem; font-weight: 800; letter-spacing: 0.05em; text-transform: uppercase;">Interview A-Z</span>
+        <span style="font-weight: 700; font-size: 1.15rem; color: #fff;">Engineering Handbook</span>
+      </a>
+    </div>
+    <div class="nav-links navlinks" style="display: flex; gap: 1.25rem; align-items: center;">
+      <a href="../../index.html" class="nav-link" style="text-decoration: none; font-weight: 600; font-size: 0.95rem;">🏠 Home</a>
+      <a href="../../index.html#topics" class="nav-link" style="text-decoration: none; font-weight: 600; font-size: 0.95rem;">📚 All Modules</a>
+      <a href="https://github.com/ChakradharReddy01/InterViewPrep" target="_blank" class="nav-link" style="text-decoration: none; font-weight: 600; font-size: 0.95rem;">GitHub</a>
+      <button onclick="document.querySelectorAll('details').forEach(d=>d.open=true);window.print();" class="nav-btn-pdf" title="Save page as PDF" style="display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.35rem 0.85rem; font-size: 0.85rem; font-weight: 700; background: linear-gradient(135deg, #38bdf8, #818cf8); color: #0f172a; border: none; border-radius: 6px; cursor: pointer; transition: transform 0.15s ease, box-shadow 0.15s ease; box-shadow: 0 2px 8px rgba(56,189,248,0.25);">
+        <span>📄</span> Save to PDF
+      </button>
+    </div>
+  </nav>
+<div class="layout">
+    <aside>
+        <p class="toc-title">On This Page</p>
+        <div class="toc">
+            <a href="#intro">Introduction</a><a href="#syllabus">Complete syllabus</a>
+            <a href="#monolith">1. Monolith</a><a href="#microservices">2. Microservices</a><a href="#boundaries">3. Service boundaries</a><a href="#bounded-context">4. Bounded Context</a>
+            <a href="#gateway">5. API Gateway</a><a href="#discovery">6. Service Discovery</a><a href="#eureka">7. Eureka</a><a href="#config">8. Config Server</a>
+            <a href="#database-per-service">9. Database per Service</a><a href="#shared-db">10. Shared Database</a><a href="#saga">11. Saga</a><a href="#cqrs">12. CQRS</a><a href="#event-sourcing">13. Event Sourcing</a><a href="#strangler">14. Strangler Fig</a>
+            <a href="#circuit-breaker">15. Circuit Breaker</a><a href="#retry">16. Retry</a><a href="#timeout">17. Timeout</a><a href="#bulkhead">18. Bulkhead</a><a href="#rate-limit">19. Rate Limiting</a><a href="#idempotency">20. Idempotency</a>
+            <a href="#transactions">21. Distributed Transactions</a><a href="#outbox">22. Outbox Pattern</a><a href="#tracing">23. Distributed Tracing</a><a href="#correlation">24. Correlation ID</a><a href="#health">25. Health Checks</a><a href="#communication">26. Service-to-Service Communication</a>
+            <a href="#workflow">End-to-end workflow</a><a href="#failures">Production scenarios</a><a href="#interview">Interview Q&A</a><a href="#tracker">Mastery tracker</a>
+        </div>
+    </aside>
+    <main>
+        <header class="hero" id="intro">
+
+            <div class="eyebrow">Module 12 · Advanced Backend Engineering</div>
+            <h1>Microservices Architecture, Distributed Patterns & Resilience</h1>
+            <p>A detailed, self-contained learning reference for Java Backend and Spring Boot engineers. Covers every topic in the supplied syllabus with definitions, diagrams, code, design trade-offs, production failure modes, and interview preparation.</p>
+            <div class="pills"><span class="pill">Java / Spring Boot</span><span class="pill">Spring Cloud</span><span class="pill">Distributed Systems</span><span class="pill">Kafka & Messaging</span><span class="pill">Production Patterns</span></div>
+            <div class="callout warning"><strong>Core principle:</strong> Microservices exchange local simplicity for distributed-systems complexity. A successful design must address service boundaries, data ownership, partial failures, consistency, security, and observability—not just split a codebase into separate applications.</div>
+            <div class="toolbar"><button class="btn" onclick="window.print()">Print / Save as PDF</button><button class="btn" onclick="document.querySelectorAll('details').forEach(d=>d.open=true)">Expand all answers</button><button class="btn" onclick="document.querySelectorAll('details').forEach(d=>d.open=false)">Collapse answers</button></div>
+        </header>
+
+        <section id="syllabus">
+            <h2>Complete syllabus — all 26 topics</h2>
+            <p>This page follows the supplied topic list and expands every item individually. Use the interactive tracker at the end to mark topics you have studied.</p>
+            <div class="checkpanel">
+                <div style="display:flex;justify-content:space-between;gap:12px;align-items:center"><strong>Topic completion</strong><span id="progressText">0 / 26 completed</span></div>
+                <div class="progressbar"><div id="progressFill"></div></div>
+                <p class="small muted">Progress is stored in this page's local browser storage when available.</p>
+                <div id="syllabusList" class="grid"></div>
+            </div>
+            <div class="grid three">
+                <div class="card"><h4>A. Architecture</h4><p>Monolith, Microservices, Service boundaries, Bounded Context</p></div>
+                <div class="card"><h4>B. Infrastructure</h4><p>API Gateway, Service Discovery, Eureka, Config Server, Service-to-Service Communication</p></div>
+                <div class="card"><h4>C. Data & consistency</h4><p>Database per Service, Shared Database, Saga, CQRS, Event Sourcing, Distributed Transactions, Outbox Pattern</p></div>
+                <div class="card"><h4>D. Resilience</h4><p>Circuit Breaker, Retry, Timeout, Bulkhead, Rate Limiting, Idempotency</p></div>
+                <div class="card"><h4>E. Migration</h4><p>Strangler Fig</p></div>
+                <div class="card"><h4>F. Observability</h4><p>Distributed Tracing, Correlation ID, Health Checks</p></div>
+            </div>
+        </section>
+
+        <section class="topic" id="monolith">
+            <h2>1. Monolith</h2>
+            <h3>Definition</h3><p>A monolithic application is built and deployed as one application unit. It can still contain well-separated modules; “monolith” describes the deployment/runtime unit, not necessarily poor code organization.</p>
+            <div class="diagram">             WEB / MOBILE CLIENT
+                |
+                v
+                +-----------------------------+
+                | E-COMMERCE APPLICATION      |
+                |-----------------------------|
+                | Order Module                |
+                | Payment Module              |
+                | Inventory Module            |
+                | Customer Module             |
+                +-----------------------------+
+                |
+                v
+                SHARED DATABASE
+                One application deployment (JAR/WAR)</div>
+            <h3>How it works in Java</h3><pre><code>@Service
+public class OrderService {
+    private final InventoryService inventory;
+    private final PaymentService payment;
+    private final OrderRepository orders;
+
+    public OrderService(InventoryService inventory,
+                        PaymentService payment,
+                        OrderRepository orders) {
+        this.inventory = inventory;
+        this.payment = payment;
+        this.orders = orders;
+    }
+
+    @Transactional
+    public Order placeOrder(OrderRequest request) {
+        inventory.reserve(request);
+        payment.charge(request);
+        return orders.save(Order.from(request));
+    }
+}</code></pre>
+            <p>These calls may be in-process method calls. Database changes can share a local transaction if they use the same transaction manager and resource. A database rollback does not automatically reverse an external payment-provider charge.</p>
+            <h3>Advantages</h3><ul><li>Simple development, deployment, debugging, and local testing.</li><li>Low-overhead in-process calls.</li><li>Local database transactions can be straightforward.</li><li>Fewer runtime infrastructure components.</li><li>Often ideal for an early product or a small team.</li></ul>
+            <h3>Disadvantages</h3><ul><li>Releasing one capability may require deploying the whole application.</li><li>Scaling one high-load module can mean scaling all modules.</li><li>Poor internal boundaries cause tight coupling.</li><li>A process-wide memory leak or resource exhaustion can affect all capabilities.</li><li>Build and test times may grow with the codebase.</li></ul>
+            <div class="callout good"><strong>Practical example:</strong> if recommendations need 10 times more CPU than checkout, scaling the entire monolith wastes resources. A modular monolith can still be the right choice until independent scaling or deployment is worth the added distributed complexity.</div>
+            <h3>When to choose it</h3><p>Choose a monolith when the domain and team are small, release coordination is manageable, and a distributed architecture would add more operational cost than value. Keep modules cohesive and enforce dependency rules so future extraction remains possible.</p>
+        </section>
+
+        <section class="topic" id="microservices">
+            <h2>2. Microservices</h2>
+            <h3>Definition</h3><p>Microservices architecture organizes a system as independently deployable services, each responsible for a cohesive business capability and exposing explicit contracts.</p>
+            <div class="diagram">Clients
+                |
+                v
+                API GATEWAY
+                |-------------------|------------------|
+                v                   v                  v
+                Order Service      Payment Service   Inventory Service
+                |                   |                  |
+                Order DB            Payment DB         Inventory DB
+                |
+                +---- events / API calls / workflows ----+</div>
+            <h3>Core characteristics</h3><ul><li><strong>Business-oriented:</strong> boundaries follow capabilities, not just technical layers.</li><li><strong>Independent deployment:</strong> services can release independently when contracts remain compatible.</li><li><strong>Data ownership:</strong> each service controls its persistence model and invariants.</li><li><strong>Explicit communication:</strong> HTTP, gRPC, or messaging crosses process boundaries.</li><li><strong>Independent scaling:</strong> scale a service according to its own demand.</li><li><strong>Failure isolation:</strong> possible only with appropriate timeouts, resource limits, and recovery design.</li></ul>
+            <table><thead><tr><th>Dimension</th><th>Monolith</th><th>Microservices</th></tr></thead><tbody>
+            <tr><td>Calls</td><td>Often in-process</td><td>Often network-based</td></tr><tr><td>Deployment</td><td>Usually one unit</td><td>Multiple units</td></tr><tr><td>Transactions</td><td>Often simpler within one DB</td><td>Local transactions plus distributed coordination</td></tr><tr><td>Scaling</td><td>Often whole application</td><td>Per service</td></tr><tr><td>Operations</td><td>Fewer components</td><td>Discovery, security, tracing, deployment, and reliability controls</td></tr></tbody></table>
+            <h3>Challenges and when to choose</h3><p>Microservices add network latency, partial failure, contract versioning, distributed data consistency, and operational overhead. They fit organizations with independently evolving capabilities, distinct scaling profiles, autonomous teams, and mature delivery/monitoring practices. Do not split an application merely because the architecture is fashionable.</p>
+        </section>
+
+        <section class="topic" id="boundaries">
+            <h2>3. Service Boundaries</h2>
+            <h3>Definition</h3><p>A service boundary defines which business responsibilities, data, invariants, and decisions belong to a service and which interactions must cross a contract.</p>
+            <div class="grid">
+                <div class="card"><h4>Bad: technical-layer split</h4><div class="diagram">UI Service
+                    |
+                    Business Service
+                    |
+                    Database Service</div><p class="small">A simple request may need many network hops, and business behavior is scattered.</p></div>
+                <div class="card"><h4>Better: business capabilities</h4><div class="diagram">Order Service
+                    Payment Service
+                    Inventory Service
+                    Shipping Service</div><p class="small">Each service owns cohesive rules and data for its business capability.</p></div>
+            </div>
+            <h3>How to identify boundaries</h3><ul><li>Does the capability have distinct business rules and invariants?</li><li>Does it change for different reasons from neighboring capabilities?</li><li>Can it own a meaningful data model?</li><li>Does it need a different scaling, security, or availability profile?</li><li>Can a team develop and deploy it without constant coordination?</li><li>Will separation reduce coupling more than it increases network coordination?</li></ul>
+            <h3>Common mistakes</h3><ul><li><strong>Too large:</strong> one “business service” owns orders, inventory, billing, shipping, and notifications.</li><li><strong>Too small:</strong> every table or CRUD entity becomes a service.</li><li><strong>Shared rules:</strong> different services independently implement pricing or tax logic and diverge.</li><li><strong>Excessive synchronous calls:</strong> requests wait through a long chain of dependencies.</li></ul>
+            <div class="callout good"><strong>Rule:</strong> optimize for business cohesion, data ownership, and manageable interactions—not for the number of services.</div>
+        </section>
+
+        <section class="topic" id="bounded-context">
+            <h2>4. Bounded Context</h2>
+            <h3>Definition (Domain-Driven Design)</h3><p>A bounded context is an explicit boundary within which a domain model and its terminology have a consistent meaning. A concept such as “Customer” can mean different things in different business contexts.</p>
+            <div class="grid three">
+                <div class="card"><h4>Identity Context</h4><code>Customer</code><p>User ID, credentials, MFA settings</p></div>
+                <div class="card"><h4>Billing Context</h4><code>Customer</code><p>Billing account, tax details, payment provider ID</p></div>
+                <div class="card"><h4>Shipping Context</h4><code>Customer</code><p>Recipient, delivery address, delivery instructions</p></div>
+            </div>
+            <h3>Ubiquitous language</h3><p>Developers, product owners, and domain experts use terms consistently inside the context. In payments, “authorize,” “capture,” and “refund” have precise meanings. Another context may use the same word differently; the context makes the intended meaning clear.</p>
+            <h3>Relationship to microservices</h3><p>A bounded context is a domain-model boundary; a microservice is a deployment/runtime boundary. They often align, but are not identical. A context can live in a modular monolith, and a poorly designed service can contain several tangled contexts.</p>
+            <div class="callout warning"><strong>Interview point:</strong> DDD informs service decomposition; it does not mean “one service per database table” or mechanically “one service per entity.”</div>
+        </section>
+
+        <section class="topic" id="gateway">
+            <h2>5. API Gateway</h2>
+            <h3>Definition and purpose</h3><p>An API Gateway is an entry point that receives external requests and routes them to backend services. It prevents clients from needing to know every internal service address and can centralize edge concerns.</p>
+            <div class="diagram">Web / Mobile / Partner Clients
+                |
+                v
+                +------------------------------------------+
+                | API GATEWAY                              |
+                | Routing | TLS | Auth policies | Limits   |
+                | Correlation context | Request controls   |
+                +-------------------+----------------------+
+                |
+                +---------+----------+
+                v         v          v
+                Orders    Payments    Catalog</div>
+            <h3>Responsibilities</h3><ul><li>Route by path, host, or configured predicates.</li><li>Terminate TLS and manage certificates.</li><li>Validate tokens and enforce edge authorization policies.</li><li>Apply rate limits, request-size limits, and selected traffic controls.</li><li>Propagate trace context and correlation IDs.</li><li>Log request metadata and publish metrics.</li><li>Optionally aggregate or transform responses where justified.</li></ul>
+            <h3>Spring Cloud Gateway example</h3><pre><code>spring:
+  cloud:
+    gateway:
+      routes:
+        - id: order-service
+          uri: http://order-service:8081
+          predicates:
+            - Path=/api/orders/**
+        - id: catalog-service
+          uri: http://catalog-service:8082
+          predicates:
+            - Path=/api/products/**</code></pre>
+            <p>This shows static destinations. A production deployment may use service-discovery-aware route URIs supported by its Spring Cloud configuration.</p>
+            <h3>BFF (Backend for Frontend)</h3><p>A Backend for Frontend is a client-specific backend or gateway: for example, a mobile BFF can return compact payloads, while a web BFF aggregates data for a rich page. A BFF is useful when client needs genuinely differ, not mandatory for every system.</p>
+            <div class="callout danger"><strong>Pitfalls:</strong> putting all business logic in the gateway, trusting arbitrary client identity headers, allowing unbounded request bodies, or assuming the gateway replaces authorization checks inside sensitive services.</div>
+        </section>
+
+        <section class="topic" id="discovery">
+            <h2>6. Service Discovery</h2>
+            <h3>Problem</h3><p>Instances can restart, scale, move, or receive new IP addresses. Hardcoded instance addresses become stale. Service discovery provides a way to locate eligible service instances dynamically.</p>
+            <div class="grid">
+                <div class="card"><h4>Client-side discovery</h4><div class="diagram">Caller
+                    | query registry
+                    v
+                    Registry → instance list
+                    |
+                    Client-side load balancer
+                    |
+                    Chosen instance</div><p>The caller obtains instance addresses and selects one using a load-balancing strategy.</p></div>
+                <div class="card"><h4>Server-side discovery</h4><div class="diagram">Caller
+                    |
+                    Stable service DNS name
+                    |
+                    Proxy / platform routing
+                    |
+                    Healthy endpoint</div><p>A platform or proxy resolves the service name and routes to an eligible endpoint.</p></div>
+            </div>
+            <h3>Concepts to distinguish</h3><ul><li><strong>Registration:</strong> an instance declares its presence.</li><li><strong>Heartbeat/lease:</strong> indicates continuing participation.</li><li><strong>Readiness:</strong> indicates whether the instance should receive traffic.</li><li><strong>Load balancing:</strong> selects among eligible instances.</li><li><strong>Deregistration:</strong> removes an instance from service.</li></ul>
+            <p>Registration is not proof that an instance is ready. Discovery, health checks, endpoint propagation, and load balancing must work together.</p>
+            <h3>When to use which</h3><p>Eureka is common in Spring Cloud systems using client-side discovery. Kubernetes offers DNS-based service naming and endpoint management inside the cluster. Choose based on deployment platform, existing infrastructure, and operational requirements.</p>
+        </section>
+
+        <section class="topic" id="eureka">
+            <h2>7. Eureka</h2>
+            <h3>Definition</h3><p>Netflix Eureka is a service registry. Spring Cloud Netflix integrates Eureka with Spring Boot applications for registration and discovery.</p>
+            <div class="diagram">             +------------------+
+                | Eureka Server    |
+                | Service Registry |
+                +--------+---------+
+                ^
+                register / heartbeat
+                /           \\
+                v             v
+                Order Service    Payment Service
+                |
+                discovery-aware client
+                |
+                selected service instance</div>
+            <h3>Minimal server setup</h3><pre><code>@SpringBootApplication
+@EnableEurekaServer
+public class DiscoveryApplication {
+    public static void main(String[] args) {
+        SpringApplication.run(
+            DiscoveryApplication.class, args
+        );
+    }
+}</code></pre>
+            <h3>Client configuration example</h3><pre><code>spring:
+  application:
+    name: order-service
+  cloud:
+    discovery:
+      enabled: true
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka/</code></pre>
+            <p>The appropriate Eureka client dependency must be included. The server commonly uses port 8761, but this is configurable. Align Spring Boot and Spring Cloud versions using a compatible release train.</p>
+            <h3>Heartbeats and self-preservation</h3><p>Clients periodically renew leases. When renewals stop, the registry may eventually evict an instance. Eureka self-preservation can reduce mass eviction when heartbeat traffic unexpectedly drops, because the cause might be a network partition rather than mass instance failure. This can also leave stale entries temporarily registered.</p>
+            <h3>Eureka vs Kubernetes DNS</h3><table><thead><tr><th>Eureka</th><th>Kubernetes service discovery</th></tr></thead><tbody><tr><td>Registry used by discovery-aware clients</td><td>Stable service names with cluster networking and endpoint management</td></tr><tr><td>Needs registry operation and client integration</td><td>Uses Kubernetes DNS, Services, and endpoint routing</td></tr><tr><td>Registry and client cache behavior matter</td><td>Readiness probes and endpoint propagation still matter</td></tr></tbody></table>
+            <div class="callout warning"><strong>Production note:</strong> do not assume a registered Eureka instance is healthy or that Kubernetes DNS alone guarantees application readiness. Use appropriate probes, timeouts, and connection-failure handling.</div>
+        </section>
+
+        <section class="topic" id="config">
+            <h2>8. Config Server</h2>
+            <h3>Definition</h3><p>Spring Cloud Config Server centralizes externalized configuration so applications can obtain settings by application name, profile, and label/version. A Git repository is a common backend.</p>
+            <div class="diagram">Git Configuration Repository
+                application.yml / order-service.yml
+                |
+                v
+                Spring Cloud Config Server
+                /           \\
+                v             v
+                Order Service   Payment Service</div>
+            <h3>Typical client setup</h3><pre><code>spring:
+  application:
+    name: order-service
+  config:
+    import: optional:configserver:http://localhost:8888</code></pre>
+            <p>This style is used by modern Spring Boot / Spring Cloud Config setups. Exact configuration depends on the compatible version train.</p>
+            <h3>Dynamic refresh</h3><p>Spring Cloud supports refresh mechanisms, including <code>@RefreshScope</code> for supported beans, refresh endpoints, and Spring Cloud Bus for broadcasting refresh events through a supported message broker. Centralized configuration does not mean every property updates live automatically; some properties require bean recreation or a restart.</p>
+            <h3>Security and production</h3><ul><li>Do not commit plaintext credentials or private keys to an exposed repository.</li><li>Protect Config Server with authentication, TLS, and network controls.</li><li>Use an appropriate secrets manager for sensitive values.</li><li>Version, review, and roll back configuration changes.</li><li>Plan startup behavior when Config Server is unavailable.</li><li>Roll out risky changes gradually and monitor their effects.</li></ul>
+        </section>
+
+        <section class="topic" id="database-per-service">
+            <h2>9. Database per Service</h2>
+            <h3>Definition</h3><p>Each service owns its data and persistence rules. Other services access that data through published APIs, events, or intentionally maintained projections—not direct access to the owning service's private tables.</p>
+            <div class="grid">
+                <div class="card"><h4>Order Service</h4><p>Orders and order state</p><div class="box">PostgreSQL</div></div>
+                <div class="card"><h4>Catalog Service</h4><p>Products and descriptions</p><div class="box">PostgreSQL / MongoDB</div></div>
+                <div class="card"><h4>Payment Service</h4><p>Payment attempts and statuses</p><div class="box">PostgreSQL</div></div>
+                <div class="card"><h4>Session Service</h4><p>Session/cache data</p><div class="box">Redis</div></div>
+            </div>
+            <h3>Example: reading product data for an order</h3><p>The Order Service can call the Catalog API, consume catalog events into a local read projection, or save a purchase-time product snapshot. Saving the purchase-time unit price is often essential: changing the catalog price later must not rewrite the historical order amount.</p>
+            <h3>Advantages</h3><ul><li>Independent schema evolution and access control.</li><li>Clear business-data ownership.</li><li>Service-specific scaling and persistence technology.</li><li>Reduced cross-team coupling.</li></ul>
+            <h3>Challenges</h3><ul><li>Cross-service joins are no longer ordinary local SQL joins.</li><li>Cross-service reports may need a warehouse or read model.</li><li>Distributed workflows may need a Saga.</li><li>Copied data requires synchronization, versioning, and reconciliation.</li><li>Backups and migrations become multi-store operational tasks.</li></ul>
+            <div class="callout good"><strong>Important distinction:</strong> database per service means independent ownership and access boundaries, not necessarily a separate physical database server for every service.</div>
+        </section>
+
+        <section class="topic" id="shared-db">
+            <h2>10. Shared Database</h2>
+            <h3>Definition</h3><p>A shared database architecture lets multiple services read or modify the same database or private business tables.</p>
+            <div class="diagram">Order Service ------\\
+                +---- Shared PostgreSQL
+                Payment Service ----/
+                Inventory Service --/</div>
+            <h3>Why it can be risky</h3><ul><li>One service cannot safely change a schema without coordinating with other consumers.</li><li>Services can bypass the owning service's business validations.</li><li>Database permissions and ownership become unclear.</li><li>A heavy query from one service can affect others.</li><li>Independent deployments become harder.</li></ul>
+            <h3>Is sharing physical infrastructure always wrong?</h3><p>No. Multiple services may use the same database cluster while having separate schemas/databases, restricted credentials, and clear data ownership. The main risk is shared ownership of private business tables and direct cross-service writes.</p>
+            <p>During migration, a shared database may be a practical stepping stone. Over time, reduce cross-service table access and move toward API/event-based integration where justified.</p>
+        </section>
+
+        <section class="topic" id="saga">
+            <h2>11. Saga Pattern</h2>
+            <h3>Definition</h3><p>A Saga coordinates a business workflow as a sequence of local transactions. If a later step fails, compensating transactions counteract earlier business actions where possible. It is a strategy for multi-service workflows, not a single atomic ACID transaction.</p>
+            <h3>Successful checkout</h3>
+            <div class="diagram">T1: Create Pending Order
+                |
+                v
+                T2: Reserve Inventory
+                |
+                v
+                T3: Authorize Payment
+                |
+                v
+                T4: Confirm Order</div>
+            <h3>Payment failure and compensation</h3>
+            <div class="diagram">Create order       SUCCESS
+                Reserve inventory  SUCCESS
+                Authorize payment  FAILURE
+                |
+                v
+                Release reservation
+                Cancel / mark order failed
+                |
+                v
+                Persist final Saga state</div>
+            <p>A compensation is a new business operation, not a database rollback across services. A captured payment may require a refund; it cannot necessarily be erased from payment history.</p>
+            <h3>Choreography vs orchestration</h3><table><thead><tr><th>Aspect</th><th>Choreography</th><th>Orchestration</th></tr></thead><tbody><tr><td>Coordination</td><td>Services react to domain events</td><td>Explicit coordinator sends commands and tracks state</td></tr><tr><td>Good fit</td><td>Short, straightforward workflows</td><td>Complex or long-running workflows</td></tr><tr><td>Strength</td><td>Looser central coupling</td><td>Workflow visibility and explicit recovery logic</td></tr><tr><td>Risk</td><td>Hard-to-follow event chains and cycles</td><td>Coordinator complexity and over-centralized business logic</td></tr></tbody></table>
+            <h3>Production requirements</h3><ul><li>Durable workflow state and recoverable transitions.</li><li>Idempotent commands and consumers.</li><li>Timeouts, bounded retries, and late-event handling.</li><li>Explicit compensation rules.</li><li>Monitoring, reconciliation, and manual recovery for exceptional failures.</li></ul>
+            <div class="callout danger"><strong>Do not assume compensation always succeeds.</strong> Persist failed compensations, retry safely, alert operators, and provide a repair workflow.</div>
+        </section>
+
+        <section class="topic" id="cqrs">
+            <h2>12. CQRS — Command Query Responsibility Segregation</h2>
+            <h3>Definition</h3><p>CQRS separates the model that changes state from the model used to read state. It does not inherently require two databases, microservices, or Event Sourcing.</p>
+            <div class="grid">
+                <div class="card"><h4>Write / command side</h4><div class="diagram">Command
+                    |
+                    Validate invariants
+                    |
+                    Write model
+                    |
+                    Local transaction</div></div>
+                <div class="card"><h4>Read / query side</h4><div class="diagram">Query
+                    |
+                    Read model / projection
+                    |
+                    Optimized response</div></div>
+            </div>
+            <h3>Example</h3><p>An order-management system can update a normalized relational model while serving order history from a denormalized read model containing customer name, order status, item summaries, and totals.</p>
+            <h3>Benefits</h3><ul><li>Independent read/write optimization and scaling.</li><li>Simpler queries for complex screens.</li><li>Clear separation of commands and queries.</li></ul>
+            <h3>Challenges</h3><ul><li>Duplicate representations and synchronization logic.</li><li>Eventual consistency if projections update asynchronously.</li><li>Additional infrastructure and rebuild procedures.</li><li>More complexity than ordinary CRUD for simple domains.</li></ul>
+            <div class="callout good"><strong>Interview distinction:</strong> CQRS is about separate command/query models; separate HTTP GET and POST endpoints alone do not establish a meaningful CQRS architecture.</div>
+        </section>
+
+        <section class="topic" id="event-sourcing">
+            <h2>13. Event Sourcing</h2>
+            <h3>Definition</h3><p>Event Sourcing stores the sequence of meaningful state-changing events as the authoritative history, instead of storing only the latest state.</p>
+            <div class="diagram">OrderCreated       → initial order
+                ItemAdded          → revised contents
+                PaymentAuthorized  → payment authorized
+                OrderShipped       → shipping state updated
+                |
+                v
+                Replay events / use snapshot
+                |
+                v
+                Reconstructed current state</div>
+            <h3>Worked example</h3><pre><code>AccountOpened(1000)
+MoneyDeposited(500)
+MoneyWithdrawn(200)
+
+// Reconstructed balance = 1000 + 500 - 200 = 1300</code></pre>
+            <p>Events should represent immutable facts. Correcting state generally means appending another event, rather than silently rewriting history. Snapshots and projections avoid replaying the full stream for every query.</p>
+            <h3>Benefits</h3><ul><li>Detailed business history and audit trail.</li><li>Ability to rebuild projections.</li><li>Temporal analysis of business decisions.</li><li>Explicit record of how state changed.</li></ul>
+            <h3>Challenges</h3><ul><li>Event schema evolution and versioning.</li><li>Replay performance and snapshot management.</li><li>Duplicate/out-of-order event handling.</li><li>Privacy, retention, and deletion requirements.</li><li>Operational complexity and eventual consistency of projections.</li></ul>
+            <h3>CQRS vs Event Sourcing</h3><table><thead><tr><th>CQRS</th><th>Event Sourcing</th></tr></thead><tbody><tr><td>Separates write and read models.</td><td>Stores state changes as an event history.</td></tr><tr><td>Can use ordinary database tables.</td><td>Uses an event store or durable event stream as source of truth.</td></tr><tr><td>Does not require event history.</td><td>Can be combined with CQRS, but they are distinct concepts.</td></tr></tbody></table>
+        </section>
+
+        <section class="topic" id="strangler">
+            <h2>14. Strangler Fig Pattern</h2>
+            <h3>Definition</h3><p>The Strangler Fig pattern incrementally replaces selected legacy capabilities while the existing monolith continues to serve the remaining functionality. It avoids a risky all-at-once rewrite.</p>
+            <div class="diagram">             Client Traffic
+                |
+                v
+                +----------------------+
+                | Gateway / Router     |
+                +----------+-----------+
+                |
+                +------+------+
+                |             |
+                v             v
+                Legacy Monolith   New Service
+                remaining paths   migrated paths
+                |             |
+                +------ gradual migration
+                |
+                retire old path</div>
+            <h3>Migration steps</h3><ol><li>Identify a capability with a clear boundary.</li><li>Establish baseline tests, metrics, and behavior.</li><li>Define compatible API/event contracts.</li><li>Extract the capability and its data ownership.</li><li>Route a controlled slice of traffic to the new service.</li><li>Validate errors, latency, business behavior, and data consistency.</li><li>Increase traffic gradually and monitor.</li><li>Retire the old implementation once consumers have migrated.</li></ol>
+            <h3>Challenges</h3><ul><li>Duplicate business logic during transition.</li><li>Dual writes and data synchronization.</li><li>Backward compatibility and routing mistakes.</li><li>Two active implementations lingering indefinitely.</li></ul>
+            <div class="callout good"><strong>Best practice:</strong> plan how the old path will be retired, not just how the new service will be created.</div>
+        </section>
+
+        <section class="topic" id="circuit-breaker">
+            <h2>15. Circuit Breaker</h2>
+            <h3>Problem</h3><p>A slow downstream dependency can exhaust upstream threads, connections, and memory. A circuit breaker observes call outcomes and temporarily stops calls when failure thresholds indicate that a dependency is unhealthy.</p>
+            <div class="diagram">      CLOSED
+                calls are allowed
+                |
+                failure threshold
+                v
+                OPEN
+                fail fast / block calls
+                |
+                wait duration
+                v
+                HALF-OPEN
+                limited trial calls
+                /         \\
+                success       failure
+                |              |
+                v              v
+                CLOSED          OPEN</div>
+            <h3>Resilience4j example</h3><pre><code>@CircuitBreaker(
+    name = "paymentService",
+    fallbackMethod = "paymentFallback"
+)
+public PaymentResponse charge(PaymentRequest request) {
+    return paymentClient.charge(request);
+}
+
+public PaymentResponse paymentFallback(
+        PaymentRequest request, Throwable ex) {
+    // Do not claim payment succeeded.
+    throw new PaymentUnavailableException(
+        "Payment outcome unavailable", ex
+    );
+}</code></pre>
+            <h3>What it does and does not do</h3><ul><li>OPEN temporarily prevents repeated calls to a failing dependency.</li><li>HALF-OPEN probes whether recovery has occurred.</li><li>It does not itself impose a network timeout.</li><li>It does not isolate all resource usage by itself.</li><li>It does not make an uncertain payment outcome safe to abandon.</li></ul>
+            <p>Use a fallback only when it preserves the business contract. For optional recommendations, cached data may be suitable. For payment, a durable pending state and reconciliation may be safer.</p>
+        </section>
+
+        <section class="topic" id="retry">
+            <h2>16. Retry</h2>
+            <h3>Definition</h3><p>Retry repeats an operation after a failure judged transient. It is useful for short-lived network errors or temporary overload, but can worsen an incident if unbounded or applied to non-idempotent operations.</p>
+            <h3>Exponential backoff and jitter</h3>
+            <div class="diagram">Attempt 1 → transient failure → short wait
+                Attempt 2 → transient failure → longer wait
+                Attempt 3 → failure           → stop / recovery queue
+
+                Delay = min(cap, base × 2^attempt) + jitter</div>
+            <p>Jitter randomizes retry timing to prevent clients from retrying in synchronized bursts. Use bounded attempts, an overall deadline, and a retry budget.</p>
+            <h3>Retry candidates</h3><ul><li>Temporary connection errors.</li><li>Selected 502, 503, or 504 responses.</li><li>429 responses when retry timing is respected.</li><li>Transient database or broker failures.</li></ul>
+            <h3>Usually do not retry blindly</h3><ul><li>Invalid input, authentication, or authorization failures.</li><li>Business validation errors such as insufficient funds.</li><li>Permanent not-found conditions.</li><li>Non-idempotent external operations without a safe deduplication strategy.</li></ul>
+            <div class="callout danger"><strong>Payment example:</strong> a request may time out after the provider has charged the card. Retrying with a new operation key can charge twice. Reuse the provider-supported idempotency key and reconcile uncertain results.</div>
+        </section>
+
+        <section class="topic" id="timeout">
+            <h2>17. Timeout</h2>
+            <h3>Definition</h3><p>A timeout bounds how long a caller waits for an operation. Without explicit timeouts, blocked remote calls may hold threads, connections, and memory indefinitely.</p>
+            <table><thead><tr><th>Timeout type</th><th>Purpose</th></tr></thead><tbody><tr><td>Connection timeout</td><td>Limits the time to establish a connection.</td></tr><tr><td>Read/response timeout</td><td>Limits waiting for response data according to client semantics.</td></tr><tr><td>Overall deadline</td><td>Bounds the complete operation, including downstream calls.</td></tr><tr><td>Database query timeout</td><td>Bounds query execution/waiting.</td></tr><tr><td>Message-processing timeout/lease</td><td>Controls or detects stalled processing according to broker semantics.</td></tr></tbody></table>
+            <h3>Deadline propagation example</h3>
+            <div class="diagram">Overall request budget: 800 ms
+                Gateway → Order Service: remaining 500 ms
+                Order → Inventory:       remaining 250 ms
+                Order → Payment:         remaining 200 ms</div>
+            <p>The values are illustrative. Downstream operations must not each consume the entire original deadline. Leave time for local processing and response delivery.</p>
+            <h3>Production advice</h3><ul><li>Set explicit HTTP-client, database, and broker timeouts.</li><li>Align timeouts with service objectives and the overall request deadline.</li><li>Leave time for fallback and error handling.</li><li>A timeout is not proof the remote operation failed.</li></ul>
+            <div class="callout warning"><strong>Critical distinction:</strong> a timed-out payment may still complete remotely. Timeout means the caller did not receive a timely response, not that no side effect happened.</div>
+        </section>
+
+        <section class="topic" id="bulkhead">
+            <h2>18. Bulkhead</h2>
+            <h3>Definition</h3><p>The bulkhead pattern isolates resource consumption so one slow dependency cannot consume all capacity needed by unrelated operations.</p>
+            <div class="grid three">
+                <div class="card"><h4>Checkout / Payment</h4><div class="progressbar"><div style="width:60%"></div></div><p>Illustrative 60 slots</p></div>
+                <div class="card"><h4>Recommendations</h4><div class="progressbar"><div style="width:25%"></div></div><p>Illustrative 25 slots</p></div>
+                <div class="card"><h4>Notifications</h4><div class="progressbar"><div style="width:15%"></div></div><p>Illustrative 15 slots</p></div>
+            </div>
+            <h3>Types</h3><ul><li><strong>Thread-pool bulkhead:</strong> separate execution pool for dependency work. Helps isolate blocking calls but adds thread and queue overhead.</li><li><strong>Semaphore bulkhead:</strong> caps concurrent executions using permits; lightweight but does not create a separate pool.</li></ul>
+            <h3>Design guidance</h3><p>Configure concurrency limits and queue capacity deliberately. Oversized queues can delay failures and consume memory. Isolate the resources that actually saturate: threads, connections, CPU, memory, or downstream quotas. A bulkhead complements—not replaces—timeouts and circuit breakers.</p>
+        </section>
+
+        <section class="topic" id="rate-limit">
+            <h2>19. Rate Limiting</h2>
+            <h3>Definition</h3><p>Rate limiting restricts the number of requests a client, tenant, API key, or system can make over a time interval or quota.</p>
+            <h3>Common algorithms</h3><table><thead><tr><th>Algorithm</th><th>Behavior</th><th>Trade-off</th></tr></thead><tbody><tr><td>Fixed window</td><td>Counts within fixed time windows</td><td>Simple; bursts can occur at window boundaries.</td></tr><tr><td>Sliding window</td><td>Tracks/estimates usage over a moving interval</td><td>Smoother limits, more implementation cost.</td></tr><tr><td>Token bucket</td><td>Tokens replenish over time; requests consume tokens</td><td>Allows controlled bursts.</td></tr><tr><td>Leaky bucket</td><td>Shapes traffic toward a controlled output rate</td><td>Useful for smoothing traffic.</td></tr></tbody></table>
+            <h3>Token bucket example</h3><p>Imagine capacity of 100 tokens with replenishment of 10 tokens per second. Each request costs one token. Requests can burst while tokens are available; excess requests are rejected or delayed until capacity returns. These values are illustrative.</p>
+            <h3>Distributed rate limiting</h3><p>If ten replicas each enforce 100 requests/minute locally, the combined allowance may be roughly 1,000 requests/minute. A global tenant quota needs a coordinated counter or gateway/platform mechanism with explicit consistency and failure semantics.</p>
+            <p>HTTP 429 Too Many Requests is commonly used for excess traffic; a <code>Retry-After</code> header may tell clients when to retry. Rate limiting protects APIs, login endpoints, expensive reports, and multi-tenant fairness.</p>
+        </section>
+
+        <section class="topic" id="idempotency">
+            <h2>20. Idempotency</h2>
+            <h3>Definition</h3><p>An operation is idempotent when repeating it with the same intended input produces the same relevant final effect as performing it once. Setting a status to CANCELLED may be idempotent; charging a card is not inherently idempotent.</p>
+            <div class="diagram">Client → Payment Service: charge ₹2,000
+                Provider charges card
+                Response is lost
+                Client retries
+                Without idempotency → possible duplicate charge
+                With same idempotency key → return existing operation/result</div>
+            <h3>Idempotency-key strategy</h3><pre><code>POST /payments
+Idempotency-Key: order-123-payment-attempt-1</code></pre>
+            <ol><li>Enforce a unique key in the correct customer/operation scope.</li><li>Associate the key with a request hash or equivalent input identity.</li><li>Reject conflicting reuse of the same key.</li><li>Persist operation state and result.</li><li>Handle concurrent requests with the same key.</li><li>Define retention/expiration behavior.</li><li>Use provider-supported idempotency where available.</li></ol>
+            <h3>Idempotent event consumers</h3><pre><code>CREATE TABLE processed_events (
+    event_id VARCHAR(100) PRIMARY KEY,
+    processed_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);</code></pre>
+            <p>Insert the event ID and apply the local business update in the same transaction. If the unique key already exists, skip the duplicate effect, following the consumer's acknowledgment and error-handling design.</p>
+            <div class="callout warning"><strong>Limit:</strong> a database deduplication table does not make an external email, payment, or HTTP side effect atomic. Coordinate those effects with their own idempotency support or reconciliation.</div>
+        </section>
+
+        <section class="topic" id="transactions">
+            <h2>21. Distributed Transactions</h2>
+            <h3>Definition</h3><p>A distributed transaction coordinates changes across multiple transactional resources. For example, an order database, payment database, and inventory database may all participate in one business workflow.</p>
+            <div class="diagram">Order Database      Payment Database      Inventory Database
+                |                    |                     |
+                +--------------------+---------------------+
+                one business workflow</div>
+            <h3>Two-phase commit (2PC)</h3><ol><li><strong>Prepare:</strong> a coordinator asks participants to prepare and retain the resources needed to commit.</li><li><strong>Commit/abort:</strong> the coordinator directs participants to finish or roll back.</li></ol>
+            <div class="diagram">Coordinator → Order DB: PREPARE
+                Coordinator → Payment DB: PREPARE
+                Order DB → Coordinator: YES
+                Payment DB → Coordinator: YES
+                Coordinator → participants: COMMIT</div>
+            <h3>Trade-offs of 2PC</h3><ul><li>Prepared participants may retain locks or state while waiting.</li><li>Coordinator failures and network partitions complicate recovery.</li><li>Coordination increases latency.</li><li>External payment providers and many messaging integrations do not participate in a common XA transaction.</li><li>Long-running business workflows are poor candidates for holding distributed transactional resources.</li></ul>
+            <p>2PC's behavior depends on its protocol and deployment; it is not accurate to summarize every distributed transaction as universally “choosing CP” in all senses of CAP.</p>
+            <h3>Practical alternatives</h3><ul><li>Use one local transaction when changes belong to one service/resource.</li><li>Use a Saga for multi-step workflows with compensations.</li><li>Use a transactional outbox to atomically store local changes and a pending event.</li><li>Use idempotent consumers, durable messaging, and reconciliation.</li><li>Use distributed transactions only when their guarantees justify infrastructure and availability costs.</li></ul>
+        </section>
+
+        <section class="topic" id="outbox">
+            <h2>22. Transactional Outbox Pattern</h2>
+            <h3>Problem: dual writes</h3><p>Saving an order and publishing an event are two separate operations. If the database write succeeds but Kafka publication fails, downstream services never learn about the order. If an event is published before the database transaction rolls back, consumers can observe a fact that was not committed.</p>
+            <h3>Solution</h3>
+            <div class="diagram">Order Service
+                |
+                | one local ACID transaction
+                v
+                +-------------------------------+
+                | Local Database                |
+                | orders table                  |
+                | outbox_events table           |
+                +---------------+---------------+
+                |
+                polling / transaction log CDC
+                |
+                v
+                Outbox Publisher
+                |
+                v
+                Kafka
+                |
+                v
+                Consumers</div>
+            <h3>Example schema</h3><pre><code>CREATE TABLE outbox_events (
+    event_id UUID PRIMARY KEY,
+    aggregate_id UUID NOT NULL,
+    event_type VARCHAR(100) NOT NULL,
+    payload JSONB NOT NULL,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+    published_at TIMESTAMPTZ
+);</code></pre>
+            <h3>Spring service example</h3><pre><code>@Transactional
+public void createOrder(Order order) {
+    orderRepository.save(order);
+
+    OutboxEvent event = OutboxEvent.orderCreated(
+        order.getId(),
+        order.getCustomerId()
+    );
+
+    outboxRepository.save(event);
+}</code></pre>
+            <p>An independent publisher sends unpublished rows to Kafka. It may use polling or change-data capture (CDC), for example with Debezium, depending on the architecture.</p>
+            <h3>Guarantees and limitations</h3><ul><li>The business row and outbox record commit or roll back together in the same local transaction.</li><li>The publisher can retry after failures.</li><li>A crash after publishing but before marking the event published can cause duplicate publication.</li><li>Consumers therefore need idempotency; the outbox does not automatically guarantee exactly-once end-to-end business processing.</li><li>Define event ordering, retry, poison-event handling, monitoring, and outbox cleanup.</li></ul>
+        </section>
+
+        <section class="topic" id="tracing">
+            <h2>23. Distributed Tracing</h2>
+            <h3>Purpose</h3><p>Distributed tracing connects individual operations belonging to one end-to-end request. It helps locate latency, errors, and unexpected dependency paths across services.</p>
+            <div class="diagram">Trace: checkout request
+                └── API Gateway span
+                └── Order Service span
+                ├── Inventory HTTP span
+                ├── SQL query span
+                └── Payment Service span
+                └── Payment DB span</div>
+            <h3>Core terms</h3><ul><li><strong>Trace ID:</strong> identifies the complete trace.</li><li><strong>Span ID:</strong> identifies one operation.</li><li><strong>Parent span:</strong> links a child operation to its caller.</li><li><strong>Trace context:</strong> carries identifiers and propagation metadata between services.</li><li><strong>MDC:</strong> logging context used by SLF4J-compatible logging to add identifiers to log lines.</li></ul>
+            <h3>W3C Trace Context example</h3><pre><code>traceparent: 00-&lt;trace-id&gt;-&lt;parent-span-id&gt;-01</code></pre>
+            <p>This is a format illustration; the placeholders are not actual IDs. Java services commonly use OpenTelemetry or Micrometer Tracing with a backend such as Jaeger, Grafana Tempo, or a commercial APM.</p>
+            <h3>How to debug with a trace</h3><ul><li>Find the slowest spans and downstream waits.</li><li>Inspect retries, database queries, and connection-pool delays.</li><li>Compare traces with service-level latency and saturation metrics.</li><li>Use correlated logs for detailed error messages.</li></ul>
+            <p>Sampling helps control cost. Propagate context across HTTP, messaging, and asynchronous boundaries. Do not place secrets or sensitive personal data in span attributes.</p>
+        </section>
+
+        <section class="topic" id="correlation">
+            <h2>24. Correlation ID</h2>
+            <h3>Definition</h3><p>A correlation ID associates logs, messages, and operations with a common business request or workflow. It is particularly useful for support investigations that span multiple services.</p>
+            <div class="diagram">Correlation ID: checkout-abc123
+                Gateway       → checkout-abc123
+                Order Service → checkout-abc123
+                Inventory     → checkout-abc123
+                Payment       → checkout-abc123</div>
+            <h3>Correlation ID vs Trace ID</h3><table><thead><tr><th>Correlation ID</th><th>Trace ID</th></tr></thead><tbody><tr><td>Application/business identifier for related activity</td><td>Identifier for one distributed trace</td></tr><tr><td>May span multiple requests, jobs, or traces</td><td>Typically identifies a single traced execution</td></tr><tr><td>Application-defined semantics</td><td>Tracing-system propagation semantics</td></tr></tbody></table>
+            <p>One order workflow can span several HTTP requests, message consumers, and scheduled jobs. It may have multiple trace IDs but share one business correlation ID.</p>
+            <h3>Java logging example</h3><pre><code>try {
+    MDC.put("correlationId", correlationId);
+    log.info("Processing order {}", orderId);
+} finally {
+    MDC.remove("correlationId");
+}</code></pre>
+            <p>Configure the logging pattern to include the MDC value. Thread-local MDC does not automatically propagate through every asynchronous executor; use supported context propagation or instrumentation.</p>
+            <div class="callout warning"><strong>Security:</strong> never treat a client-provided correlation ID as identity or authorization. Validate its format and length, and generate a server-controlled ID when appropriate.</div>
+        </section>
+
+        <section class="topic" id="health">
+            <h2>25. Health Checks</h2>
+            <h3>Why health checks matter</h3><p>A process can be running while unable to serve requests. Health checks help orchestrators and monitoring systems distinguish application liveness, readiness, and startup state.</p>
+            <div class="grid three">
+                <div class="card"><h4>Liveness</h4><p>Is the process alive and progressing, or stuck and potentially in need of restart?</p></div>
+                <div class="card"><h4>Readiness</h4><p>Can this instance accept requests now? It may be alive but still initializing.</p></div>
+                <div class="card"><h4>Startup</h4><p>Has initialization completed? Useful for applications with long startup periods.</p></div>
+            </div>
+            <h3>Spring Boot Actuator endpoints</h3><pre><code>GET /actuator/health
+GET /actuator/health/liveness
+GET /actuator/health/readiness</code></pre>
+            <p>Endpoint availability depends on Actuator dependencies and health-probe configuration.</p>
+            <h3>Kubernetes example</h3><pre><code>livenessProbe:
+  httpGet:
+    path: /actuator/health/liveness
+    port: 8080
+  initialDelaySeconds: 15
+  periodSeconds: 10
+
+readinessProbe:
+  httpGet:
+    path: /actuator/health/readiness
+    port: 8080
+  initialDelaySeconds: 5
+  periodSeconds: 5</code></pre>
+            <p>Timings are illustrative; tune them to application startup and response characteristics.</p>
+            <h3>Common mistakes</h3><ul><li>Making liveness fail whenever any downstream dependency is unavailable, triggering restart storms.</li><li>Allowing traffic before the application is ready.</li><li>Making every probe execute expensive deep checks against many dependencies.</li><li>Returning healthy unconditionally when critical operations cannot work.</li></ul>
+            <p>Separate liveness, readiness, startup, and dependency-health semantics. Use probes to improve recovery rather than amplify an outage.</p>
+        </section>
+
+        <section class="topic" id="communication">
+            <h2>26. Service-to-Service Communication</h2>
+            <h3>Synchronous communication</h3><p>HTTP/REST and gRPC are common request-response approaches. The caller generally waits for the response before continuing.</p>
+            <div class="diagram">Order Service
+                |
+                | synchronous HTTP / gRPC
+                v
+                Payment Service
+                |
+                | response
+                v
+                Order Service continues</div>
+            <p><strong>Benefits:</strong> immediate response and straightforward request/response contracts. <strong>Costs:</strong> network latency, downstream failure propagation, and latency multiplication through call chains.</p>
+            <h3>Asynchronous communication</h3><p>Kafka, RabbitMQ, and other messaging systems let a producer publish a message without waiting for a consumer to finish processing it.</p>
+            <div class="diagram">Order Service
+                |
+                v
+                Message Broker / Topic
+                |
+                v
+                Payment Consumer
+                |
+                v
+                Local transaction / result event</div>
+            <p><strong>Benefits:</strong> temporal decoupling, buffering, and natural support for event-driven workflows. <strong>Costs:</strong> eventual consistency, duplicates, ordering concerns, and more complex debugging/recovery.</p>
+            <h3>Choosing an approach</h3><table><thead><tr><th>Requirement</th><th>Typical fit</th></tr></thead><tbody><tr><td>Read a price needed immediately</td><td>Synchronous query or local read model</td></tr><tr><td>Send a confirmation after order creation</td><td>Asynchronous event</td></tr><tr><td>Reserve stock as part of checkout</td><td>Synchronous response or asynchronous Saga, based on business needs</td></tr><tr><td>Update analytics projections</td><td>Asynchronous events</td></tr><tr><td>Long-running approval process</td><td>Durable asynchronous workflow/orchestration</td></tr></tbody></table>
+            <div class="callout warning"><strong>Important:</strong> asynchronous messaging does not automatically provide correctness. Define delivery semantics, idempotency, event ordering where required, observability, dead-letter handling, and recovery.</div>
+        </section>
+
+        <section id="workflow">
+            <h2>End-to-End Example: Checkout Architecture</h2>
+            <div class="diagram">1. Client sends checkout request
+                |
+                v
+                2. API Gateway authenticates and rate-limits
+                |
+                v
+                3. Order Service creates PENDING order
+                |
+                v
+                4. Local transaction writes order + outbox event
+                |
+                v
+                5. Outbox publisher publishes event to Kafka
+                |
+                +-----+------+
+                v            v
+                Inventory        Payment
+                reserve stock    authorize payment
+                |            |
+                +------+- ----+
+                v
+                6. Saga records progress and handles failures
+                |
+                v
+                7. Order status is updated; projections/notifications follow
+
+                Throughout: timeouts, retries, circuit breakers, bulkheads,
+                idempotency, trace context, correlation IDs, metrics and probes.</div>
+            <h3>State and consistency</h3><p>A real implementation must define its business states and recovery behavior. The customer may see PENDING while payment is being confirmed. A successful message publication is not proof that payment or inventory processing has completed. Only the workflow's validated state should determine whether an order is confirmed.</p>
+        </section>
+
+        <section id="failures">
+            <h2>Production Failure Scenarios</h2>
+            <div class="card"><h3>Scenario 1 — Payment times out</h3><p><strong>Problem:</strong> The provider might have charged the card even though the response never arrived.</p><p><strong>Response:</strong> Use explicit timeouts, durable payment-attempt state, a stable provider idempotency key, and reconciliation. Do not mark payment successful just because the request was sent, or failed solely because the caller timed out.</p></div>
+            <div class="card"><h3>Scenario 2 — Kafka delivers duplicate events</h3><p><strong>Problem:</strong> Inventory reserves stock twice for one order.</p><p><strong>Response:</strong> Use stable event IDs, atomically persist deduplication state with the local business change, and acknowledge messages according to durability requirements.</p></div>
+            <div class="card"><h3>Scenario 3 — Recommendations become slow</h3><p><strong>Problem:</strong> Optional recommendation calls consume all Order Service threads.</p><p><strong>Response:</strong> Use timeouts, circuit breakers, bulkheads, and cached optional data. Preserve capacity for critical checkout operations.</p></div>
+            <div class="card"><h3>Scenario 4 — Inventory reserved, payment failed</h3><p><strong>Problem:</strong> Stock remains reserved for an unsuccessful order.</p><p><strong>Response:</strong> Use a durable Saga, idempotent compensation, retries for failed release, and operator alerts for unresolved compensation.</p></div>
+            <div class="card"><h3>Scenario 5 — Database schema changes</h3><p><strong>Problem:</strong> A consumer still expects the old field.</p><p><strong>Response:</strong> Use expand-and-contract: add the new representation compatibly, migrate consumers, observe usage, then remove the old field only after it is safe.</p></div>
+        </section>
+
+        <section id="interview">
+            <h2>Senior Java Backend Interview Q&A</h2>
+            <div class="qa">
+                <details><summary>1. Why choose a modular monolith instead of microservices?</summary><p>A modular monolith reduces deployment and distributed-systems overhead while preserving business boundaries. Microservices are justified when independent deployment, scaling, ownership, or fault isolation benefits outweigh operational costs.</p></details>
+                <details><summary>2. How do you maintain consistency across services without a global transaction?</summary><p>Use local ACID transactions, Saga coordination, explicit business states, idempotent operations, durable messaging, and compensating actions. Reconciliation handles exceptional states that automated recovery cannot resolve.</p></details>
+                <details><summary>3. How does the transactional outbox solve dual writes?</summary><p>The business change and outbox event record commit in the same local transaction. A publisher later sends the event. Consumers still need idempotency because publication can be duplicated.</p></details>
+                <details><summary>4. CQRS vs Event Sourcing?</summary><p>CQRS separates command and query models. Event Sourcing persists state transitions as an event history. They can be combined but are separate concepts; neither should be introduced without a business need.</p></details>
+                <details><summary>5. How do timeout, retry, circuit breaker, and bulkhead work together?</summary><p>Timeout bounds waiting, retry handles eligible transient errors, circuit breaker stops repeated calls to an unhealthy dependency, and bulkhead isolates resource consumption. Retry must respect deadlines and idempotency.</p></details>
+                <details><summary>6. How do you debug a slow checkout across six services?</summary><p>Use tracing to find slow spans, metrics to identify saturation and latency trends, and correlated structured logs for detailed events. Inspect downstream waits, retries, connection pools, and database queries.</p></details>
+                <details><summary>7. Why is a shared database risky?</summary><p>Direct shared-table access couples schemas, business rules, permissions, and release schedules. Independent ownership avoids this coupling, although services may still share physical database infrastructure.</p></details>
+                <details><summary>8. Correlation ID vs Trace ID?</summary><p>A correlation ID groups activity for a business request or workflow. A trace ID identifies a distributed trace. One business workflow may span several traces.</p></details>
+                <details><summary>9. What happens when Eureka self-preservation activates?</summary><p>Eureka can avoid evicting too many instances after a sudden drop in heartbeat traffic, protecting against a network partition being mistaken for mass failure. The trade-off is that stale entries can remain, so client failure handling and health monitoring matter.</p></details>
+                <details><summary>10. Why is a timeout not proof that a payment failed?</summary><p>The request may have reached the provider and completed while its response was delayed or lost. The caller must preserve an uncertain state, query/reconcile the operation, and retry only with safe idempotency semantics.</p></details>
+                <details><summary>11. What is the difference between liveness and readiness?</summary><p>Liveness indicates whether a process should continue running or be restarted. Readiness indicates whether it should receive traffic. A temporarily unavailable downstream dependency should not automatically make every instance fail liveness.</p></details>
+                <details><summary>12. Does Kafka guarantee exactly-once business processing?</summary><p>Broker-level transactional or exactly-once features can provide specific guarantees within defined boundaries, but they do not automatically make arbitrary external side effects exactly once. Consumers still need correct transaction boundaries, idempotency, and recovery design.</p></details>
+            </div>
+        </section>
+
+        <section id="tracker">
+            <h2>Final Mastery Tracker</h2>
+            <p>Mark a topic complete only when you can explain it, draw its flow, implement or demonstrate it where appropriate, and describe failure recovery and trade-offs.</p>
+            <div class="checkpanel">
+                <div style="display:flex;justify-content:space-between;align-items:center;gap:12px"><strong>All 26 topics</strong><span id="masteryCount">0 / 26</span></div><div class="progressbar"><div id="masteryFill"></div></div>
+                <div id="masteryList"></div>
+                <div class="toolbar"><button class="btn" id="resetTracker">Reset tracker</button><button class="btn" onclick="window.print()">Print / Save PDF</button></div>
+            </div>
+            <h3>Four mastery levels for every topic</h3><ol><li><strong>Understand:</strong> explain the concept in your own words.</li><li><strong>Visualize:</strong> draw the architecture or execution flow.</li><li><strong>Implement:</strong> demonstrate it with Java/Spring Boot or a small working example when appropriate.</li><li><strong>Troubleshoot:</strong> explain failure scenarios, trade-offs, observability, and recovery.</li></ol>
+            <div class="callout good"><strong>Final recommendation:</strong> do not add every pattern to every service. Start with clear boundaries and data ownership, add resilience controls for real remote-dependency risks, and adopt Saga, CQRS, or Event Sourcing only when the business requirements justify the added complexity.</div>
+        </section>
+        <footer class="footer">Interview A-Z · Module 12: Microservices · Self-contained HTML reference · Built for Java Backend interview preparation</footer>
+    </main>
+</div>
+<script>
+    const topics=[
+        "Monolith","Microservices","Service boundaries","Bounded Context","API Gateway","Service Discovery","Eureka","Config Server","Database per Service","Shared Database","Saga","CQRS","Event Sourcing","Strangler Fig","Circuit Breaker","Retry","Timeout","Bulkhead","Rate Limiting","Idempotency","Distributed Transactions","Outbox Pattern","Distributed Tracing","Correlation ID","Health Checks","Service-to-Service Communication"
+    ];
+    const storageKey="interviewAZ.microservices.mastery.v1";
+    let completed=new Set();
+    try{completed=new Set(JSON.parse(localStorage.getItem(storageKey)||"[]"));}catch(e){}
+    function renderTracker(containerId,countId,fillId){
+        const container=document.getElementById(containerId);container.innerHTML="";
+        topics.forEach((topic,i)=>{
+            const label=document.createElement("label");label.className="topic-check";
+            const input=document.createElement("input");input.type="checkbox";input.checked=completed.has(topic);input.setAttribute("aria-label","Mark "+topic+" complete");
+            input.addEventListener("change",()=>{input.checked?completed.add(topic):completed.delete(topic);save();updateCounts();});
+            const span=document.createElement("span");span.textContent=(i+1)+". "+topic;
+            label.append(input,span);container.appendChild(label);
+        });
+    }
+    function save(){try{localStorage.setItem(storageKey,JSON.stringify([...completed]));}catch(e){}}
+    function updateCounts(){
+        const n=topics.filter(t=>completed.has(t)).length;
+        ["progressText","masteryCount"].forEach(id=>{const el=document.getElementById(id);if(el)el.textContent=n+" / "+topics.length+" completed";});
+        ["progressFill","masteryFill"].forEach(id=>{const el=document.getElementById(id);if(el)el.style.width=(n/topics.length*100)+"%";});
+    }
+    renderTracker("syllabusList","progressText","progressFill");
+    renderTracker("masteryList","masteryCount","masteryFill");
+    document.getElementById("resetTracker").addEventListener("click",()=>{if(confirm("Reset all microservices topic progress?")){completed.clear();save();renderTracker("syllabusList","progressText","progressFill");renderTracker("masteryList","masteryCount","masteryFill");updateCounts();}});
+    updateCounts();
+</script>
+</body>
+</html>

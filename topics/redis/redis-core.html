@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Detailed Redis masterclass for Java backend engineers: architecture, data structures, caching patterns, persistence, replication, cluster, locks, streams, and production troubleshooting.">
+    <title>Module 11: Redis Masterclass | Interview A-Z</title>
+    <style>
+        :root{--bg:#0b1020;--panel:#111a2e;--panel2:#17233b;--text:#e8eefb;--muted:#a8b5cc;--line:#2b3a57;--accent:#7dd3fc;--accent2:#a7f3d0;--warn:#fbbf24;--danger:#fca5a5;--code:#080d18}
+        *{box-sizing:border-box}html{scroll-behavior:smooth;scroll-padding-top:84px}body{margin:0;background:var(--bg);color:var(--text);font:16px/1.72 Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,Arial,sans-serif}a{color:var(--accent)}.navbar{position:sticky;top:0;z-index:10;background:#0b1020ed;backdrop-filter:blur(12px);border-bottom:1px solid var(--line);padding:13px clamp(16px,4vw,54px);display:flex;align-items:center;justify-content:space-between;gap:16px}.brand{font-weight:800}.brand span{color:var(--accent)}.navlinks{display:flex;gap:16px;flex-wrap:wrap;font-size:.9rem}.layout{max-width:1500px;margin:auto;display:grid;grid-template-columns:270px minmax(0,1fr);gap:30px;padding:28px clamp(16px,3vw,44px)}aside{position:sticky;top:82px;align-self:start;max-height:calc(100vh - 100px);overflow:auto;background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:18px}.toc-title{font-weight:800;margin:0 0 8px}.toc a{display:block;padding:5px 8px;color:var(--muted);text-decoration:none;border-radius:6px;font-size:.88rem}.toc a:hover{background:var(--panel2);color:var(--text)}main{min-width:0;max-width:1000px}.hero{padding:34px;border:1px solid var(--line);border-radius:20px;background:linear-gradient(140deg,#172b47,#111a2e 60%,#15243a)}.eyebrow{text-transform:uppercase;letter-spacing:.14em;color:var(--accent);font-size:.78rem;font-weight:800}.hero h1{font-size:clamp(2rem,4vw,3.2rem);line-height:1.12;margin:.4em 0}.hero p{color:var(--muted);max-width:800px}.pills{display:flex;flex-wrap:wrap;gap:8px}.pill{border:1px solid var(--line);background:#0b1020aa;padding:5px 10px;border-radius:999px;font-size:.82rem;color:var(--accent2)}h2{font-size:1.8rem;line-height:1.25;margin-top:2.3rem;border-bottom:1px solid var(--line);padding-bottom:10px}h3{font-size:1.28rem;margin-top:1.8rem;color:#dbeafe}h4{font-size:1.05rem;margin-bottom:.3rem;color:var(--accent2)}p{margin:.7rem 0}li{margin:.3rem 0}.topic{padding:8px 0 24px;border-bottom:1px solid var(--line)}.card,.callout,.diagram,.checkpanel{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:18px;margin:16px 0}.callout strong{color:var(--accent2)}.warning{border-left:4px solid var(--warn)}.danger{border-left:4px solid var(--danger)}.good{border-left:4px solid var(--accent2)}.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.grid.three{grid-template-columns:repeat(3,minmax(0,1fr))}.box{background:var(--panel2);border:1px solid #3a4c6b;border-radius:10px;padding:13px;text-align:center}.arrow{text-align:center;color:var(--accent);font-size:1.35rem;line-height:1.4}.muted{color:var(--muted)}table{width:100%;border-collapse:collapse;margin:16px 0;font-size:.93rem}th,td{padding:10px 12px;border:1px solid var(--line);text-align:left;vertical-align:top}th{background:var(--panel2);color:#dbeafe}tr:nth-child(even) td{background:#ffffff05}pre{background:var(--code);border:1px solid var(--line);border-radius:12px;padding:16px;overflow:auto;line-height:1.55;font-size:.88rem}code{font-family:ui-monospace,SFMono-Regular,Consolas,monospace;color:#bae6fd}p code,li code,td code{background:var(--code);padding:2px 5px;border-radius:5px}.diagram{font-family:ui-monospace,Consolas,monospace;white-space:pre;overflow:auto;color:#c7f9e9;line-height:1.45}.progressbar{height:9px;background:#26334b;border-radius:20px;overflow:hidden}.progressbar div{height:100%;background:var(--accent2);width:0;transition:width .2s}.topic-check{display:flex;align-items:flex-start;gap:10px;padding:7px 0;border-bottom:1px solid #ffffff0c}.topic-check input{margin-top:7px;accent-color:#34d399}.btn{background:#173454;color:var(--text);border:1px solid #365779;padding:9px 13px;border-radius:8px;cursor:pointer;font:inherit}.btn:hover{background:#21496e}.toolbar{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0}.qa details{border:1px solid var(--line);border-radius:10px;margin:10px 0;padding:12px 15px;background:var(--panel)}.qa summary{cursor:pointer;font-weight:700}.qa details p{color:var(--muted)}.small{font-size:.88rem}.footer{border-top:1px solid var(--line);padding:28px;text-align:center;color:var(--muted)}@media(max-width:1000px){.layout{grid-template-columns:1fr}aside{position:relative;top:auto;max-height:none}.toc{columns:2}.grid.three{grid-template-columns:1fr 1fr}}@media(max-width:620px){.navlinks{display:none}.hero{padding:22px}.grid,.grid.three{grid-template-columns:1fr}.toc{columns:1}table{display:block;overflow-x:auto}h2{font-size:1.5rem}}@media print{body{background:white;color:#111}.navbar,aside,.toolbar,.btn{display:none!important}.layout{display:block;padding:0}.hero,.card,.callout,.diagram,.checkpanel,.qa details{background:white;color:#111;box-shadow:none;break-inside:avoid;border-color:#aaa}h2,h3,h4,th,code{color:#111}p,li,.muted,.hero p,.qa details p{color:#222}pre{background:#f6f6f6;color:#111;white-space:pre-wrap}a{color:#111}}
+    </style>
+</head>
+<body>
+  <!-- Top Navigation -->
+    <nav class="navbar">
+    <div class="brand">
+      <a href="../../index.html" class="brand-link" style="display: flex; align-items: center; gap: 0.75rem; text-decoration: none; color: inherit;">
+        <span class="brand-badge" style="background: linear-gradient(135deg, #38bdf8, #818cf8); color: #0f172a; padding: 0.15rem 0.55rem; border-radius: 6px; font-size: 0.75rem; font-weight: 800; letter-spacing: 0.05em; text-transform: uppercase;">Interview A-Z</span>
+        <span style="font-weight: 700; font-size: 1.15rem; color: #fff;">Engineering Handbook</span>
+      </a>
+    </div>
+    <div class="nav-links navlinks" style="display: flex; gap: 1.25rem; align-items: center;">
+      <a href="../../index.html" class="nav-link" style="text-decoration: none; font-weight: 600; font-size: 0.95rem;">🏠 Home</a>
+      <a href="../../index.html#topics" class="nav-link" style="text-decoration: none; font-weight: 600; font-size: 0.95rem;">📚 All Modules</a>
+      <a href="https://github.com/ChakradharReddy01/InterViewPrep" target="_blank" class="nav-link" style="text-decoration: none; font-weight: 600; font-size: 0.95rem;">GitHub</a>
+      <button onclick="document.querySelectorAll('details').forEach(d=>d.open=true);window.print();" class="nav-btn-pdf" title="Save page as PDF" style="display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.35rem 0.85rem; font-size: 0.85rem; font-weight: 700; background: linear-gradient(135deg, #38bdf8, #818cf8); color: #0f172a; border: none; border-radius: 6px; cursor: pointer; transition: transform 0.15s ease, box-shadow 0.15s ease; box-shadow: 0 2px 8px rgba(56,189,248,0.25);">
+        <span>📄</span> Save to PDF
+      </button>
+    </div>
+  </nav>
+<div class="layout">
+    <aside><p class="toc-title">On This Page</p><div class="toc">
+        <a href="#intro">Introduction</a><a href="#syllabus">Complete syllabus</a><a href="#architecture">Redis architecture</a><a href="#string">1. String</a><a href="#hash">2. Hash</a><a href="#list">3. List</a><a href="#set">4. Set</a><a href="#zset">5. Sorted Set</a><a href="#ttl">6. TTL</a><a href="#expiration">7. Expiration</a><a href="#cache-aside">8. Cache Aside</a><a href="#write-through">9. Write Through</a><a href="#write-behind">10. Write Behind</a><a href="#eviction">11. Cache Eviction</a><a href="#lock">12. Distributed Lock</a><a href="#pubsub">13. Pub/Sub</a><a href="#streams">14. Streams</a><a href="#persistence">15. Persistence</a><a href="#rdb">16. RDB</a><a href="#aof">17. AOF</a><a href="#replication">18. Replication</a><a href="#cluster">19. Redis Cluster</a><a href="#consistency">20. Cache Consistency</a><a href="#stampede">21. Cache Stampede</a><a href="#workflow">End-to-end example</a><a href="#failures">Production scenarios</a><a href="#interview">Interview Q&A</a><a href="#tracker">Mastery tracker</a>
+    </div></aside>
+    <main>
+        <header class="hero" id="intro">
+            <a href="../../index.html" class="nav-link">Home</a>
+            <div class="eyebrow">Module 11 · Data & Performance Engineering</div>
+            <h1>Redis Architecture, Data Structures, Caching & Distributed Systems</h1>
+            <p>A detailed, self-contained reference for Java backend engineers. Covers all 21 supplied topics with Redis command examples, architecture diagrams, Spring integration concepts, trade-offs, production failure modes, and interview preparation.</p>
+            <div class="pills"><span class="pill">Redis</span><span class="pill">Java / Spring Boot</span><span class="pill">Caching</span><span class="pill">Persistence</span><span class="pill">Distributed Systems</span></div>
+            <div class="callout warning"><strong>Core principle:</strong> Redis is an in-memory data-structure server, not merely a key-value cache. Its persistence, replication, eviction, failover, and consistency behavior depend on configuration and deployment topology. Do not assume every Redis deployment is durable or strongly consistent.</div>
+            <div class="toolbar"><button class="btn" onclick="window.print()">Print / Save as PDF</button><button class="btn" onclick="document.querySelectorAll('details').forEach(d=>d.open=true)">Expand all answers</button><button class="btn" onclick="document.querySelectorAll('details').forEach(d=>d.open=false)">Collapse answers</button></div>
+        </header>
+        <section id="syllabus"><h2>Complete syllabus — all 21 topics</h2><p>This page follows the supplied topic list and explains every item individually. Mark each topic after you can explain it, draw its flow, and discuss production trade-offs.</p><div class="checkpanel"><div style="display:flex;justify-content:space-between;gap:12px;align-items:center"><strong>Topic completion</strong><span id="progressText">0 / 21 completed</span></div><div class="progressbar"><div id="progressFill"></div></div><p class="small muted">Progress is stored in this browser when local storage is available.</p><div id="syllabusList" class="grid"></div></div></section>
+
+        <section class="topic" id="architecture"><h2>Redis Architecture</h2>
+            <h3>What Redis is</h3><p>Redis is an in-memory data-structure server that exposes commands over a network protocol. It stores values under keys, but values can be strings, hashes, lists, sets, sorted sets, streams, and other supported types. It is commonly used for caching, counters, sessions, rate limits, leaderboards, coordination, and event processing.</p>
+            <div class="diagram">Java / Spring Boot application
+                |
+                | Redis protocol (TCP; commonly RESP)
+                v
+                +-----------------------------------+
+                | Redis server / primary            |
+                | Keyspace + data structures        |
+                | Command execution                 |
+                | Expiration + eviction             |
+                | Optional persistence              |
+                +----------------+------------------+
+                |
+                replication / cluster
+                /                 \
+                v                   v
+                Replica node         Other shard nodes</div>
+            <h3>Key-value model</h3><pre><code>SET user:42:name "Asha"
+GET user:42:name
+# "Asha"
+
+HSET user:42 name "Asha" city "Bengaluru"
+HGET user:42 name
+# "Asha"</code></pre>
+            <h3>Execution and performance</h3><p>Redis command execution is largely single-threaded for many core data operations, which avoids many concurrent mutation races within a command. Modern Redis can use I/O threads for some networking work and has additional background activities; do not generalize this to “Redis uses only one thread for everything.” Large or computationally expensive commands can still block command processing and create latency spikes.</p>
+            <h3>Important operational concepts</h3><ul><li><strong>Keyspace:</strong> the set of keys in a Redis database.</li><li><strong>Data type:</strong> determines which commands are valid for a key.</li><li><strong>Logical database:</strong> selected with <code>SELECT</code> in deployments that support multiple logical DBs; Redis Cluster supports only database 0.</li><li><strong>Persistence:</strong> optional RDB snapshots and/or AOF logging, depending on configuration.</li><li><strong>Replication:</strong> copies data from a primary to replicas, generally asynchronously.</li><li><strong>Cluster:</strong> distributes keys across shards and supports resharding/failover.</li></ul>
+            <div class="callout good"><strong>Design rule:</strong> keep keys bounded, use suitable data structures, avoid unexpectedly large blocking operations, monitor memory and latency, and decide explicitly whether each dataset is disposable cache data or data that requires durable recovery.</div>
+        </section>
+
+        <section class="topic" id="string"><h2>1. String</h2>
+            <h3>Definition</h3><p>Redis String is a binary-safe value type. It can store text, serialized JSON, bytes, numbers represented as strings, and counters. It is often used for simple cache entries, tokens, flags, counters, and distributed-lock values.</p>
+            <h3>Commands</h3><pre><code>SET product:100:name "Mechanical Keyboard"
+GET product:100:name
+SET session:abc "serialized-session" EX 1800
+INCR page:views
+INCRBY wallet:balance 500
+MSET feature:a "on" feature:b "off"
+MGET feature:a feature:b</code></pre>
+            <h3>Visual example</h3><div class="diagram">Key                         Value
+                product:100:name      →     "Mechanical Keyboard"
+                page:views            →     "12501"
+                session:abc           →     serialized session (TTL 1800s)</div>
+            <h3>Atomic increments</h3><p><code>INCR</code> and <code>INCRBY</code> atomically update integer-valued strings at the command level, making them useful for counters and some rate-limit implementations. They do not create a complete business transaction across Redis and another database.</p>
+            <h3>Expiration on writes</h3><p><code>SET key value</code> normally replaces the value and clears an existing TTL unless an expiration is supplied again. Use <code>SET key value EX 60</code> or supported conditional options when you want the TTL applied with the value write.</p>
+            <h3>Common mistakes</h3><ul><li>Storing a huge object as one string when field-level updates are needed.</li><li>Assuming a counter update and SQL database update are atomic together.</li><li>Overwriting a key and unintentionally removing its previous expiration.</li><li>Using unbounded key names or embedding sensitive data without access controls.</li></ul></section>
+
+        <section class="topic" id="hash"><h2>2. Hash</h2>
+            <h3>Definition</h3><p>A Redis Hash stores field-value pairs under one Redis key. It is useful for compact object-like records when individual fields need to be read or updated.</p>
+            <pre><code>HSET user:42 name "Asha" city "Bengaluru" plan "premium"
+HGET user:42 name
+HGETALL user:42
+HINCRBY user:42 loginCount 1
+HDEL user:42 plan</code></pre>
+            <div class="diagram">Redis key: user:42
+                +---------------------------+
+                | name       → "Asha"       |
+                | city       → "Bengaluru"  |
+                | plan       → "premium"    |
+                | loginCount → "12"         |
+                +---------------------------+</div>
+            <h3>Why use a Hash?</h3><ul><li>Read or update selected fields without replacing a full serialized object.</li><li>Use commands such as <code>HINCRBY</code> for atomic field increments.</li><li>Organize related fields under a predictable key.</li></ul>
+            <h3>Hash versus JSON string</h3><table><thead><tr><th>Hash</th><th>Serialized JSON String</th></tr></thead><tbody><tr><td>Field-level commands such as HGET/HSET.</td><td>Often fetch and deserialize the entire JSON value.</td></tr><tr><td>Simple scalar fields.</td><td>Naturally represents nested structures.</td></tr><tr><td>Field updates are convenient.</td><td>Application controls serialization and schema.</td></tr></tbody></table>
+            <p>Redis Hash is not automatically a relational table or a schema-enforced object. Plan key naming, field evolution, and object size. TTL normally applies to the entire hash key; field-level expiration capabilities depend on Redis version and should not be assumed on older deployments.</p></section>
+
+        <section class="topic" id="list"><h2>3. List</h2>
+            <h3>Definition</h3><p>A Redis List is an ordered sequence of values. It supports pushes and pops at either end, making it useful for simple queues, recent-item lists, and bounded activity histories.</p>
+            <pre><code>LPUSH jobs "job-3" "job-2" "job-1"
+LRANGE jobs 0 -1
+RPOP jobs
+RPUSH recent:users "u1"
+LTRIM recent:users 0 99
+BLPOP simple-queue 5</code></pre>
+            <div class="diagram">LPUSH jobs job-3 job-2 job-1
+
+                LEFT                                  RIGHT
+                |                                      |
+                v                                      v
+                [job-1] ⇄ [job-2] ⇄ [job-3]
+
+                RPOP → removes job-3 (rightmost item)</div>
+            <h3>List as a queue</h3><p>Producer pushes jobs and a consumer pops them. Blocking pops wait for work instead of repeatedly polling. However, a simple pop removes the item immediately; if the consumer crashes after popping, the item can be lost.</p>
+            <h3>Safer queue handling</h3><p>For reliable work queues, consider Redis Streams consumer groups, or an explicit processing/acknowledgment pattern. Redis Lists also support reliable-list patterns using move commands, but recovery and visibility-timeout behavior must be designed carefully.</p>
+            <h3>Complexity and pitfalls</h3><p>End operations are efficient; operations such as indexing or removing arbitrary elements can cost more. Use <code>LTRIM</code> to bound history lists and avoid unlimited growth.</p></section>
+
+        <section class="topic" id="set"><h2>4. Set</h2>
+            <h3>Definition</h3><p>A Redis Set is an unordered collection of unique string members. It is useful for membership tests, deduplication, tags, and set algebra.</p>
+            <pre><code>SADD product:100:tags "wireless" "keyboard" "office"
+SISMEMBER product:100:tags "wireless"
+SMEMBERS product:100:tags
+SREM product:100:tags "office"
+SINTER team:backend team:oncall
+SUNION campaign:a campaign:b</code></pre>
+            <div class="diagram">Set: product:100:tags
+                { "wireless", "keyboard", "office" }
+
+                SADD ... "wireless" again
+                → cardinality stays unchanged (member is unique)</div>
+            <h3>Useful operations</h3><ul><li><code>SISMEMBER</code>: test membership.</li><li><code>SADD</code>: add unique members.</li><li><code>SINTER</code>: find members common to sets.</li><li><code>SUNION</code>: combine members.</li><li><code>SDIFF</code>: find members present in one set but not another.</li></ul>
+            <p>Set order is not guaranteed. Avoid returning a huge <code>SMEMBERS</code> result on a hot path; use scanning patterns where suitable and keep collection sizes controlled.</p></section>
+
+        <section class="topic" id="zset"><h2>5. Sorted Set (ZSET)</h2>
+            <h3>Definition</h3><p>A Sorted Set stores unique members associated with numeric scores. Redis orders members by score, with lexicographic ordering used to break score ties. It is useful for leaderboards, ranking, scheduled tasks, and time-based indexes.</p>
+            <pre><code>ZADD leaderboard 1200 "player:alice"
+ZADD leaderboard 980 "player:bob"
+ZADD leaderboard 1500 "player:chen"
+ZREVRANGE leaderboard 0 9 WITHSCORES
+ZRANK leaderboard "player:bob"
+ZINCRBY leaderboard 50 "player:bob"
+ZRANGEBYSCORE scheduled:jobs -inf 1760000000</code></pre>
+            <div class="diagram">Leaderboard (score descending)
+                1. player:chen    1500
+                2. player:alice   1200
+                3. player:bob     1030  ← after ZINCRBY 50
+
+                Member uniqueness: one member has one current score per sorted set.</div>
+            <h3>Use cases</h3><ul><li>Top-N leaderboard and player rank.</li><li>Scheduled work ordered by due-time score.</li><li>Recent events indexed by timestamp.</li><li>Priority queue-like ordering.</li></ul>
+            <p>Scores are IEEE-754 double precision numbers, so integers are exactly representable only within the safe precision range. For high-resolution timestamps or composite ordering, choose a representation that preserves the needed precision. A Sorted Set is not by itself a durable job scheduler; handle claims, retries, crashes, and duplicate work explicitly.</p></section>
+
+        <section class="topic" id="ttl"><h2>6. TTL (Time To Live)</h2>
+            <h3>Definition</h3><p>TTL is the remaining lifetime before a key expires. It is commonly used for cache freshness, sessions, temporary tokens, locks, and short-lived deduplication records.</p>
+            <pre><code>SET cache:product:100 '{"name":"Keyboard"}' EX 300
+TTL cache:product:100
+PTTL cache:product:100
+EXPIRE cache:product:100 60
+PERSIST cache:product:100</code></pre>
+            <div class="diagram">t = 0s        t = 100s       t = 300s
+                SET EX 300 → TTL ≈ 200s → key expires
+                |
+                v
+                GET → nil</div>
+            <h3>TTL command results</h3><ul><li>Non-negative value: remaining seconds (or milliseconds for PTTL).</li><li><code>-1</code>: key exists but has no expiration.</li><li><code>-2</code>: key does not exist.</li></ul>
+            <h3>Important behaviors</h3><ul><li>Expiration is attached to the key, not ordinarily each field in a hash or member in a set.</li><li>Replacing a value with commands such as ordinary <code>SET</code> may clear the TTL unless the command also sets/retains expiration as supported.</li><li>TTL is not a promise of deletion at an exact wall-clock millisecond.</li><li>For caches, TTL is a freshness policy—not a substitute for explicit invalidation where correctness requires it.</li></ul></section>
+
+        <section class="topic" id="expiration"><h2>7. Expiration</h2>
+            <h3>TTL vs expiration</h3><p>TTL is the remaining-time measurement; expiration is the mechanism/policy that marks a key to expire at a deadline or after a duration.</p>
+            <h3>How Redis expires keys</h3><p>Redis uses a combination of passive expiration (when a key is accessed and found expired) and active expiration (periodically sampling expiring keys and removing expired ones). Therefore, an expired key is treated as absent, but physical cleanup need not occur at the exact deadline.</p>
+            <div class="diagram">Key has expiry timestamp
+                |
+                +--> command accesses key after expiry
+                |       → treated as absent (passive)
+                |
+                +--> periodic expiration work
+                → expired keys sampled/removed (active)</div>
+            <h3>Commands</h3><pre><code>EXPIRE session:abc 1800
+EXPIREAT promotion:active 1760000000
+PEXPIRE token:abc 30000
+SET otp:123456 "used" EX 300</code></pre>
+            <h3>Expiration design</h3><ul><li>Use shorter TTLs for rapidly changing data and longer TTLs for stable reference data, based on business freshness requirements.</li><li>Add random TTL jitter to many similar keys to avoid synchronized expirations.</li><li>Refresh TTL deliberately for sliding sessions; fixed TTL and sliding TTL have different security and lifecycle semantics.</li><li>Do not rely on key expiration alone to perform business cleanup actions.</li></ul></section>
+
+        <section class="topic" id="cache-aside"><h2>8. Cache Aside (Lazy Loading)</h2>
+            <h3>Definition</h3><p>The application checks Redis first. On a cache miss, it reads the system-of-record database, puts the result in Redis, and returns it. The application controls cache population and invalidation.</p>
+            <div class="diagram">Request
+                |
+                v
+                Redis GET key
+                |
+                +---- HIT ----> return cached value
+                |
+                +---- MISS
+                |
+                v
+                Read database
+                |
+                v
+                Populate Redis with TTL
+                |
+                v
+                Return value</div>
+            <h3>Java-style example</h3><pre><code>Product getProduct(long id) {
+    String key = "product:" + id;
+    Product cached = redis.get(key);
+    if (cached != null) return cached;
+
+    Product product = repository.findById(id)
+        .orElseThrow();
+
+    redis.set(key, serialize(product), Duration.ofMinutes(5));
+    return product;
+}</code></pre>
+            <p>This is pseudocode; production code must handle serialization, cache errors, null/not-found results, and concurrent misses.</p>
+            <h3>Write path</h3><p>A common pattern is: update the database transactionally, then invalidate the corresponding cache key after the database commit. Deleting the key often avoids serving an old cached value indefinitely. Invalidation timing and concurrent requests can still create races.</p>
+            <h3>Advantages and drawbacks</h3><ul><li>Simple and widely applicable.</li><li>Only accessed data is cached.</li><li>Cache failure can fall back to the database if capacity allows.</li><li>Misses add latency and database load.</li><li>Hot keys can trigger stampedes.</li><li>Invalidation and stale-read races require explicit policy.</li></ul></section>
+
+        <section class="topic" id="write-through"><h2>9. Write Through</h2>
+            <h3>Definition</h3><p>In a write-through design, a write is propagated through the cache layer to the underlying data store before the operation is reported successful. The intended effect is to keep cache and backing data aligned on the write path.</p>
+            <div class="diagram">Application
+                |
+                v
+                Write-through layer
+                |             |
+                v             v
+                Redis cache   Primary database
+                \             /
+                completion after defined writes</div>
+            <h3>Example workflow</h3><ol><li>Application requests an update to product 100.</li><li>Write-through component updates the authoritative store.</li><li>It updates or refreshes the Redis representation according to the chosen protocol.</li><li>The request completes according to the system's defined success conditions.</li></ol>
+            <h3>Benefits</h3><ul><li>Frequently accessed updated values may already be cached.</li><li>Centralized write logic can reduce stale-cache windows.</li></ul>
+            <h3>Trade-offs</h3><ul><li>Write latency increases because cache and backing-store work is coupled.</li><li>A partial failure can still occur unless a transaction/protocol handles it.</li><li>Cache entries may be written for data that is rarely read.</li></ul>
+            <div class="callout warning"><strong>Important:</strong> Redis and a relational database generally do not share one atomic transaction. “Write-through” is a cache strategy, not a guarantee that two separate stores commit atomically. Define failure recovery and invalidation behavior.</div></section>
+
+        <section class="topic" id="write-behind"><h2>10. Write Behind (Write Back)</h2>
+            <h3>Definition</h3><p>Write-behind accepts a write into the cache layer first and persists it to the backing database asynchronously later.</p>
+            <div class="diagram">Application
+                |
+                v
+                Redis / write-behind buffer
+                |  immediate acknowledgment (by design)
+                |
+                +---- async worker / durable queue ----> Database</div>
+            <h3>Example</h3><p>A high-volume counter or telemetry pipeline may aggregate updates in memory and periodically flush batches to a database. This can reduce database write load, but only if the durability contract allows buffering and delayed persistence.</p>
+            <h3>Benefits</h3><ul><li>Lower write latency for the caller.</li><li>Batching can reduce backing-store overhead.</li><li>Multiple updates may be coalesced.</li></ul>
+            <h3>Risks</h3><ul><li>Recent writes can be lost if acknowledged data is not durably recoverable and Redis fails.</li><li>Database lag can grow without bounds.</li><li>Flush failures, duplicate flushes, and ordering must be handled.</li><li>Reads from the database can lag behind accepted cache writes.</li></ul>
+            <div class="callout danger"><strong>Do not casually use write-behind for financial balances or critical orders.</strong> A plain Redis write followed by an in-memory background task is not a durable write-behind system. Use a durable queue/log, retryable delivery, idempotent database writes, and monitoring if the use case requires this model.</div></section>
+
+        <section class="topic" id="eviction"><h2>11. Cache Eviction</h2>
+            <h3>Definition</h3><p>Eviction is the policy Redis uses to decide what keys to remove when memory use reaches the configured maximum. Expiration and eviction are different: expiration removes keys whose TTL has elapsed; eviction removes keys to manage memory under the configured policy.</p>
+            <h3>Common maxmemory policies</h3><table><thead><tr><th>Policy</th><th>Behavior</th><th>Typical consideration</th></tr></thead><tbody><tr><td><code>noeviction</code></td><td>Does not evict keys; memory-growing writes may fail at the limit.</td><td>Useful when silently removing keys is unacceptable, but callers must handle write errors.</td></tr><tr><td><code>allkeys-lru</code></td><td>Evicts keys approximating least recently used across all keys.</td><td>General cache workload with recency locality.</td></tr><tr><td><code>allkeys-lfu</code></td><td>Evicts keys approximating least frequently used across all keys.</td><td>Workloads where repeated access frequency predicts future demand.</td></tr><tr><td><code>volatile-lru</code></td><td>Evicts LRU keys among keys with expiration set.</td><td>Only TTL-bearing keys are candidates.</td></tr><tr><td><code>volatile-lfu</code></td><td>LFU-style eviction among expiring keys.</td><td>Only TTL-bearing keys are candidates.</td></tr><tr><td><code>volatile-ttl</code></td><td>Prefers expiring keys with shorter remaining TTL.</td><td>TTL-based prioritization, not a pure popularity strategy.</td></tr><tr><td><code>volatile-random</code> / <code>allkeys-random</code></td><td>Random eligible key selection.</td><td>Useful only for workloads where random eviction is acceptable.</td></tr></tbody></table>
+            <p>Exact policy availability and details can vary by Redis version. Check the deployed version's documentation and configuration.</p>
+            <h3>Choosing a policy</h3><ul><li>For a pure cache, an all-keys LRU/LFU policy is often a starting point.</li><li>For mixed cache and critical data, separating instances or workloads is usually safer than relying on one eviction policy to protect everything.</li><li>Set memory headroom for replication buffers, client buffers, fragmentation, and persistence activity.</li><li>Monitor memory, evictions, rejected writes, hit ratio, and latency.</li></ul>
+            <pre><code>CONFIG GET maxmemory
+CONFIG GET maxmemory-policy
+INFO memory
+INFO stats</code></pre></section>
+
+        <section class="topic" id="lock"><h2>12. Distributed Lock</h2>
+            <h3>Purpose</h3><p>A distributed lock coordinates workers across processes or machines so that only one holder should perform a protected operation at a time. Redis can implement a lease-based lock, but correctness depends on acquisition, expiration, ownership, and failure handling.</p>
+            <h3>Basic acquisition</h3><pre><code>SET lock:invoice:123 random-owner-token NX PX 10000</code></pre>
+            <p><code>NX</code> means create only if the key does not exist; <code>PX 10000</code> sets a 10-second lease. The owner token must be unique for each acquisition attempt.</p>
+            <div class="diagram">Worker A: SET lock NX PX 10000 → OK
+                Worker B: SET lock NX PX 10000 → nil
+                Worker A does protected work
+                Worker A releases only if token still matches</div>
+            <h3>Safe release</h3><pre><code>-- Lua script: compare-and-delete atomically
+if redis.call("GET", KEYS[1]) == ARGV[1] then
+  return redis.call("DEL", KEYS[1])
+else
+  return 0
+end</code></pre>
+            <p>Do not blindly <code>DEL</code> the lock key. The lease may have expired and another worker may have acquired the same key; the original worker must not delete the new owner's lock.</p>
+            <h3>Important limitations</h3><ul><li>A process can pause longer than the lease, then resume and continue its protected operation after another worker has acquired the lock.</li><li>Redis failover/replication behavior can complicate lock guarantees.</li><li>Use fencing tokens or downstream version checks when stale holders must be prevented from modifying protected resources.</li><li>Keep critical sections bounded; renew leases only with a safe ownership check.</li><li>For high-stakes coordination, evaluate whether a consensus-backed coordination system or database-level concurrency control is more appropriate.</li></ul>
+            <div class="callout danger"><strong>Critical:</strong> a Redis lock alone does not prove that only one worker can ever perform a side effect under all pauses, partitions, and failovers. The protected resource should reject stale owners when strict correctness is required.</div></section>
+
+        <section class="topic" id="pubsub"><h2>13. Pub/Sub</h2>
+            <h3>Definition</h3><p>Redis Pub/Sub lets publishers send messages to channels, and currently subscribed clients receive them. It is a lightweight, real-time broadcast mechanism.</p>
+            <div class="diagram">Publisher A ---- publish("price-updates", event)
+                |
+                v
+                Redis channel
+                /        \\
+                v          v
+                Subscriber B  Subscriber C</div>
+            <pre><code>PUBLISH price-updates '{"productId":100,"price":99.5}'
+SUBSCRIBE price-updates
+PSUBSCRIBE price-*</code></pre>
+            <h3>Characteristics</h3><ul><li>Messages are delivered to active subscribers, subject to connection and delivery behavior.</li><li>Messages are not stored as a durable backlog for clients that were disconnected.</li><li>There is no consumer-group acknowledgment/replay mechanism comparable to Streams.</li><li>It is useful for live notifications, ephemeral signals, and cache-invalidation hints when missed messages can be recovered.</li></ul>
+            <div class="callout warning"><strong>Do not use Pub/Sub as a durable job queue.</strong> If a disconnected subscriber must later process every event, use Redis Streams or a durable message broker with the needed persistence and acknowledgment semantics.</div></section>
+
+        <section class="topic" id="streams"><h2>14. Redis Streams</h2>
+            <h3>Definition</h3><p>Redis Streams is an append-oriented log data structure. Entries have IDs and fields, can be read by consumers, and support consumer groups with pending-entry tracking and acknowledgment.</p>
+            <div class="diagram">XADD orders * orderId 123 status CREATED
+                |
+                v
+                Redis Stream: orders
+                |
+                Consumer Group
+                /          \\
+                v            v
+                consumer-A    consumer-B
+                |
+                XACK after processing</div>
+            <h3>Commands</h3><pre><code>XADD orders * orderId 123 status CREATED
+XRANGE orders - +
+XGROUP CREATE orders order-workers $ MKSTREAM
+XREADGROUP GROUP order-workers worker-1
+  COUNT 10 BLOCK 5000 STREAMS orders >
+XACK orders order-workers 1710000000000-0
+XPENDING orders order-workers
+XAUTOCLAIM orders order-workers worker-2 60000 0-0 COUNT 10</code></pre>
+            <p>Line breaks are for readability; enter commands according to your Redis client/shell. A real consumer must use the actual IDs returned by Redis and handle empty reads, pending entries, and errors.</p>
+            <h3>Consumer group lifecycle</h3><ol><li>Producer appends an entry.</li><li>A consumer group distributes new entries among its consumers.</li><li>Delivered-but-unacknowledged entries are tracked in the Pending Entries List.</li><li>Consumer performs the business operation.</li><li>Consumer acknowledges with <code>XACK</code> after successful processing.</li><li>Recovery logic inspects pending entries and reclaims work from failed consumers.</li></ol>
+            <h3>Streams vs Pub/Sub</h3><table><thead><tr><th>Pub/Sub</th><th>Streams</th></tr></thead><tbody><tr><td>Live broadcast to active subscribers.</td><td>Stored entries that can be read later within retention.</td></tr><tr><td>No built-in replay backlog.</td><td>Supports IDs, replay/range reads, and consumer groups.</td></tr><tr><td>No per-message acknowledgment.</td><td>Consumer groups track pending messages and support acknowledgment.</td></tr><tr><td>Good for ephemeral notifications.</td><td>Good for recoverable event processing, within Redis durability limits.</td></tr></tbody></table>
+            <h3>Production considerations</h3><p>Define retention/trimming, consumer lag alerts, pending-entry recovery, idempotent processing, ordering requirements, and persistence. Streams are more recoverable than Pub/Sub but are not automatically equivalent to a fully managed durable event platform.</p></section>
+
+        <section class="topic" id="persistence"><h2>15. Persistence</h2>
+            <h3>What persistence means</h3><p>Redis persistence saves data to storage so it can be restored after a process restart. Redis is often used as a disposable cache, but it can also hold data whose recovery matters. The required recovery-point objective (RPO) and recovery-time objective (RTO) should determine the configuration.</p>
+            <div class="grid">
+                <div class="card"><h4>RDB snapshots</h4><p>Point-in-time snapshots written to an RDB file.</p><p><strong>Typical trade-off:</strong> compact backups and fast restoration, but recent writes after the last snapshot may be lost.</p></div>
+                <div class="card"><h4>AOF log</h4><p>Records write operations in an append-only log that can be replayed.</p><p><strong>Typical trade-off:</strong> potentially smaller loss window depending on fsync policy, but larger files and rewrite/restore overhead.</p></div>
+            </div>
+            <h3>RDB + AOF</h3><p>Redis can be configured to use both. They solve related but different recovery needs. Persistence is not a replacement for backups, replication, disaster recovery, or a database designed to be the authoritative store for critical business data.</p>
+            <h3>Questions to answer before production</h3><ul><li>How much recent data may be lost on process/host failure?</li><li>How long may recovery take?</li><li>Where are backups stored and how are restores tested?</li><li>Can disk saturation or persistence forks affect latency?</li><li>Is Redis data authoritative or rebuildable from a database/event log?</li></ul></section>
+
+        <section class="topic" id="rdb"><h2>16. RDB (Redis Database Snapshot)</h2>
+            <h3>Definition</h3><p>RDB produces point-in-time snapshots of the dataset in a compact binary file. Depending on configuration and command, Redis can create snapshots periodically or on demand.</p>
+            <div class="diagram">Redis in-memory dataset
+                |
+                snapshot trigger
+                |
+                v
+                background save process
+                |
+                v
+                dump.rdb file
+                |
+                v
+                restore at startup</div>
+            <h3>Example configuration</h3><pre><code>save 900 1
+save 300 10
+save 60 10000</code></pre>
+            <p>These example rules request snapshots when at least the stated number of changes occur within each interval. Actual configuration syntax and defaults depend on Redis version/distribution; inspect the running server configuration.</p>
+            <h3>Advantages</h3><ul><li>Compact representation and often efficient restore.</li><li>Convenient for backups and moving snapshots.</li><li>Can limit disk-write overhead compared with logging every operation.</li></ul>
+            <h3>Disadvantages</h3><ul><li>Changes since the last successful snapshot may be lost.</li><li>Background save can consume CPU and memory; copy-on-write can increase memory pressure.</li><li>Snapshot frequency affects RPO, I/O, and resource use.</li></ul>
+            <p>Test actual restore procedures and verify snapshot freshness. A file existing on disk does not prove it is recent, complete, or restorable.</p></section>
+
+        <section class="topic" id="aof"><h2>17. AOF (Append Only File)</h2>
+            <h3>Definition</h3><p>AOF records write operations in a log that Redis can replay during recovery. It can reduce the recovery gap relative to periodic snapshots, depending on fsync policy and storage behavior.</p>
+            <div class="diagram">Client write command
+                |
+                v
+                Redis executes command
+                |
+                v
+                Append operation to AOF
+                |
+                fsync policy
+                |
+                v
+                Durable log (subject to OS/storage guarantees)</div>
+            <h3>Fsync policies</h3><table><thead><tr><th>Policy</th><th>Trade-off</th></tr></thead><tbody><tr><td><code>appendfsync always</code></td><td>Requests synchronization for each write operation; potentially higher write latency.</td></tr><tr><td><code>appendfsync everysec</code></td><td>Common balance between performance and durability; a crash may lose roughly the latest second of writes under normal assumptions.</td></tr><tr><td><code>appendfsync no</code></td><td>Lets the operating system decide when to flush; can improve throughput but may widen the loss window.</td></tr></tbody></table>
+            <p>These are practical expectations, not absolute guarantees under every hardware, kernel, or storage failure.</p>
+            <h3>AOF rewrite</h3><p>As the log grows, Redis can rewrite it into a more compact sequence representing the current dataset. AOF rewrite is not simply deleting old bytes; Redis constructs a compact representation while preserving ongoing writes.</p>
+            <h3>RDB vs AOF</h3><table><thead><tr><th>RDB</th><th>AOF</th></tr></thead><tbody><tr><td>Snapshot of dataset at a point in time.</td><td>Replayable log of write operations.</td></tr><tr><td>Often compact and fast to restore.</td><td>Can provide a smaller loss window based on fsync policy.</td></tr><tr><td>May lose writes since last snapshot.</td><td>May need more disk and replay time; rewrite is needed.</td></tr></tbody></table></section>
+
+        <section class="topic" id="replication"><h2>18. Replication</h2>
+            <h3>Definition</h3><p>Redis replication copies data from a primary to one or more replicas. Replicas can serve selected read workloads and support failover systems, but replication is generally asynchronous.</p>
+            <div class="diagram">              Application writes
+                |
+                v
+                +-------------+
+                |   Primary   |
+                +------+------+
+                |
+                replication stream
+                /           \\
+                v             v
+                +-----------+  +-----------+
+                | Replica 1 |  | Replica 2 |
+                +-----------+  +-----------+</div>
+            <h3>Benefits</h3><ul><li>Replica copies can support failover orchestration.</li><li>Read traffic can be distributed where stale reads are acceptable.</li><li>Multiple copies can improve availability planning.</li></ul>
+            <h3>Important limitations</h3><ul><li>Asynchronous replication means a primary can acknowledge a write before replicas receive it.</li><li>If the primary fails before replication, a failover may lose recently acknowledged writes.</li><li>Replica reads may be stale.</li><li>Replication does not by itself create a backup; deletions and corrupt writes can propagate.</li><li>Failover orchestration, monitoring, and recovery are still required.</li></ul>
+            <h3>Sentinel and Cluster</h3><p>Redis Sentinel monitors non-clustered primary/replica deployments and can coordinate failover. Redis Cluster shards data and has its own replica/failover behavior. They are different deployment modes; Sentinel is not the manager for Redis Cluster.</p>
+            <div class="callout warning"><strong>Consistency note:</strong> replication improves availability and can provide copies, but it is not a guarantee of strong consistency or zero data loss.</div></section>
+
+        <section class="topic" id="cluster"><h2>19. Redis Cluster</h2>
+            <h3>Why cluster?</h3><p>Redis Cluster distributes the keyspace across multiple primary shards and supports replica-based failover. It helps scale data capacity and throughput beyond one primary, with operational and multi-key constraints.</p>
+            <div class="diagram">Client / Cluster-aware Redis client
+                |
+                key hash → slot
+                |
+                +-------+--------+---------+
+                |                |         |
+                v                v         v
+                Shard A          Shard B   Shard C
+                slots range      slots     slots
+                Primary          Primary   Primary
+                |                |         |
+                Replica          Replica   Replica</div>
+            <h3>Hash slots</h3><p>Redis Cluster has 16,384 hash slots. A key is mapped to a slot, and each primary owns a range/set of slots. The client follows redirections such as MOVED and may handle ASK during slot migration.</p>
+            <h3>Hash tags for related keys</h3><pre><code>SET cart:{user42}:items "..."
+SET cart:{user42}:total "..."
+</code></pre>
+            <p>The substring inside braces is used for hash-slot calculation when present, so keys with the same hash tag can be placed in the same slot. This can enable supported multi-key operations and Lua scripts that require keys in one slot.</p>
+            <h3>Limitations</h3><ul><li>Multi-key commands and transactions generally require relevant keys to be in the same slot.</li><li>Some administrative and database features differ from standalone Redis.</li><li>Resharding, replica health, and slot balance require monitoring.</li><li>A single hot key remains on one shard and can become a bottleneck.</li><li>Failover can lose writes that had not replicated.</li></ul>
+            <h3>Cluster vs Sentinel</h3><table><thead><tr><th>Redis Cluster</th><th>Redis Sentinel</th></tr></thead><tbody><tr><td>Shards keyspace across primaries and supports replica failover.</td><td>Monitors a non-clustered primary/replica setup and coordinates failover.</td></tr><tr><td>For horizontal data partitioning and availability.</td><td>For availability/failover without cluster sharding.</td></tr><tr><td>Requires cluster-aware clients and slot routing.</td><td>Clients discover the current primary through Sentinel-aware integration.</td></tr></tbody></table></section>
+
+        <section class="topic" id="consistency"><h2>20. Cache Consistency</h2>
+            <h3>What consistency means here</h3><p>Cache consistency concerns whether the value returned by Redis matches the latest authoritative state to the degree the application requires. A cache can be stale because writes, invalidations, events, and replicas do not update simultaneously.</p>
+            <h3>Common write-and-invalidate flow</h3>
+            <div class="diagram">1. Update product in database
+                2. Commit database transaction
+                3. Delete Redis key product:100
+                4. Next reader misses cache
+                5. Reader loads new DB value and repopulates Redis</div>
+            <h3>Why invalidation races happen</h3><div class="diagram">Reader A: cache miss → reads old DB value
+                Writer B: updates DB → deletes cache key
+                Reader A: writes old value into cache
+                Later reads see stale value until expiry/next invalidation</div>
+            <p>Deleting the key after the database commit is common, but it does not eliminate every race. Stronger requirements may need versioned values, compare-and-set logic, event ordering, or reading from the authoritative store after a write.</p>
+            <h3>Strategies</h3><ul><li><strong>TTL:</strong> bounds staleness approximately; does not guarantee immediate freshness.</li><li><strong>Invalidate on write:</strong> delete affected cache entries after a committed database update.</li><li><strong>Update cache on write:</strong> can reduce misses but needs careful ordering/failure handling.</li><li><strong>Versioning:</strong> associate values with versions to prevent older data overwriting newer data.</li><li><strong>Outbox/event invalidation:</strong> reliably publish invalidation/update events after the DB commit, while still handling duplicate and delayed events.</li><li><strong>Read-your-writes:</strong> route the caller to authoritative data or use a version/session strategy when needed.</li></ul>
+            <div class="callout good"><strong>Design decision:</strong> define the freshness requirement per data type. A product description may tolerate seconds of staleness; an available balance, access-control decision, or inventory reservation may require a stricter authoritative path.</div></section>
+
+        <section class="topic" id="stampede"><h2>21. Cache Stampede (Thundering Herd)</h2>
+            <h3>Definition</h3><p>A cache stampede occurs when a popular key expires or is evicted and many requests simultaneously miss the cache, causing a burst of duplicate database or downstream work.</p>
+            <div class="diagram">Popular key expires
+                |
+                v
+                1,000 concurrent requests → Redis MISS
+                |
+                +----> DB query
+                +----> DB query
+                +----> DB query
+                +----> hundreds more queries
+                |
+                v
+                database overload</div>
+            <h3>Mitigation 1: request coalescing / single-flight</h3><p>Within an application instance, allow one request to load a missing key while other requests await its result. This reduces duplicate loads locally, but multiple service instances may still each load the same key.</p>
+            <h3>Mitigation 2: distributed lock</h3><p>Use a short-lived lock for cache regeneration when cross-instance coordination is required. Set a bounded wait, unique owner token, safe compare-and-delete release, and a fallback policy. Locks must not become a new bottleneck or correctness hazard.</p>
+            <h3>Mitigation 3: TTL jitter</h3><pre><code>baseTTL = 300 seconds
+actualTTL = baseTTL + random(0..60 seconds)</code></pre>
+            <p>Randomized expiration spreads load across time. It is most useful when many keys are populated together.</p>
+            <h3>Mitigation 4: stale-while-revalidate</h3><p>Keep a stale-but-acceptable value available for a short grace period while one worker refreshes it in the background. This reduces latency and load, but only works when serving stale data is safe for that business domain.</p>
+            <h3>Mitigation 5: pre-warming and rate controls</h3><ul><li>Refresh known hot keys before expiration.</li><li>Limit concurrent database loads and apply backpressure.</li><li>Use negative caching for safe not-found results to avoid repeated misses.</li><li>Monitor cache misses, hot keys, database query volume, and refresh latency.</li></ul>
+            <div class="callout warning"><strong>Do not confuse:</strong> a cache stampede is many concurrent misses for the same or popular keys; cache penetration is repeated requests for keys that do not exist; cache avalanche is a broad surge of expirations or cache failure affecting many keys.</div></section>
+
+        <section id="workflow"><h2>End-to-End Example: Product Cache in a Java Service</h2>
+            <div class="diagram">Client → Product Service
+                |
+                v
+                GET product:100
+                |
+                +----+----+
+                |         |
+                HIT       MISS
+                |         |
+                v         v
+                Return     Database query
+                cached         |
+                product        v
+                SET Redis value + TTL
+                |
+                v
+                Return product
+
+                On product update:
+                Database transaction commits
+                |
+                v
+                Invalidate cache key after commit
+                |
+                v
+                Next read reloads authoritative value
+
+                Observability: hit ratio, misses, latency, evictions,
+                memory, errors, stale reads, stampede/load indicators.</div>
+            <h3>Operational checklist</h3><ul><li>Choose a cache key format and version it when serialized schemas change.</li><li>Set explicit TTLs and use jitter for synchronized workloads.</li><li>Decide behavior if Redis is unavailable: fail open to DB only if the DB can handle the load.</li><li>Use timeouts and connection pools in the Redis client.</li><li>Set a memory limit and appropriate eviction policy.</li><li>Protect Redis with authentication, TLS where needed, network isolation, and least-privilege access.</li><li>Measure cache hit ratio alongside database load; a high hit ratio alone does not prove correctness.</li><li>Test restarts, failover, persistence restore, and stale-cache races.</li></ul></section>
+
+        <section id="failures"><h2>Production Failure Scenarios</h2>
+            <div class="card"><h3>Scenario 1 — Redis is unavailable</h3><p><strong>Problem:</strong> Every cache miss falls through to the database and traffic overwhelms it.</p><p><strong>Response:</strong> Use bounded timeouts, circuit breaking where appropriate, concurrency limits, load shedding, and database protection. Do not let every request create unlimited fallback work.</p></div>
+            <div class="card"><h3>Scenario 2 — Cache key expires under heavy traffic</h3><p><strong>Problem:</strong> Hundreds of requests execute the same expensive SQL query.</p><p><strong>Response:</strong> Use single-flight/request coalescing, TTL jitter, pre-warming, stale-while-revalidate when safe, or a bounded refresh lock.</p></div>
+            <div class="card"><h3>Scenario 3 — A cache write fails after a database update</h3><p><strong>Problem:</strong> Old cache data remains visible.</p><p><strong>Response:</strong> Prefer post-commit invalidation, use a durable outbox/event when reliable propagation is required, monitor invalidation failures, and define a TTL-based upper bound for tolerated staleness.</p></div>
+            <div class="card"><h3>Scenario 4 — Redis primary fails after acknowledging a write</h3><p><strong>Problem:</strong> An asynchronous replica may not have received the latest write before promotion.</p><p><strong>Response:</strong> Understand replication and failover guarantees, use persistence/backup where appropriate, and do not store irreplaceable business truth only in Redis unless its durability model satisfies the requirements.</p></div>
+            <div class="card"><h3>Scenario 5 — Memory reaches maxmemory</h3><p><strong>Problem:</strong> Keys are evicted unexpectedly or writes begin failing.</p><p><strong>Response:</strong> Inspect memory and key growth, tune policy and TTLs, bound collections, reserve headroom, and separate disposable cache data from durable/critical workloads.</p></div>
+        </section>
+
+        <section id="interview"><h2>Senior Java Backend Interview Q&A</h2><div class="qa">
+            <details><summary>1. Is Redis only a cache?</summary><p>No. Redis provides data structures, atomic commands, Pub/Sub, Streams, replication, persistence options, and cluster sharding. Whether it is used as a cache, coordination store, or data store depends on durability and correctness requirements.</p></details>
+            <details><summary>2. What is the difference between TTL and expiration?</summary><p>Expiration is the key's lifetime policy. TTL reports the remaining time before the key expires. Redis uses passive and active expiration, so cleanup is not guaranteed at the exact deadline.</p></details>
+            <details><summary>3. Cache Aside vs Write Through vs Write Behind?</summary><p>Cache Aside lets the application load on a miss and manage invalidation. Write Through propagates writes through a cache layer to the backing store before success is reported according to its protocol. Write Behind acknowledges before asynchronous persistence and therefore needs durable buffering, retries, idempotency, and explicit data-loss analysis.</p></details>
+            <details><summary>4. RDB vs AOF?</summary><p>RDB stores point-in-time snapshots. AOF records write operations for replay and has durability behavior influenced by its fsync policy. Both have trade-offs in recovery time, disk use, write latency, and recovery-point objective.</p></details>
+            <details><summary>5. Redis replication vs Redis Cluster?</summary><p>Replication copies a primary's data to replicas. Cluster partitions keys among multiple primaries and can use replicas for failover. Replication alone does not shard the keyspace, and Cluster is not managed by Sentinel.</p></details>
+            <details><summary>6. How do you implement a safer Redis distributed lock?</summary><p>Acquire with SET key unique-token NX PX lease. Release atomically only if the stored token matches. Handle lease expiry, process pauses, failover, and stale holders; use fencing tokens or downstream version checks if strict exclusion is required.</p></details>
+            <details><summary>7. Pub/Sub vs Streams?</summary><p>Pub/Sub delivers live messages to active subscribers and has no durable backlog or acknowledgment. Streams store entries and provide IDs, replay/range reads, consumer groups, pending tracking, and acknowledgments, subject to retention and persistence settings.</p></details>
+            <details><summary>8. How do you prevent a cache stampede?</summary><p>Use request coalescing, bounded refresh locks, TTL jitter, pre-warming, stale-while-revalidate when safe, negative caching where appropriate, and database concurrency limits.</p></details>
+            <details><summary>9. Is Redis strongly consistent across replicas?</summary><p>Ordinary primary-replica replication is generally asynchronous, so replica reads can be stale and failover can lose recent writes that were not replicated. Do not assume strong consistency or zero data loss.</p></details>
+            <details><summary>10. Why is a Redis cache key invalidation race possible?</summary><p>A reader can load an old database value, a writer can commit and delete the cache key, and then the reader can write the old value back into Redis. Versioning, coordinated loading, durable invalidation events, or authoritative reads may be needed for stricter requirements.</p></details>
+            <details><summary>11. What is the difference between eviction and expiration?</summary><p>Expiration removes keys whose TTL has elapsed. Eviction removes eligible keys to manage memory when maxmemory limits are reached. A key without a TTL can still be evicted under an allkeys policy.</p></details>
+            <details><summary>12. Can Redis be the system of record for orders or balances?</summary><p>Only if the chosen Redis deployment, persistence, replication, backup, recovery, and operational guarantees meet the business requirements. For many enterprise applications, a transactional database remains authoritative and Redis is a cache or specialized supporting store.</p></details>
+        </div></section>
+
+        <section id="tracker"><h2>Final Mastery Tracker</h2><p>Mark a topic complete when you can define it, draw its execution flow, use its commands/design, and explain trade-offs and failure recovery.</p><div class="checkpanel"><div style="display:flex;justify-content:space-between;align-items:center;gap:12px"><strong>All 21 topics</strong><span id="masteryCount">0 / 21</span></div><div class="progressbar"><div id="masteryFill"></div></div><div id="masteryList"></div><div class="toolbar"><button class="btn" id="resetTracker">Reset tracker</button><button class="btn" onclick="window.print()">Print / Save PDF</button></div></div>
+            <h3>Four mastery levels</h3><ol><li><strong>Understand:</strong> explain the concept in your own words.</li><li><strong>Visualize:</strong> draw the data flow or architecture.</li><li><strong>Implement:</strong> demonstrate it using Redis commands and Java/Spring Boot where appropriate.</li><li><strong>Troubleshoot:</strong> explain failure modes, monitoring, consistency, and recovery.</li></ol>
+            <div class="callout good"><strong>Final recommendation:</strong> use Redis with a clear purpose. Define which data is disposable cache data, which requires durable recovery, what staleness is acceptable, and what happens when Redis is slow, full, or unavailable.</div></section>
+        <footer class="footer">Interview A-Z · Module 11: Redis · Self-contained HTML reference · Built for Java Backend interview preparation</footer>
+    </main></div>
+<script>
+    const topics=["Redis architecture","String","Hash","List","Set","Sorted Set","TTL","Expiration","Cache Aside","Write Through","Write Behind","Cache Eviction","Distributed Lock","Pub/Sub","Streams","Persistence","RDB","AOF","Replication","Redis Cluster","Cache consistency","Cache stampede"];
+    const storageKey="interviewAZ.redis.mastery.v1";let completed=new Set();try{completed=new Set(JSON.parse(localStorage.getItem(storageKey)||"[]"));}catch(e){}
+    function renderTracker(containerId){const container=document.getElementById(containerId);container.innerHTML="";topics.forEach((topic,i)=>{const label=document.createElement("label");label.className="topic-check";const input=document.createElement("input");input.type="checkbox";input.checked=completed.has(topic);input.setAttribute("aria-label","Mark "+topic+" complete");input.addEventListener("change",()=>{input.checked?completed.add(topic):completed.delete(topic);save();updateCounts();});const span=document.createElement("span");span.textContent=(i+1)+". "+topic;label.append(input,span);container.appendChild(label);});}
+    function save(){try{localStorage.setItem(storageKey,JSON.stringify([...completed]));}catch(e){}}
+    function updateCounts(){const n=topics.filter(t=>completed.has(t)).length;["progressText","masteryCount"].forEach(id=>{const el=document.getElementById(id);if(el)el.textContent=n+" / "+topics.length+" completed";});["progressFill","masteryFill"].forEach(id=>{const el=document.getElementById(id);if(el)el.style.width=(n/topics.length*100)+"%";});}
+    renderTracker("syllabusList");renderTracker("masteryList");document.getElementById("resetTracker").addEventListener("click",()=>{if(confirm("Reset all Redis topic progress?")){completed.clear();save();renderTracker("syllabusList");renderTracker("masteryList");updateCounts();}});updateCounts();
+</script>
+</body>
+</html>
