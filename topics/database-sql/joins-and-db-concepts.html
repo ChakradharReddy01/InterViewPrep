@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Module 7: Relational Joins, Keys & Normalization (1NF to BCNF) | Interview A-Z</title>
+  <link rel="stylesheet" href="../../assets/css/style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+</head>
+<body>
+
+  <!-- Top Navigation -->
+  <nav class="navbar">
+    <div class="brand">
+      <span class="brand-badge">Interview A-Z</span>
+      <span>Engineering & Architecture Handbook</span>
+    </div>
+    <div class="nav-links">
+      <a href="../../index.html" class="nav-link">Home</a>
+      <a href="../../index.html#module-7" class="nav-link">Module Catalog</a>
+      <a href="https://github.com" target="_blank" class="nav-link">GitHub</a>
+    </div>
+  </nav>
+
+  <div class="container">
+    <div class="article-layout">
+      <!-- Sticky Sidebar Table of Contents -->
+      <aside class="sidebar-toc">
+        <h3>On This Page</h3>
+        <ul class="toc-links" id="dynamic-toc">
+          <!-- Dynamically populated via main.js -->
+        </ul>
+      </aside>
+
+      <!-- Main Article Content -->
+      <main class="article-content">
+        <!-- Breadcrumb -->
+        <nav class="breadcrumb">
+          <a href="../../index.html">Home</a>
+          <span>/</span>
+          <span>Module 7: SQL & Databases</span>
+          <span>/</span>
+          <span style="color: #fff;">Joins & Relational Schema Design</span>
+        </nav>
+
+        <!-- Article Header -->
+        <header class="article-header">
+          <h1>Module 7 (Part 2): Relational Joins, Key Constraints & Schema Normalization (1NF to BCNF)</h1>
+          <div class="article-meta">
+            <span class="badge badge-spring">Database Design</span>
+            <span class="badge badge-advanced">Relational Theory</span>
+            <span class="badge badge-prod">OLTP vs OLAP Architecture</span>
+            <span>⏱️ 55 min deep dive</span>
+            <span>Target Roles: SDE-2, SDE-3, Database Architect</span>
+          </div>
+        </header>
+
+        <!-- SECTION 1: RELATIONAL JOINS DEEP DIVE -->
+        <section>
+          <h2>1. Relational Joins: Semantics, Execution & Edge Cases</h2>
+
+          <h3>1.1 The Relational Join Matrix</h3>
+          <p>
+            A relational join combines attributes from two relations ($R$ and $S$) based on a join condition $\theta$. The fundamental join types handle matching and non-matching tuples with specific nullability rules:
+          </p>
+
+          <pre><code>Table A (Customers)               Table B (Orders)
++----+----------+                +----------+--------+--------+
+| id | name     |                | order_id | cus_id | amount |
++----+----------+                +----------+--------+--------+
+|  1 | Alice    |                |      101 |      1 |    250 |
+|  2 | Bob      |                |      102 |      1 |    100 |
+|  3 | Charlie  |                |      103 |      2 |    450 |
+|  4 | Diana    |                |      104 |   NULL |     75 |
++----+----------+                +----------+--------+--------+
+
+1. INNER JOIN (A ⋈ B on id = cus_id):
+   - Returns ONLY matching tuples: (Alice, 101), (Alice, 102), (Bob, 103).
+   - Charlie (no orders) and Order 104 (orphan/null) are eliminated.
+
+2. LEFT (OUTER) JOIN (A ⟕ B on id = cus_id):
+   - Preserves ALL left rows (A). If no match in B, populates B columns with NULL.
+   - (Alice, 101), (Alice, 102), (Bob, 103), (Charlie, NULL, NULL).
+   - Diana has no orders -> (Diana, NULL, NULL).
+
+3. RIGHT (OUTER) JOIN (A ⟖ B on id = cus_id):
+   - Preserves ALL right rows (B). If no match in A, populates A columns with NULL.
+   - (Alice, 101), (Alice, 102), (Bob, 103), (NULL, 104).
+
+4. FULL (OUTER) JOIN (A ⟗ B on id = cus_id):
+   - Preserves ALL rows from both tables. Produces the union of LEFT and RIGHT joins.
+   - (Alice, 101), (Alice, 102), (Bob, 103), (Charlie, NULL), (Diana, NULL), (NULL, 104).
+
+5. CROSS JOIN (A × B):
+   - Pure Cartesian Product: Cardinality = |A| × |B| = 4 × 4 = 16 rows.
+   - No join predicate required.
+
+6. SELF JOIN:
+   - A relation joined with itself via aliasing (e.g. Employee manager hierarchy, graph edges).</code></pre>
+
+          <h3>1.2 The Dangerous "WHERE on LEFT JOIN" Trap</h3>
+          <p>
+            One of the most frequent production bugs occurs when developers filter columns of the preserved (outer) table inside the <code>WHERE</code> clause instead of the <code>ON</code> clause:
+          </p>
+
+          <div class="callout callout-warning">
+            <div class="callout-title">⚠️ How WHERE Silently Converts a LEFT JOIN into an INNER JOIN</div>
+            <p>
+              Suppose you want all customers and their active orders:
+            </p>
+            <pre><code class="language-sql">-- BUG: WHERE clause filters after the LEFT JOIN is constructed!
+SELECT c.id, c.name, o.order_id, o.status
+FROM customers c
+LEFT JOIN orders o ON c.id = o.customer_id
+WHERE o.status = 'ACTIVE'; -- Kills all customers who have 0 orders!</code></pre>
+            <p>
+              <strong>Why this happens:</strong> For customers with no orders, <code>o.status</code> is <code>NULL</code>. The expression <code>NULL = 'ACTIVE'</code> evaluates to <strong>UNKNOWN (false)</strong> in SQL's three-valued logic. Consequently, all customers without active orders are discarded, converting your query into an <strong>INNER JOIN</strong>.
+            </p>
+            <p>
+              <strong>The Fix:</strong> Move the predicate to the <code>ON</code> clause:
+            </p>
+            <pre><code class="language-sql">-- CORRECT: Filters orders during the join while preserving all customers
+SELECT c.id, c.name, o.order_id, o.status
+FROM customers c
+LEFT JOIN orders o ON c.id = o.customer_id AND o.status = 'ACTIVE';</code></pre>
+          </div>
+
+          <h3>1.3 Self-Join Patterns: Hierarchies and Graph Traversals</h3>
+          <pre><code class="language-sql">-- Finding Employees who earn more than their direct manager
+SELECT 
+    e.employee_id,
+    e.first_name || ' ' || e.last_name AS employee_name,
+    e.salary AS employee_salary,
+    m.first_name || ' ' || m.last_name AS manager_name,
+    m.salary AS manager_salary
+FROM employees e
+INNER JOIN employees m ON e.manager_id = m.employee_id
+WHERE e.salary > m.salary;</code></pre>
+        </section>
+
+        <!-- SECTION 2: RELATIONAL KEYS & CONSTRAINTS -->
+        <section>
+          <h2>2. Relational Keys & Integrity Constraints</h2>
+
+          <h3>2.1 Key Hierarchy: Super Key $\rightarrow$ Candidate Key $\rightarrow$ Primary Key</h3>
+          <p>
+            In relational database theory, keys guarantee entity uniqueness and data integrity:
+          </p>
+
+          <pre><code>                    +------------------------------------+
+                    |             SUPER KEY              |
+                    | Any set of attributes that         |
+                    | uniquely identifies a tuple.       |
+                    | (e.g., {SSN, Name, Email}, {SSN})  |
+                    +-----------------+------------------+
+                                      |
+                         (Minimal set with no redundancy)
+                                      v
+                    +------------------------------------+
+                    |           CANDIDATE KEY            |
+                    | Minimal super key; removing any    |
+                    | attribute destroys uniqueness.     |
+                    | (e.g., {SSN}, {Email}, {User_UUID})|
+                    +--------+------------------+--------+
+                             |                  |
+           (Chosen as DB ID) |                  | (Unchosen candidates)
+                             v                  v
+    +--------------------------------+  +--------------------------------+
+    |          PRIMARY KEY           |  |         ALTERNATE KEY          |
+    | Unique + NOT NULL. Forms       |  | Secondary unique constraint    |
+    | default clustered index.       |  | (e.g. UNIQUE constraint on     |
+    +--------------------------------+  |  email column).                |
+                                        +--------------------------------+</code></pre>
+
+          <h3>2.2 Composite Key vs Surrogate Key vs Natural Key</h3>
+          <table style="width:100%; border-collapse:collapse; margin: 1.5rem 0;">
+            <thead>
+              <tr style="background: rgba(255,255,255,0.05); text-align: left;">
+                <th style="padding: 10px; border: 1px solid var(--border-color);">Key Type</th>
+                <th style="padding: 10px; border: 1px solid var(--border-color);">Definition</th>
+                <th style="padding: 10px; border: 1px solid var(--border-color);">Pros</th>
+                <th style="padding: 10px; border: 1px solid var(--border-color);">Cons</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td style="padding: 10px; border: 1px solid var(--border-color);"><strong>Natural Key</strong></td>
+                <td style="padding: 10px; border: 1px solid var(--border-color);">An attribute that exists in the real world (e.g. SSN, VIN number, ISBN, Email).</td>
+                <td style="padding: 10px; border: 1px solid var(--border-color);">Has intrinsic domain meaning; eliminates need for extra ID lookups.</td>
+                <td style="padding: 10px; border: 1px solid var(--border-color);">Business requirements change (e.g. users change emails); cascade updates across foreign keys are expensive.</td>
+              </tr>
+              <tr>
+                <td style="padding: 10px; border: 1px solid var(--border-color);"><strong>Surrogate Key</strong></td>
+                <td style="padding: 10px; border: 1px solid var(--border-color);">An artificial, system-generated identifier (e.g. <code>BIGINT AUTO_INCREMENT</code>, <code>UUIDv7</code>).</td>
+                <td style="padding: 10px; border: 1px solid var(--border-color);">Compact (8-byte int), immutable, never changes with business rules, highly optimal B-Tree insertion.</td>
+                <td style="padding: 10px; border: 1px solid var(--border-color);">No business meaning; requires join back to find domain identity.</td>
+              </tr>
+              <tr>
+                <td style="padding: 10px; border: 1px solid var(--border-color);"><strong>Composite Key</strong></td>
+                <td style="padding: 10px; border: 1px solid var(--border-color);">A key composed of two or more columns (e.g. <code>PRIMARY KEY (order_id, product_id)</code> in order_items).</td>
+                <td style="padding: 10px; border: 1px solid var(--border-color);">Enforces compound uniqueness naturally in junction tables.</td>
+                <td style="padding: 10px; border: 1px solid var(--border-color);">Foreign keys referencing this table must carry all composite columns (storage bloat).</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <h3>2.3 Foreign Keys & Referential Actions</h3>
+          <p>
+            A <strong>Foreign Key (FK)</strong> enforces referential integrity between a child table's attribute and a parent table's Primary/Candidate Key. When a referenced parent row is updated or deleted:
+          </p>
+          <ul>
+            <li><code>ON DELETE CASCADE</code>: Deletes all child records automatically. (<em>Risk:</em> Accidental wipeout of millions of rows).</li>
+            <li><code>ON DELETE RESTRICT / NO ACTION</code>: Rejects the delete with a foreign key violation error.</li>
+            <li><code>ON DELETE SET NULL</code>: Sets child foreign key columns to NULL (requires foreign key to be nullable).</li>
+          </ul>
+
+          <div class="callout callout-warning">
+            <div class="callout-title">⚠️ The Unindexed Foreign Key Performance Trap</div>
+            <p>
+              Most databases (PostgreSQL, MySQL, Oracle) <strong>do not automatically create an index on Foreign Key columns</strong> in child tables!
+            </p>
+            <p>
+              If you execute <code>DELETE FROM customers WHERE id = 5;</code>, the engine must verify that no child <code>orders</code> reference <code>customer_id = 5</code>. Without an index on <code>orders(customer_id)</code>, the engine must perform a <strong>FULL TABLE SCAN</strong> on the entire <code>orders</code> table, taking share locks and causing severe application timeouts.
+            </p>
+          </div>
+        </section>
+
+        <!-- SECTION 3: NORMALIZATION & THE THREE ANOMALIES -->
+        <section>
+          <h2>3. Relational Normalization & The Three Update Anomalies</h2>
+
+          <h3>3.1 Why Normalize? The Three Database Anomalies</h3>
+          <p>
+            Normalization is the mathematical process of organizing attributes in a database to reduce data redundancy and eliminate <strong>data modification anomalies</strong>:
+          </p>
+
+          <pre><code>Unnormalized Schema: EmployeeDepartment (emp_id, emp_name, dept_id, dept_name, dept_head)
++--------+----------+---------+-------------+------------+
+| emp_id | emp_name | dept_id | dept_name   | dept_head  |
++--------+----------+---------+-------------+------------+
+|    101 | John Doe |     D01 | Engineering | Sarah Lee  |
+|    102 | Jane Roe |     D01 | Engineering | Sarah Lee  |
++--------+----------+---------+-------------+------------+
+
+1. Insertion Anomaly:
+   - You cannot create a new Department "Marketing" until you hire at least one employee!
+     (dept_id cannot exist if emp_id is the primary key and cannot be NULL).
+
+2. Deletion Anomaly:
+   - If Jane Roe is the only employee in Department "HR", deleting Jane Roe 
+     accidentally wipes out the entire existence of the HR department and its budget.
+
+3. Update / Modification Anomaly:
+   - If Sarah Lee steps down as head of Engineering, you must update Sarah's name across
+     thousands of employee rows. If a single row update fails, the database becomes corrupt!</code></pre>
+        </section>
+
+        <!-- SECTION 4: NORMAL FORMS: 1NF, 2NF, 3NF, BCNF -->
+        <section>
+          <h2>4. Normal Forms: 1NF, 2NF, 3NF & BCNF In-Depth</h2>
+
+          <h3>4.1 First Normal Form (1NF)</h3>
+          <p><strong>Rule:</strong> All attributes must be <strong>atomic</strong> (indivisible values). No repeating groups, arrays, or comma-separated lists.</p>
+
+          <pre><code>VIOLATING 1NF:
++--------+----------+----------------------------+
+| emp_id | emp_name | phone_numbers (non-atomic) |
++--------+----------+----------------------------+
+|    101 | Alice    | 555-0192, 555-0199         |
++--------+----------+----------------------------+
+
+CONVERTING TO 1NF:
+Decompose into atomic tuples or create a separate employee_phones table:
++--------+----------+--------------+
+| emp_id | emp_name | phone_number |
++--------+----------+--------------+
+|    101 | Alice    | 555-0192     |
+|    101 | Alice    | 555-0199     |
++--------+----------+--------------+</code></pre>
+
+          <h3>4.2 Second Normal Form (2NF)</h3>
+          <p><strong>Rule:</strong> Must be in 1NF <strong>AND</strong> contain <strong>no Partial Functional Dependencies</strong>. Every non-prime attribute must depend on the <em>entire</em> candidate key, not a subset of a composite key.</p>
+
+          <pre><code>VIOLATING 2NF:
+Table: OrderItems (Composite PK: {order_id, product_id})
+Functional Dependencies (FDs):
+  {order_id, product_id} -> quantity
+  {product_id}           -> product_name, unit_price  <-- PARTIAL DEPENDENCY!
+
+CONVERTING TO 2NF:
+Decompose into two relations:
+1. Orders_Products (order_id, product_id, quantity) -> PK: {order_id, product_id}
+2. Products (product_id, product_name, unit_price)  -> PK: {product_id}</code></pre>
+
+          <h3>4.3 Third Normal Form (3NF)</h3>
+          <p><strong>Rule:</strong> Must be in 2NF <strong>AND</strong> contain <strong>no Transitive Dependencies</strong>. Non-prime attributes must not depend on other non-prime attributes ($X \rightarrow Y$ and $Y \rightarrow Z$).</p>
+          <p><em>Mnemonic: "Every attribute must depend on the key, the whole key, and nothing but the key, so help me Codd."</em></p>
+
+          <pre><code>VIOLATING 3NF:
+Table: Employees (PK: emp_id)
+Functional Dependencies:
+  emp_id  -> department_id
+  dept_id -> department_name, department_budget  <-- TRANSITIVE DEPENDENCY!
+
+emp_id determines dept_id, which in turn determines department_name.
+
+CONVERTING TO 3NF:
+Decompose into two relations:
+1. Employees (emp_id, emp_name, department_id) -> department_id is Foreign Key
+2. Departments (department_id, department_name, department_budget)</code></pre>
+
+          <h3>4.4 Boyce-Codd Normal Form (BCNF)</h3>
+          <p><strong>Rule:</strong> A stricter version of 3NF. For <em>every</em> non-trivial functional dependency $X \rightarrow Y$, <strong>$X$ must be a Super Key</strong>.</p>
+          <p>
+            3NF allows a functional dependency $X \rightarrow Y$ if $Y$ is a prime attribute (part of a candidate key). BCNF eliminates this exception, dealing with overlapping candidate keys:
+          </p>
+
+          <pre><code>VIOLATING BCNF (Classic Professor-Student-Subject Example):
+Relation: Tutoring (student_id, subject, professor)
+Candidate Keys: {student_id, subject} and {student_id, professor}
+Rules:
+  1. A student can have multiple professors, but only one professor per subject:
+     {student_id, subject} -> professor
+  2. Each professor teaches only ONE subject:
+     professor -> subject  <-- VIOLATION OF BCNF!
+
+Notice: professor is NOT a super key, but subject is a prime attribute!
+Thus, this table is in 3NF, but NOT in BCNF.
+
+Anomalies present:
+- Cannot record that Professor Turing teaches Physics until a student enrolls!
+
+CONVERTING TO BCNF:
+Decompose into two tables:
+1. Professor_Subject (professor, subject) -> PK: {professor}
+2. Student_Professor (student_id, professor) -> PK: {student_id, professor}</code></pre>
+        </section>
+
+        <!-- SECTION 5: NORMALIZATION VS DENORMALIZATION -->
+        <section>
+          <h2>5. Normalization vs Denormalization (OLTP vs OLAP)</h2>
+
+          <h3>5.1 The Architectural Trade-Off</h3>
+          <table style="width:100%; border-collapse:collapse; margin: 1.5rem 0;">
+            <thead>
+              <tr style="background: rgba(255,255,255,0.05); text-align: left;">
+                <th style="padding: 10px; border: 1px solid var(--border-color);">Dimension</th>
+                <th style="padding: 10px; border: 1px solid var(--border-color);">Normalized (3NF / BCNF)</th>
+                <th style="padding: 10px; border: 1px solid var(--border-color);">Denormalized</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td style="padding: 10px; border: 1px solid var(--border-color);"><strong>Primary Goal</strong></td>
+                <td style="padding: 10px; border: 1px solid var(--border-color);">Data consistency, zero redundancy, fast writes.</td>
+                <td style="padding: 10px; border: 1px solid var(--border-color);">Fast read performance, minimal joins.</td>
+              </tr>
+              <tr>
+                <td style="padding: 10px; border: 1px solid var(--border-color);"><strong>Workload Fit</strong></td>
+                <td style="padding: 10px; border: 1px solid var(--border-color);"><strong>OLTP (Transactional):</strong> Banking, Order processing, Booking systems.</td>
+                <td style="padding: 10px; border: 1px solid var(--border-color);"><strong>OLAP (Analytical):</strong> Data Warehouses, BigQuery, Star/Snowflake schemas.</td>
+              </tr>
+              <tr>
+                <td style="padding: 10px; border: 1px solid var(--border-color);"><strong>Read Performance</strong></td>
+                <td style="padding: 10px; border: 1px solid var(--border-color);">Slower for complex queries due to multiple JOIN operations.</td>
+                <td style="padding: 10px; border: 1px solid var(--border-color);">Extremely fast (single-table scans, pre-computed totals).</td>
+              </tr>
+              <tr>
+                <td style="padding: 10px; border: 1px solid var(--border-color);"><strong>Write Performance</strong></td>
+                <td style="padding: 10px; border: 1px solid var(--border-color);">Very fast (updates affect a single row in a single table).</td>
+                <td style="padding: 10px; border: 1px solid var(--border-color);">Slower (Write Amplification: updating an address requires modifying thousands of denormalized rows).</td>
+              </tr>
+              <tr>
+                <td style="padding: 10px; border: 1px solid var(--border-color);"><strong>Storage Overhead</strong></td>
+                <td style="padding: 10px; border: 1px solid var(--border-color);">Minimal.</td>
+                <td style="padding: 10px; border: 1px solid var(--border-color);">High (duplicated strings, redundant metadata).</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <h3>5.2 Strategic Denormalization Patterns</h3>
+          <p>
+            In high-scale systems, pure 3NF can cause latency issues. Architects intentionally introduce controlled redundancy:
+          </p>
+          <ul>
+            <li><strong>Precomputed Aggregates:</strong> Storing <code>total_orders_count</code> or <code>account_balance</code> directly on the <code>users</code> table to avoid expensive <code>COUNT(*)</code> scans across millions of transaction rows.</li>
+            <li><strong>Snapshot Attributes:</strong> Storing <code>historical_product_price</code> and <code>delivery_address</code> on the <code>orders</code> table. Even if the customer moves or the product price changes next week, the historical invoice must remain immutable.</li>
+            <li><strong>Materialized Views:</strong> Database-managed denormalized views refreshed periodically or incrementally upon commit.</li>
+          </ul>
+        </section>
+
+        <!-- SECTION 6: PRODUCTION POST-MORTEMS -->
+        <section>
+          <h2>6. Real-World Production War Stories (RCA & Fixes)</h2>
+
+          <!-- POST-MORTEM 1 -->
+          <div class="callout callout-production">
+            <div class="callout-title">🚨 Incident 1: Cascading DELETE Lockout Caused by Unindexed Foreign Key</div>
+            <p><strong>Environment:</strong> SaaS CRM system running on PostgreSQL 15 with 120 million contacts and 400 million interaction logs.</p>
+            <p><strong>The Failure:</strong> When a user triggered "Delete Customer Account" from the dashboard, the API request hung for 60 seconds, timed out, and triggered widespread database connection pool exhaustion (504 Gateway Outages).</p>
+            <p><strong>Root Cause Analysis (RCA):</strong></p>
+            <ul>
+              <li>The table <code>interaction_logs</code> had a foreign key constraint: <code>customer_id REFERENCES customers(id) ON DELETE CASCADE</code>.</li>
+              <li>The developers had never created an index on <code>interaction_logs(customer_id)</code>.</li>
+              <li>When the parent customer was deleted, PostgreSQL was forced to perform a <strong>Sequential Full Table Scan of all 400 million rows</strong> in <code>interaction_logs</code> to locate rows referencing the deleted customer.</li>
+              <li>The sequential scan acquired an exclusive row lock on the log table, queueing up thousands of concurrent incoming API write operations.</li>
+            </ul>
+            <p><strong>The Fix:</strong> Add an index on the child table's foreign key column:</p>
+            <pre><code class="language-sql">CREATE INDEX CONCURRENTLY idx_interaction_logs_customer_id 
+ON interaction_logs(customer_id);</code></pre>
+            <p>PostgreSQL immediately transitioned from a 45-second sequential scan to a <strong>0.2ms Index Scan</strong> during cascading deletions.</p>
+          </div>
+
+          <!-- POST-MORTEM 2 -->
+          <div class="callout callout-production">
+            <div class="callout-title">🚨 Incident 2: Over-Normalized 14-Table JOIN Gridlock in High-Throughput Checkout</div>
+            <p><strong>Environment:</strong> E-commerce checkout service handling 8,000 requests/sec.</p>
+            <p><strong>The Failure:</strong> P99 latency on the checkout finalization endpoint degraded from 40ms to 3.8 seconds under peak traffic, exhausting database connections.</p>
+            <p><strong>Root Cause Analysis (RCA):</strong></p>
+            <ul>
+              <li>A strict normalization purist had decomposed the product and price model into 14 distinct normalized tables (products, product_skus, sku_prices, currency_rates, tax_brackets, category_hierarchies, manufacturer_discounts, etc.).</li>
+              <li>Every checkout required executing a <strong>14-table JOIN</strong> to compute the final cart line items.</li>
+              <li>Under high concurrency, the Cost-Based Optimizer spent more time evaluating join permutations ($14!$ possibilities) and performing buffer cache lookups across 14 separate B-Tree indexes than executing the actual business logic.</li>
+            </ul>
+            <p><strong>The Fix:</strong> Strategically denormalize the read model for the checkout path. A lightweight read-optimized table (or Redis document cache) was introduced with pre-joined and calculated fields (<code>sku, final_price, tax_rate, currency</code>), reducing the query from a 14-table join to a single primary key lookup.</p>
+          </div>
+        </section>
+
+        <!-- SECTION 7: SENIOR INTERVIEW Q&A -->
+        <section>
+          <h2>7. Senior & Staff Engineer Interview Q&A</h2>
+
+          <div class="callout callout-interview">
+            <div class="callout-title">Q1: Can a table in 3NF still have anomalies? Explain BCNF with a real scenario.</div>
+            <p><strong>Answer:</strong> Yes. 3NF allows anomalies when a relation has <strong>multiple overlapping composite candidate keys</strong>.</p>
+            <p>
+              In 3NF, a functional dependency $X \rightarrow Y$ is allowed if $Y$ is a prime attribute (part of any candidate key). However, if $X$ is not a super key, an anomaly still exists.
+            </p>
+            <p>
+              <em>Scenario:</em> In a sports academy, consider <code>(student_id, sport, coach)</code>. Suppose each coach coaches only one sport (<code>coach -> sport</code>), but a student can play multiple sports with different coaches. Candidate keys are <code>{student_id, sport}</code> and <code>{student_id, coach}</code>. Because <code>sport</code> is a prime attribute, the dependency <code>coach -> sport</code> is legal in 3NF. However, you cannot add a new coach for Tennis until a student registers (Insertion Anomaly). BCNF resolves this by mandating that <em>every determinant must be a super key</em>, forcing decomposition into <code>Coach_Sport(coach, sport)</code> and <code>Student_Coach(student_id, coach)</code>.
+            </p>
+          </div>
+
+          <div class="callout callout-interview">
+            <div class="callout-title">Q2: What is the difference between a Surrogate Key and a Natural Key, and why do modern databases prefer UUIDv7 or BIGINT over UUIDv4?</div>
+            <p><strong>Answer:</strong></p>
+            <ul>
+              <li><strong>Natural Key:</strong> An existing real-world attribute (e.g. Email, SSN). Prone to business requirement changes; updating a natural key requires costly cascading foreign key updates.</li>
+              <li><strong>Surrogate Key:</strong> An artificial identifier with zero business meaning (e.g. sequential integer or UUID). Compact, immutable, and ideal for stable joins.</li>
+              <li><strong>UUIDv4 vs UUIDv7:</strong> UUIDv4 is completely random. Inserting random UUIDs into a clustered B-Tree index causes severe <strong>B-Tree page splits and page fragmentation</strong> because new rows land randomly throughout the tree rather than at the end. UUIDv7 embeds a millisecond-precision Unix timestamp in its most significant bits, making it <strong>monotonically increasing (time-ordered)</strong>. This preserves sequential B-Tree appends while maintaining globally unique distributed ID generation without lock coordination.</li>
+            </ul>
+          </div>
+
+          <div class="callout callout-interview">
+            <div class="callout-title">Q3: When should you deliberately choose Denormalization over 3NF in an enterprise system?</div>
+            <p><strong>Answer:</strong></p>
+            <ol>
+              <li><strong>Read-Heavy OLTP Systems:</strong> When read queries dominate writes by 100:1 and multiple joins create intolerable latency or CPU consumption.</li>
+              <li><strong>Immutable Historical Invoices & Audits:</strong> In financial and e-commerce transactions, customer billing addresses and product prices at the moment of purchase must be copied and preserved forever on the order entity.</li>
+              <li><strong>Data Warehousing & OLAP (Star Schema):</strong> Analytical reporting tools require wide, flat dimension tables to avoid joining millions of rows during aggregate slice-and-dice operations.</li>
+              <li><strong>Pre-aggregated Dashboard Metrics:</strong> Storing counter caches (e.g. <code>unread_messages_count</code>) to avoid full scans on every request.</li>
+            </ol>
+          </div>
+        </section>
+
+      </main>
+    </div>
+  </div>
+
+  <footer class="footer">
+    <div class="container">
+      <p>&copy; 2026 Interview A-Z Knowledge Base. Designed for Senior & Lead Engineering Interviews.</p>
+    </div>
+  </footer>
+
+  <script src="../../assets/js/main.js"></script>
+</body>
+</html>

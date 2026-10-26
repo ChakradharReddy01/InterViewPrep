@@ -123,6 +123,7 @@
           </div>
           <ul class="module-subtopics">
             <li><a href="topics/database-sql/sql-core.html">SQL Mastery & Internals</a></li>
+            <li><a href="topics/database-sql/joins-and-db-concepts.html">Joins, Keys & Normalization (1NF-BCNF)</a></li>
           </ul>
         </li>
       </ul>
@@ -169,7 +170,7 @@
             <div class="topic-group-title">
               <span>💾 Module 7: SQL & Database</span>
             </div>
-            <span class="topic-count">1 Comprehensive Master Module Active</span>
+            <span class="topic-count">2 Master Deep Dives Active</span>
           </div>
 
           <div class="cards-grid">
@@ -196,6 +197,31 @@
               <div class="card-footer">
                 <span style="font-size: 0.82rem; color: var(--text-muted);">13 Core Subtopics Covered</span>
                 <a href="topics/database-sql/sql-core.html" class="card-link">Explore Deep Dive &rarr;</a>
+              </div>
+            </div>
+            <!-- Card 2: Relational Joins, Key Constraints & Normalization -->
+            <div class="card" data-tags="sql database joins normalization keys production">
+              <div class="card-top">
+                <span class="badge badge-spring">Database Concepts</span>
+                <span class="badge badge-prod">1NF to BCNF Normalization</span>
+              </div>
+              <h2 class="card-title">Relational Joins, Keys & Schema Normalization (1NF - BCNF)</h2>
+              <p class="card-desc">Deep architectural examination of relational algebra and schema design: INNER, LEFT, RIGHT, FULL, CROSS, and SELF joins; the dangerous 'WHERE on LEFT JOIN' trap; Super/Candidate/Primary keys; Surrogate vs Natural keys (UUIDv7 vs UUIDv4); Foreign Key cascade locking; the 3 Update Anomalies; and step-by-step 1NF, 2NF, 3NF, BCNF decomposition and OLAP denormalization trade-offs.</p>
+              
+              <ul class="subtopics-list">
+                <li class="subtopic-item"><strong>Join Semantics & Traps:</strong> INNER, LEFT, RIGHT, FULL OUTER, CROSS (Cartesian $|A| \times |B|$), and SELF join hierarchies; how <code>WHERE</code> converts <code>LEFT JOIN</code> to <code>INNER JOIN</code></li>
+                <li class="subtopic-item"><strong>Key Theory:</strong> Super Key $\rightarrow$ Candidate Key $\rightarrow$ Primary Key / Alternate Key; Composite keys vs Surrogate keys</li>
+                <li class="subtopic-item"><strong>Identifier Performance:</strong> Why UUIDv4 causes B-Tree page splits and fragmentation vs time-ordered UUIDv7 and BIGINT</li>
+                <li class="subtopic-item"><strong>Foreign Key Hazards:</strong> Cascade rules (CASCADE, RESTRICT, SET NULL) and catastrophic full-table lockups caused by missing FK indexes</li>
+                <li class="subtopic-item"><strong>The 3 Update Anomalies:</strong> Insertion Anomaly, Deletion Anomaly, and Modification Anomaly in unnormalized relations</li>
+                <li class="subtopic-item"><strong>Normal Forms (1NF &rarr; BCNF):</strong> 1NF (atomic values), 2NF (no partial dependency), 3NF (no transitive dependency), BCNF (every determinant is a super key)</li>
+                <li class="subtopic-item"><strong>Normalization vs Denormalization:</strong> OLTP write-consistency vs OLAP analytical read performance, immutable order snapshots, and pre-aggregated counters</li>
+                <li class="subtopic-item"><strong>Production Post-Mortems:</strong> Cascading DELETE table lockup from unindexed FKs, 14-table join gridlock during high-throughput checkout</li>
+              </ul>
+
+              <div class="card-footer">
+                <span style="font-size: 0.82rem; color: var(--text-muted);">15 Core Subtopics Covered</span>
+                <a href="topics/database-sql/joins-and-db-concepts.html" class="card-link">Explore Deep Dive &rarr;</a>
               </div>
             </div>
           </div>
