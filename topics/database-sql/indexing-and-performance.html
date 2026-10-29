@@ -1,450 +1,127 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Module 7: Database Indexing, Query Optimization, HikariCP & Deadlocks | Interview A-Z</title>
-  <link rel="stylesheet" href="../../assets/css/style.css">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
-</head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Module 7 Part 4 — Database Performance Masterclass | Interview A-Z</title>
+  <style>
+    :root{--bg:#0b1120;--panel:#111b2e;--panel2:#17243a;--text:#e6edf7;--muted:#9eb0c9;--line:#2b3b54;--cyan:#38bdf8;--violet:#a5b4fc;--green:#86efac;--amber:#fcd34d;--red:#fca5a5;--code:#080e19}
+    *{box-sizing:border-box}html{scroll-behavior:smooth;scroll-padding-top:80px}body{margin:0;background:var(--bg);color:var(--text);font:16px/1.7 Inter,system-ui,-apple-system,Segoe UI,sans-serif}.navbar{position:sticky;top:0;z-index:5;background:#0c1424ee;backdrop-filter:blur(12px);border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center;padding:13px clamp(16px,4vw,48px);gap:18px}.brand{font-weight:800}.brand-badge{background:linear-gradient(135deg,var(--cyan),var(--violet));color:#0b1120;border-radius:6px;padding:3px 8px;font-size:11px;letter-spacing:.07em;margin-right:9px}.navlinks{display:flex;gap:16px;align-items:center;flex-wrap:wrap}.navlinks a{font-size:13px;text-decoration:none;font-weight:650;color:var(--cyan)}.pdf{border:0;border-radius:7px;padding:9px 12px;background:linear-gradient(135deg,var(--cyan),var(--violet));color:#07101d;font-weight:800;cursor:pointer}.layout{max-width:1440px;margin:auto;display:grid;grid-template-columns:250px minmax(0,1fr);gap:30px;padding:28px 24px}.sidebar{position:sticky;top:82px;align-self:start;max-height:calc(100vh - 100px);overflow:auto;border:1px solid var(--line);background:var(--panel);border-radius:14px;padding:18px}.sidebar h3{margin:0 0 10px;font-size:14px}.sidebar a{display:block;text-decoration:none;color:var(--muted);font-size:12px;padding:5px 0}.sidebar a:hover{color:var(--cyan)}.progress{height:6px;background:#26364d;border-radius:8px;overflow:hidden;margin:9px 0}.progress span{display:block;height:100%;width:0;background:var(--cyan);transition:width .2s}.content{min-width:0;max-width:1000px}.crumb{color:var(--muted);font-size:13px;margin-bottom:14px}.hero{padding:30px;border:1px solid var(--line);border-radius:18px;background:radial-gradient(ellipse at top right,#1b3653 0,transparent 58%),var(--panel);margin-bottom:24px}.hero h1{font-size:clamp(28px,4vw,43px);line-height:1.15;margin:10px 0 14px}.hero p{color:var(--muted);max-width:850px}.pills{display:flex;gap:8px;flex-wrap:wrap}.pill{border:1px solid #3a4e6d;border-radius:20px;padding:3px 10px;font-size:12px;color:var(--cyan)}section{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:26px;margin:20px 0}h2{font-size:25px;line-height:1.25;margin:0 0 14px}h3{font-size:19px;margin:26px 0 8px;color:#d5e6ff}h4{font-size:16px;margin:16px 0 6px}p{margin:10px 0}li{margin:6px 0}ul,ol{padding-left:24px}.muted{color:var(--muted)}.callout{border-left:4px solid var(--cyan);background:#0d192a;padding:15px 18px;border-radius:0 10px 10px 0;margin:16px 0}.warn{border-color:var(--amber)}.danger{border-color:var(--red)}.good{border-color:var(--green)}pre{white-space:pre-wrap;overflow-wrap:anywhere;background:var(--code);border:1px solid var(--line);border-radius:10px;padding:16px;overflow:auto;color:#d6e7ff;font:13px/1.65 "JetBrains Mono",Consolas,monospace}code{font-family:"JetBrains Mono",Consolas,monospace;color:#bae6fd;background:#091321;padding:2px 5px;border-radius:4px;font-size:.9em}pre code{background:none;padding:0;color:inherit}table{width:100%;border-collapse:collapse;margin:15px 0;font-size:14px}th,td{border:1px solid var(--line);padding:10px 12px;text-align:left;vertical-align:top}th{background:#1b2a41;color:#d9e8fb}tr:nth-child(even) td{background:#0d1727}.grid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}.mini{border:1px solid var(--line);border-radius:10px;padding:15px;background:#0d1727}.mini h4{margin-top:0}.footer{text-align:center;color:var(--muted);padding:30px;font-size:12px}.checklist label{display:flex;gap:10px;align-items:flex-start;padding:7px 0;border-bottom:1px solid #233047}.checklist input{margin-top:7px;accent-color:var(--cyan)}details{border-bottom:1px solid var(--line);padding:12px 0}summary{cursor:pointer}.small{font-size:13px;color:var(--muted)}@media(max-width:900px){.layout{grid-template-columns:1fr;padding:16px}.sidebar{position:relative;top:auto;max-height:none}.toc{columns:2}.navbar{position:relative;align-items:flex-start}.grid2{grid-template-columns:1fr}}@media print{body{background:white;color:#111;font-size:11pt}.navbar,.sidebar,.pdf{display:none!important}.layout{display:block;padding:0;max-width:none}.hero,section{background:white;border:1px solid #bbb;color:#111;break-inside:avoid}.hero p,.muted,.crumb,.small{color:#444}.callout,pre{background:#f4f6f8;color:#111}code{color:#111;background:#eee}a{color:#111;text-decoration:none}h2,h3{color:#111}details{display:block}}
+  </style></head>
 <body>
+<nav class="navbar"><div class="brand"><span class="brand-badge">INTERVIEW A–Z</span>Engineering Handbook</div><div class="navlinks"><a href="../../index.html">🏠 Home Directory</a><a href="../../index.html#topics">📚 All Modules</a><a href="https://github.com/ChakradharReddy01/InterViewPrep" target="_blank" rel="noopener">GitHub</a><button class="pdf" onclick="document.querySelectorAll('details').forEach(d=>d.open=true);window.print()">📄 Save to PDF</button></div></nav>
+<div class="layout"><aside class="sidebar"><h3>On This Page</h3><div class="small">Study progress</div><div class="progress"><span id="progressbar"></span></div><div id="progresslabel" class="small">0% complete</div><nav id="toc" class="toc"></nav></aside>
+  <main class="content"><div class="crumb"><a href="../../index.html">Home</a> / Module 7: SQL & Databases / Indexing & Performance</div>
+    <header class="hero"><div class="pills"><span class="pill">Database Performance</span><span class="pill">B+ Trees</span><span class="pill">EXPLAIN</span><span class="pill">HikariCP</span><span class="pill">Concurrency</span></div><h1>Module 7 (Part 4): Database Performance & Tuning</h1><p>Understand how indexes work, choose composite and covering indexes, read execution plans, optimize SQL, size connection pools, and diagnose database deadlocks. Built around practical SQL, Spring Boot examples, and production root-cause analysis.</p><p class="muted">Suggested time: 60 minutes · Target: Java backend, database, and systems interviews</p></header>
+    <section id="roadmap"><h2>0. Learning Roadmap</h2><ul><li>Indexes reduce work, but every index costs storage and write overhead.</li><li>Execution plans reveal what the optimizer intends to do—and what actually happened when runtime analysis is enabled.</li><li>Optimization starts with evidence: latency, rows scanned, estimates, buffers, locks, and pool metrics.</li><li>Connection pools are a concurrency limit, not a magic throughput multiplier.</li><li>Deadlocks require both database-level retry handling and application-level prevention.</li></ul><div class="callout good"><strong>Performance rule:</strong> measure first, change one thing, and compare the same workload before and after.</div></section>
+    <section id="index"><h2>1. Database Indexes</h2><h3>1.1 What is an index?</h3><p>An index is an auxiliary data structure that helps the database locate rows without scanning the entire table. Without a suitable index, a lookup may require a sequential scan of many or all table pages. With a suitable B-tree index, the engine can often navigate to a small matching range efficiently.</p><pre><code>-- Example table
+CREATE TABLE customers (
+  customer_id BIGINT PRIMARY KEY,
+  email        VARCHAR(320) NOT NULL,
+  country      VARCHAR(2),
+  created_at   TIMESTAMP NOT NULL
+);
 
-  <!-- Top Navigation -->
-    <!-- Top Navigation -->
-    <nav class="navbar">
-    <div class="brand">
-      <a href="../../index.html" class="brand-link" style="display: flex; align-items: center; gap: 0.75rem; text-decoration: none; color: inherit;">
-        <span class="brand-badge" style="background: linear-gradient(135deg, #38bdf8, #818cf8); color: #0f172a; padding: 0.15rem 0.55rem; border-radius: 6px; font-size: 0.75rem; font-weight: 800; letter-spacing: 0.05em; text-transform: uppercase;">Interview A-Z</span>
-        <span style="font-weight: 700; font-size: 1.15rem; color: #fff;">Engineering Handbook</span>
-      </a>
-    </div>
-    <div class="nav-links navlinks" style="display: flex; gap: 1.25rem; align-items: center;">
-      <a href="../../index.html" class="nav-link" style="text-decoration: none; font-weight: 600; font-size: 0.95rem;">🏠 Home</a>
-      <a href="../../index.html#topics" class="nav-link" style="text-decoration: none; font-weight: 600; font-size: 0.95rem;">📚 All Modules</a>
-      <a href="https://github.com/ChakradharReddy01/InterViewPrep" target="_blank" class="nav-link" style="text-decoration: none; font-weight: 600; font-size: 0.95rem;">GitHub</a>
-      <button onclick="document.querySelectorAll('details').forEach(d=>d.open=true);window.print();" class="nav-btn-pdf" title="Save page as PDF" style="display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.35rem 0.85rem; font-size: 0.85rem; font-weight: 700; background: linear-gradient(135deg, #38bdf8, #818cf8); color: #0f172a; border: none; border-radius: 6px; cursor: pointer; transition: transform 0.15s ease, box-shadow 0.15s ease; box-shadow: 0 2px 8px rgba(56,189,248,0.25);">
-        <span>📄</span> Save to PDF
-      </button>
-    </div>
-  </nav>
+-- Useful for exact email lookups (assuming the query and collation align)
+CREATE INDEX idx_customers_email ON customers(email);
 
-  <div class="container">
-    <div class="article-layout">
-      <!-- Sticky Sidebar Table of Contents -->
-      <aside class="sidebar-toc">
-        <h3>On This Page</h3>
-        <ul class="toc-links" id="dynamic-toc">
-          <!-- Dynamically populated via main.js -->
-        </ul>
-      </aside>
+SELECT customer_id, email
+FROM customers
+WHERE email = 'alice@example.com';</code></pre><p>An index is not guaranteed to be used. The optimizer may choose a table scan if many rows match, the table is small, statistics suggest the scan is cheaper, or the query expression cannot use the index.</p><h3>1.2 Index benefits and costs</h3><div class="grid2"><div class="mini"><h4>Benefits</h4><ul><li>Faster selective lookups</li><li>Efficient range scans and ordered retrieval</li><li>Can support joins, uniqueness, and covering access</li></ul></div><div class="mini"><h4>Costs</h4><ul><li>Extra disk and memory use</li><li>Slower inserts, updates, and deletes</li><li>Maintenance, page splits, and write amplification</li><li>More choices for the optimizer to evaluate</li></ul></div></div><div class="callout warn"><strong>Don't index every column.</strong> Index columns used by real, important predicates, joins, ordering, or uniqueness requirements. Confirm the index helps representative queries and does not impose unacceptable write costs.</div><h3>1.3 Clustered and secondary indexes</h3><p>In systems such as InnoDB, the primary-key clustered index leaf pages contain the row data, and secondary index entries include the primary key. Other databases organize heap and index storage differently. Avoid assuming that every RDBMS has exactly the same clustered-index model or exactly one physically clustered index.</p></section>
+    <section id="btree"><h2>2. B-Tree and B+ Tree Internals</h2><p>Database indexes commonly use balanced multi-way search trees. B-tree-family structures keep the tree shallow by storing many keys per page, which matches page-oriented storage much better than a binary tree with only two children per node.</p><pre><code>                 [ 40 | 80 ]          Root / internal page
+                /    |     \\
+          [10 | 25] [50 | 65] [90 | 110]  Internal pages
+             |         |          |
+       [10,15,20] <-> [40,50,60] <-> [80,90,100]  Leaf level
+                         ordered leaf traversal</code></pre><h3>2.1 Why a B+ tree works well</h3><ul><li><strong>High fan-out:</strong> many keys fit in each index page, keeping height low.</li><li><strong>Balanced height:</strong> search, insert, and delete remain efficient as the index grows.</li><li><strong>Leaf-level ordering:</strong> range scans can move through adjacent leaf pages instead of restarting at the root for every key.</li><li><strong>Page-oriented design:</strong> minimizes page accesses compared with pointer-heavy binary trees in many database workloads.</li></ul><p>Conceptually, point lookup is often described as \(O(\\log N)\), but real performance depends on page cache hits, row lookups, selectivity, I/O, and concurrency. A cached tree traversal is not the same cost as random physical disk I/O.</p><h3>2.2 Point lookup vs range lookup</h3><pre><code>-- Point lookup
+SELECT * FROM customers WHERE customer_id = 42;
 
-      <!-- Main Article Content -->
-      <main class="article-content">
-        <!-- Breadcrumb -->
-        <nav class="breadcrumb">
-          <a href="../../index.html">Home</a>
-          <span>/</span>
-          <span>Module 7: SQL & Databases</span>
-          <span>/</span>
-          <span style="color: #fff;">Indexing & Performance Tuning</span>
-        </nav>
+-- Range lookup; ordered index may help
+SELECT customer_id, created_at
+FROM customers
+WHERE created_at >= '2026-01-01'
+  AND created_at <  '2026-02-01'
+ORDER BY created_at;</code></pre></section>
+    <section id="composite"><h2>3. Composite Index</h2><p>A composite index contains more than one key column. Column order matters because the index is ordered lexicographically: first by the leading column, then by the next column within equal leading values, and so on.</p><pre><code>CREATE INDEX idx_customers_location
+ON customers(country, state, city);
 
-        <!-- Article Header -->
-        <header class="article-header">
-          <h1>Module 7 (Part 4): Database Indexing, B+ Trees, Query Optimization, Connection Pools & Deadlocks</h1>
-          <div class="article-meta">
-            <span class="badge badge-spring">Database Performance</span>
-            <span class="badge badge-advanced">B+ Tree Internals</span>
-            <span class="badge badge-prod">EXPLAIN & HikariCP Tuning</span>
-            <span>⏱️ 60 min deep dive</span>
-            <span>Target Roles: SDE-2, SDE-3, Database & Systems Architect</span>
-          </div>
-        </header>
+-- Leading column: generally a good match
+SELECT * FROM customers WHERE country = 'US';
 
-        <!-- SECTION 1: DATABASE INDEXING & B+ TREE INTERNALS -->
-        <section>
-          <h2>1. Database Indexing & B+ Tree Architecture Under the Hood</h2>
+-- Leading prefix: generally a good match
+SELECT * FROM customers
+WHERE country = 'US' AND state = 'CA';
 
-          <h3>1.1 What is an Index?</h3>
-          <p>
-            Without an index, finding a row in a table of 10 million records requires a <strong>Full Table Scan (Sequential Scan)</strong>, reading every data block from disk into memory ($O(N)$ I/O operations). An <strong>Index</strong> is an auxiliary on-disk data structure that maintains pointers to data rows sorted by specific columns, reducing search complexity from $O(N)$ to $O(\log N)$.
-          </p>
+-- Missing the leading column: usually cannot seek directly by this index
+SELECT * FROM customers WHERE state = 'CA';</code></pre><h3>3.1 Leftmost-prefix intuition</h3><table><thead><tr><th>Predicate</th><th>Likely index utility for (country, state, city)</th></tr></thead><tbody><tr><td><code>country = ?</code></td><td>Strong match for leading key</td></tr><tr><td><code>country = ? AND state = ?</code></td><td>Strong match for leading two keys</td></tr><tr><td><code>country = ? AND state = ? AND city = ?</code></td><td>Matches all three keys</td></tr><tr><td><code>state = ?</code></td><td>Usually cannot directly seek by state alone</td></tr><tr><td><code>country = ? AND city = ?</code></td><td>Can use country prefix; city filtering may happen afterward</td></tr></tbody></table><h3>3.2 Equality, range, and ordering</h3><p>For a query such as <code>WHERE customer_id = ? AND status = ? ORDER BY created_at DESC</code>, an index like <code>(customer_id, status, created_at)</code> may help filter and return rows in order. Equality columns often precede a range/order column, but the best order depends on selectivity, query patterns, sort direction support, and other queries sharing the index.</p><div class="callout warn"><strong>Design from real queries.</strong> The leftmost-prefix rule is a useful guide, not a promise that every predicate combination will be optimal. Check the actual execution plan and engine documentation.</div></section>
+    <section id="covering"><h2>4. Covering Index</h2><p>A covering index contains all columns a specific query needs for filtering, joining, ordering, and output. The engine may then answer the query from the index without fetching the base table row. Some engines call this an index-only scan; visibility rules can still require additional checks.</p><pre><code>-- PostgreSQL example: key columns plus included payload columns
+CREATE INDEX idx_orders_customer_status
+ON orders(customer_id, status)
+INCLUDE (order_date, total_amount);
 
-          <h3>1.2 Why B+ Trees Over Binary Trees or Standard B-Trees?</h3>
-          <p>
-            Databases do not use Binary Search Trees (AVL, Red-Black) because their low fan-out (2 children per node) creates deep trees requiring 20–30 random disk I/O seeks per query.
-          </p>
-          <p>
-            <strong>The B+ Tree Advantage:</strong>
-          </p>
-          <ul>
-            <li><strong>Enormous Fan-Out (High Branching Factor):</strong> A single 16KB database page can hold hundreds or thousands of index keys (e.g., fan-out $B \approx 500-1000$). A 3-to-4 level B+ Tree can index <strong>hundreds of millions of rows</strong> in only 3 to 4 disk page lookups!</li>
-            <li><strong>Non-Leaf Nodes Store Keys Only (No Data Pointers):</strong> Allows interior nodes to fit maximum key values per 16KB block, keeping the tree exceptionally shallow.</li>
-            <li><strong>Doubly-Linked Leaf Nodes:</strong> All data pointers reside exclusively in leaf nodes, linked sequentially via bidirectional pointers. Range scans (<code>BETWEEN</code>, <code>&gt;</code>, <code>ORDER BY</code>) traverse the linked leaf list sequentially with zero tree re-traversals.</li>
-          </ul>
-
-          <pre><code>B+ Tree Architecture (Height = 3, Fan-out = 3):
-                    [ 50 | 100 ]                     <-- Root Node (Page 1)
-                   /      |     \
-       +----------+       |      +----------+
-       |                  |                 |
-  [ 20 | 35 ]        [ 65 | 80 ]       [ 120 | 150 ]   <-- Branch / Interior Nodes
-   /   |   \          /   |   \         /    |    \
-+--+   +--+ +--+   +--+  +--+ +--+    +---+ +---+ +---+
-|      |    |      |     |    |       |     |     |
-[10,15]<->[20,30]<->[35,45]<->[50,60]<->...<->[150,180] <-- Leaf Nodes (Doubly Linked)
- (Contains actual clustered row data OR primary key pointers)</code></pre>
-
-          <h3>1.3 Clustered vs Non-Clustered (Secondary) Indexes</h3>
-          <table style="width:100%; border-collapse:collapse; margin: 1.5rem 0;">
-            <thead>
-              <tr style="background: rgba(255,255,255,0.05); text-align: left;">
-                <th style="padding: 10px; border: 1px solid var(--border-color);">Attribute</th>
-                <th style="padding: 10px; border: 1px solid var(--border-color);">Clustered Index (Primary)</th>
-                <th style="padding: 10px; border: 1px solid var(--border-color);">Non-Clustered Index (Secondary)</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td style="padding: 10px; border: 1px solid var(--border-color);"><strong>Storage</strong></td>
-                <td style="padding: 10px; border: 1px solid var(--border-color);"><strong>The table IS the index.</strong> Leaf nodes store the entire row (all columns).</td>
-                <td style="padding: 10px; border: 1px solid var(--border-color);">Stored in a separate B+ tree. Leaf nodes store only the indexed columns + row locator (PK or TupleID).</td>
-              </tr>
-              <tr>
-                <td style="padding: 10px; border: 1px solid var(--border-color);"><strong>Count per Table</strong></td>
-                <td style="padding: 10px; border: 1px solid var(--border-color);"><strong>Exactly 1</strong> per table (data can only be sorted physically on disk in one order).</td>
-                <td style="padding: 10px; border: 1px solid var(--border-color);">Multiple (typically 2 to 5 per table).</td>
-              </tr>
-              <tr>
-                <td style="padding: 10px; border: 1px solid var(--border-color);"><strong>Lookup Overhead</strong></td>
-                <td style="padding: 10px; border: 1px solid var(--border-color);">Direct access. Finding the key immediately yields all row data.</td>
-                <td style="padding: 10px; border: 1px solid var(--border-color);">Requires <strong>Bookmark Lookup / Double Lookup</strong>: traverses secondary index &rarr; gets PK &rarr; traverses clustered index to fetch full row.</td>
-              </tr>
-            </tbody>
-          </table>
-        </section>
-
-        <!-- SECTION 2: ADVANCED INDEXING PATTERNS -->
-        <section>
-          <h2>2. Advanced Indexing: Composite, Covering & Filtered Indexes</h2>
-
-          <h3>2.1 Composite Index & The Leftmost Prefix Rule</h3>
-          <p>
-            A <strong>Composite Index</strong> is created on multiple columns: <code>CREATE INDEX idx_user_loc ON users(country, state, city);</code>.
-          </p>
-          <p>
-            The B+ Tree sorts keys lexicographically from left to right: first by <code>country</code>; for rows with identical countries, by <code>state</code>; and finally by <code>city</code>.
-          </p>
-
-          <pre><code>The Leftmost Prefix Rule:
-Query Predicates                                      Uses Index?
--------------------------------------------------------------------------------------
-WHERE country = 'US'                                  YES (Leftmost column matched)
-WHERE country = 'US' AND state = 'CA'                 YES (Leftmost 2 columns matched)
-WHERE country = 'US' AND state = 'CA' AND city = 'SF' YES (All columns matched)
-WHERE state = 'CA'                                    NO  (Cannot bypass 'country'!)
-WHERE city = 'SF'                                     NO  (Full table scan)
-WHERE country = 'US' AND city = 'SF'                  PARTIAL (Uses index on 'country' only)</code></pre>
-
-          <h3>2.2 Covering Index (Index-Only Scan)</h3>
-          <p>
-            A <strong>Covering Index</strong> contains <em>every single column</em> requested by the query's <code>SELECT</code>, <code>WHERE</code>, and <code>ORDER BY</code> clauses.
-          </p>
-          <div class="callout callout-solution">
-            <div class="callout-title">💡 The 10x Performance Win of Index-Only Scans</div>
-            <p>
-              When a query is satisfied entirely by a covering index, the database engine executes an <strong>Index-Only Scan</strong>. The engine reads the data directly from the leaf nodes of the secondary index in RAM and <strong>never touches the clustered table heap</strong>, eliminating expensive random I/O bookmark lookups!
-            </p>
-            <pre><code class="language-sql">-- Creating a covering index using PostgreSQL INCLUDE clause:
-CREATE INDEX idx_orders_customer_covering 
-ON orders (customer_id, status) INCLUDE (total_amount, order_date);
-
--- Query executes 100% in RAM via Index-Only Scan:
-SELECT customer_id, status, total_amount, order_date
+SELECT order_date, total_amount
 FROM orders
-WHERE customer_id = 1042 AND status = 'COMPLETED';</code></pre>
-          </div>
+WHERE customer_id = 1042
+  AND status = 'COMPLETED';</code></pre><p><strong>Why it can help:</strong> fewer base-table lookups and less random I/O. <strong>Trade-off:</strong> wider indexes consume more space and increase write and cache costs. Don't include large text/blob fields indiscriminately.</p><h3>Covering vs clustered index</h3><table><thead><tr><th>Concept</th><th>What it means</th></tr></thead><tbody><tr><td>Clustered index</td><td>Describes the table's primary storage organization in engines that support this concept.</td></tr><tr><td>Covering index</td><td>An index that contains everything required by one particular query; it may be a secondary index.</td></tr></tbody></table></section>
+    <section id="plan"><h2>5. Query Plan and EXPLAIN</h2><p>The query optimizer considers candidate access paths and chooses a plan based on statistics, estimated cardinalities, costs, and engine rules. An execution plan is a tree of operations such as scans, joins, sorts, and aggregates.</p><h3>5.1 EXPLAIN vs EXPLAIN ANALYZE</h3><ul><li><code>EXPLAIN</code> generally shows the estimated plan without executing the query.</li><li><code>EXPLAIN ANALYZE</code> executes the statement and reports actual runtime measurements in engines that support it.</li><li>Options such as buffers, verbose output, and JSON output vary by database.</li></ul><pre><code>-- PostgreSQL syntax
+EXPLAIN (ANALYZE, BUFFERS)
+SELECT customer_id, SUM(total_amount)
+FROM orders
+WHERE order_date >= DATE '2026-01-01'
+GROUP BY customer_id;</code></pre><div class="callout danger"><strong>Caution:</strong> EXPLAIN ANALYZE runs the query. For UPDATE/DELETE or other statements with side effects, use a safe test environment or a deliberate transaction/rollback strategy; not every side effect can be undone by rollback.</div><h3>5.2 What to inspect</h3><table><thead><tr><th>Plan signal</th><th>What it tells you</th><th>Next question</th></tr></thead><tbody><tr><td>Estimated rows vs actual rows</td><td>Cardinality estimate quality</td><td>Are statistics stale or data distributions skewed?</td></tr><tr><td>Sequential/table scan</td><td>Reads many table pages</td><td>Is the table small, or does the query return a large fraction of rows?</td></tr><tr><td>Index scan + many row fetches</td><td>Index found matches, but table lookups may be expensive</td><td>Could a covering index help? Is selectivity poor?</td></tr><tr><td>Sort / temporary spill</td><td>Ordering or grouping may need extra work</td><td>Could index ordering help? Is memory pressure involved?</td></tr><tr><td>Nested-loop join with huge inner loops</td><td>Repeated lookups may dominate</td><td>Are join keys indexed and estimates accurate?</td></tr><tr><td>Buffer hits/reads</td><td>Cache and I/O context (engine-specific meanings)</td><td>Is latency from storage, CPU, or row processing?</td></tr></tbody></table><h3>5.3 Estimated cost is not milliseconds</h3><p>Optimizer cost units are usually internal relative estimates, not wall-clock milliseconds. Compare estimated and actual rows, loops, elapsed time, buffers, and the plan shape. A row-estimate mismatch by an order of magnitude is a useful clue, not a universal threshold proving stale statistics.</p></section>
+    <section id="optimize"><h2>6. Query Optimization</h2><h3>6.1 SARGable predicates</h3><p>A SARGable predicate allows the optimizer to use an index search argument effectively. Wrapping an indexed column in a function can prevent use of a normal index unless a matching expression/function-based index exists.</p><table><thead><tr><th>Potentially less index-friendly</th><th>Alternative to evaluate</th></tr></thead><tbody><tr><td><code>WHERE YEAR(created_at) = 2026</code></td><td><code>WHERE created_at >= '2026-01-01' AND created_at &lt; '2027-01-01'</code></td></tr><tr><td><code>WHERE LOWER(email) = 'alice@example.com'</code></td><td>Normalize stored values or create a matching functional index, depending on collation and requirements.</td></tr><tr><td><code>WHERE amount * 1.18 > 100</code></td><td>Consider algebraically rewriting as <code>amount > 100 / 1.18</code> if semantics and numeric precision remain correct.</td></tr><tr><td><code>LIKE '%smith'</code></td><td>A leading wildcard often prevents ordinary B-tree prefix access; consider full-text/trigram or engine-specific indexing if needed.</td></tr></tbody></table><h3>6.2 Avoid SELECT *</h3><p>Select only columns needed by the caller. This can reduce transferred data, memory, serialization, and table lookups, and may make a covering index possible. It is not automatically faster in every case, but it makes query intent explicit.</p><h3>6.3 Deep pagination: OFFSET vs keyset</h3><pre><code>-- Deep OFFSET may scan/discard many rows
+SELECT id, created_at FROM orders
+ORDER BY id LIMIT 20 OFFSET 1000000;
 
-          <h3>2.3 Partial & Functional Indexes</h3>
-          <ul>
-            <li><strong>Partial (Filtered) Index:</strong> Indexes only a subset of rows: <code>CREATE INDEX idx_unpaid_invoices ON invoices(due_date) WHERE is_paid = FALSE;</code>. Reduces index size by 95% if 95% of invoices are paid.</li>
-            <li><strong>Expression / Function-Based Index:</strong> Indexes the computed result of an expression: <code>CREATE INDEX idx_users_lower_email ON users(LOWER(email));</code>. Enables fast index lookups for case-insensitive searches.</li>
-          </ul>
-        </section>
-
-        <!-- SECTION 3: QUERY EXECUTION PLANS (EXPLAIN ANALYZE) -->
-        <section>
-          <h2>3. Query Execution Plans & EXPLAIN ANALYZE Internals</h2>
-
-          <h3>3.1 Reading an Execution Plan</h3>
-          <p>
-            The Cost-Based Optimizer (CBO) evaluates available access paths and produces an execution plan tree. Prepending <code>EXPLAIN ANALYZE</code> runs the query and displays both the <strong>estimated optimizer cost</strong> and the <strong>actual hardware execution statistics</strong>:
-          </p>
-
-          <pre><code class="language-sql">EXPLAIN (ANALYZE, BUFFERS) 
-SELECT customer_id, SUM(total_amount) 
-FROM orders 
-WHERE order_date >= '2026-01-01' 
-GROUP BY customer_id;</code></pre>
-
-          <pre><code>Execution Plan Output Breakdown:
-HashAggregate  (cost=1254.20..1280.50 rows=2100 width=16) (actual time=14.210..15.820 rows=1980 loops=1)
-  Group Key: customer_id
-  Buffers: shared hit=412 read=18
-  ->  Bitmap Heap Scan on orders  (cost=42.10..1180.00 rows=14840 width=12) (actual time=1.240..8.500 rows=15100 loops=1)
-        Recheck Cond: (order_date >= '2026-01-01'::date)
-        Buffers: shared hit=85 read=18
-        ->  Bitmap Index Scan on idx_orders_date  (cost=0.00..38.39 rows=14840 width=0) (actual time=0.980..0.980 rows=15100 loops=1)
-              Index Cond: (order_date >= '2026-01-01'::date)
-              Buffers: shared hit=12
-
-Key Metrics to Examine:
-1. cost=42.10..1180.00: Estimated startup cost (42.10) to total cost (1180.00) in arbitrary I/O units.
-2. rows=14840 vs actual rows=15100: If estimated rows deviate by 10x+, database statistics (ANALYZE) are stale!
-3. Buffers: shared hit=412 read=18: Pages served from RAM cache (hit) vs fetched from disk (read).
-4. actual time=14.210..15.820: Real execution time in milliseconds.</code></pre>
-
-          <h3>3.2 Core Scan Operations Ranked by Efficiency</h3>
-          <ol>
-            <li><strong>Index Only Scan (Best):</strong> Satisfied 100% from index B+ tree leaf nodes. Zero heap access.</li>
-            <li><strong>Index Scan:</strong> B+ tree lookup fetches pointers followed by random I/O lookups to table heap pages.</li>
-            <li><strong>Bitmap Index Scan + Bitmap Heap Scan:</strong> Scans index, builds an in-memory bitmap of physical block offsets, and reads heap pages in sequential physical order (minimizing disk arm travel).</li>
-            <li><strong>Sequential Scan / Full Table Scan (Worst for point lookups):</strong> Scans every page in the table. Optimal only when fetching &gt;20% of total table rows.</li>
-          </ol>
-        </section>
-
-        <!-- SECTION 4: QUERY OPTIMIZATION & SARGABILITY -->
-        <section>
-          <h2>4. Query Optimization & SARGability Rules</h2>
-
-          <h3>4.1 SARGable Queries (Search Argument Able)</h3>
-          <p>
-            A query is <strong>SARGable</strong> if the database engine can take direct advantage of a B+ Tree index range scan. Wrapping indexed columns inside functions or mathematical expressions destroys SARGability:
-          </p>
-
-          <table style="width:100%; border-collapse:collapse; margin: 1.5rem 0;">
-            <thead>
-              <tr style="background: rgba(255,255,255,0.05); text-align: left;">
-                <th style="padding: 10px; border: 1px solid var(--border-color);">Non-SARGable (Forces Full Table Scan)</th>
-                <th style="padding: 10px; border: 1px solid var(--border-color);">SARGable (Index Range Scan)</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td style="padding: 10px; border: 1px solid var(--border-color); color: #ff5555;"><code>WHERE YEAR(created_at) = 2026</code></td>
-                <td style="padding: 10px; border: 1px solid var(--border-color); color: #50fa7b;"><code>WHERE created_at &gt;= '2026-01-01' AND created_at &lt; '2027-01-01'</code></td>
-              </tr>
-              <tr>
-                <td style="padding: 10px; border: 1px solid var(--border-color); color: #ff5555;"><code>WHERE LOWER(email) = 'alice@gmail.com'</code></td>
-                <td style="padding: 10px; border: 1px solid var(--border-color); color: #50fa7b;">Store emails lowercased OR create functional index on <code>LOWER(email)</code></td>
-              </tr>
-              <tr>
-                <td style="padding: 10px; border: 1px solid var(--border-color); color: #ff5555;"><code>WHERE amount * 1.18 &gt; 100</code></td>
-                <td style="padding: 10px; border: 1px solid var(--border-color); color: #50fa7b;"><code>WHERE amount &gt; (100 / 1.18)</code> (Expression on literal constant)</td>
-              </tr>
-              <tr>
-                <td style="padding: 10px; border: 1px solid var(--border-color); color: #ff5555;"><code>WHERE username LIKE '%smith'</code> (Leading wildcard)</td>
-                <td style="padding: 10px; border: 1px solid var(--border-color); color: #50fa7b;"><code>WHERE username LIKE 'smith%'</code> (Trailing wildcard uses index)</td>
-              </tr>
-            </tbody>
-          </table>
-
-          <h3>4.2 Deep Pagination: OFFSET vs Keyset Pagination</h3>
-          <p>
-            When executing <code>SELECT * FROM orders ORDER BY id LIMIT 20 OFFSET 1000000;</code>, the engine must physically read, sort, and discard <strong>1,000,000 rows</strong> before returning 20 records.
-          </p>
-          <pre><code class="language-sql">-- OPTIMAL PRODUCTION PATTERN: Keyset (Cursor-Based) Pagination
-SELECT * 
-FROM orders 
-WHERE id > :last_seen_id 
-ORDER BY id ASC 
-LIMIT 20; -- O(log N) direct B+ tree traversal! Constant latency at page 1 or page 10,000!</code></pre>
-        </section>
-
-        <!-- SECTION 5: DATABASE CONNECTION POOLING (HIKARICP) -->
-        <section>
-          <h2>5. Database Connection Pooling & HikariCP Internals</h2>
-
-          <h3>5.1 The Cost of Establishing a Raw Database Connection</h3>
-          <p>
-            Opening a raw database connection per request is catastrophic in high-traffic applications. A single connection handshake requires:
-          </p>
-          <ol>
-            <li>TCP 3-way handshake (1 RTT).</li>
-            <li>TLS cryptographic handshake (1–2 RTTs).</li>
-            <li>Database authentication, authorization, and session variable allocation.</li>
-            <li>OS backend server process/thread allocation (10–20MB memory in Postgres/Oracle).</li>
-          </ol>
-          <p>Total latency overhead: <strong>30ms to 120ms per query</strong>. A connection pool holds a pre-initialized set of live, reusable connections in memory.</p>
-
-          <h3>5.2 Why HikariCP Outperforms Legacy Pools (C3P0, DBCP2)</h3>
-          <ul>
-            <li><strong>Bytecode Engineering & Inlining:</strong> HikariCP compiles down to minimal bytecode, fitting entirely in CPU L1/L2 instruction cache.</li>
-            <li><strong>FastList:</strong> Replaces <code>ArrayList</code>, eliminating index range checks and removing elements via reverse iteration ($O(1)$ removal of statement proxies).</li>
-            <li><strong>ConcurrentBag:</strong> A lock-free, thread-local caching structure. Worker threads borrow connections directly from their own <code>ThreadLocal</code> cache without contending for global synchronizers.</li>
-          </ul>
-
-          <h3>5.3 The Connection Pool Sizing Formula (Less is More!)</h3>
-          <p>
-            A common mistake by junior engineers is setting <code>maximum-pool-size: 200</code>. Having 200 connections on an 8-core CPU causes the operating system to spend 80% of its CPU time on <strong>thread context switching and disk spindle thrashing</strong> rather than executing SQL.
-          </p>
-
-          <pre><code>HikariCP / PostgreSQL Official Sizing Formula:
-connections = ((core_count * 2) + effective_spindle_count)
-
-Example:
-An 8-Core CPU server with an SSD (effective_spindle_count = 1) requires:
-pool_size = (8 * 2) + 1 = 17 connections!
-
-A pool of 20 connections will sustain higher throughput and lower latency
-than a pool of 200 connections under identical load!</code></pre>
-
-          <pre><code class="language-yaml"># Production HikariCP Configuration (application.yml)
+-- Keyset pagination: requires stable ordered key and suitable index
+SELECT id, created_at FROM orders
+WHERE id > :last_seen_id
+ORDER BY id
+LIMIT 20;</code></pre><p>Keyset pagination is often more efficient for deep pages and avoids some shifting-page problems. For a non-unique sort, use a deterministic tie-breaker such as <code>(created_at, id)</code> and encode both values in the cursor.</p><h3>6.4 Practical optimization workflow</h3><ol><li>Measure endpoint latency and database time; identify the expensive query.</li><li>Capture representative parameters and run the plan safely.</li><li>Compare estimated and actual rows, loops, I/O, sorting, and lock waits.</li><li>Check predicates, join order, indexes, selected columns, and pagination.</li><li>Change one thing at a time and retest with representative data and concurrency.</li><li>Monitor after deployment; keep a rollback plan.</li></ol></section>
+    <section id="pool"><h2>7. Database Connection Pool</h2><p>Establishing a database connection can involve networking, authentication, TLS, and server-side session setup. A connection pool keeps a bounded set of reusable connections so requests borrow and return them rather than opening a new connection every time.</p><h3>7.1 Pool lifecycle</h3><pre><code>HTTP request
+    |
+    v
+Borrow connection from pool -- none available? wait up to timeout
+    |
+    v
+Execute SQL / transaction
+    |
+    v
+Commit or rollback; return connection
+    |
+    v
+Pool can reuse it for another request</code></pre><h3>7.2 HikariCP configuration example</h3><pre><code># Spring Boot application.yml — example values only
 spring:
   datasource:
     hikari:
       maximum-pool-size: 20
-      minimum-idle: 10
-      idle-timeout: 300000        # 5 minutes
-      max-lifetime: 1800000       # 30 minutes (must be shorter than DB wait_timeout)
-      connection-timeout: 30000   # 30 seconds wait before Throwing ConnectionTimeoutException
-      leak-detection-threshold: 2000 # Warns if a thread holds connection > 2 seconds!</code></pre>
-        </section>
+      minimum-idle: 5
+      connection-timeout: 30000
+      idle-timeout: 600000
+      max-lifetime: 1800000</code></pre><p>These values are not universal recommendations. Align them with database capacity, application instance count, query duration, and infrastructure timeouts. If there are 8 app replicas and each can open 20 connections, the database may see up to about 160 connections from that service alone, plus other clients.</p><h3>7.3 Pool sizing and the “more is better” trap</h3><p>Too small a pool can cause requests to wait for connections; too large a pool can overload the database with concurrent work, increase contention, and waste resources. Start with a measured workload and database limits. A frequently cited rough sizing heuristic is <code>(core_count × 2) + effective_spindle_count</code>, but it is only a starting hypothesis—not a universal formula, especially for SSDs, cloud databases, and mixed workloads.</p><h3>7.4 Metrics to monitor</h3><ul><li>Active, idle, and total connections</li><li>Connection acquisition wait and timeout count</li><li>Connection usage/transaction duration</li><li>Slow queries and lock waits</li><li>Database CPU, I/O, and active sessions</li></ul><div class="callout warn"><strong>Pool exhaustion has multiple causes:</strong> a pool may be undersized, but slow queries, long transactions, connection leaks, or a database slowdown can all make connections stay borrowed too long. Increasing pool size without diagnosing the cause may worsen the incident.</div><h3>7.5 Leak detection is a diagnostic aid</h3><p>HikariCP leak detection can log a warning when a connection is held longer than a configured threshold. A warning does not prove a connection was permanently leaked; a legitimately long operation may trigger it. Use the stack trace to investigate and pair it with usage metrics.</p></section>
+    <section id="deadlock"><h2>8. Database Deadlocks</h2><p>A deadlock occurs when transactions form a circular wait: each holds a lock another transaction needs. Many database engines detect the cycle, abort one transaction, and return an error to the application.</p><h3>8.1 A two-row example</h3><pre><code>Transaction A                 Transaction B
+-------------                 -------------
+locks Account 1               locks Account 2
+requests Account 2            requests Account 1
+waits for B                   waits for A
 
-        <!-- SECTION 6: DATABASE DEADLOCKS & RESOLUTION -->
-        <section>
-          <h2>6. Database Deadlocks & Resolution Strategies</h2>
+A waits for B; B waits for A => circular wait / deadlock</code></pre><h3>8.2 Prevention: deterministic lock ordering</h3><pre><code>// Conceptual Java example: always lock IDs in ascending order
+long first = Math.min(fromAccountId, toAccountId);
+long second = Math.max(fromAccountId, toAccountId);
 
-          <h3>6.1 Anatomy of a Database Deadlock</h3>
-          <p>
-            A deadlock occurs when two or more transactions hold exclusive locks that the other requires, forming a circular wait graph:
-          </p>
+accountRepository.lockById(first);
+accountRepository.lockById(second);
 
-          <pre><code>Transaction 1: Holds Lock on Row A  ----(Wants Lock)---->  Row B (Held by Tx 2)
-      ^                                                            |
-      |                                                            |
-      +------------------(Wants Lock)------------------------------+</code></pre>
+// Perform validated debit/credit in the same transaction.</code></pre><p>Every code path that can lock the same resources should follow the same ordering convention. Consistent ordering reduces circular waits but does not eliminate every possible deadlock involving other tables, indexes, or implicit locks.</p><h3>8.3 Diagnosis and recovery</h3><ul><li>Inspect database deadlock logs/reports and identify the exact statements and lock order.</li><li>Check indexes and query plans; broad scans can lock or touch more resources than expected.</li><li>Keep transactions short and avoid slow external API calls while holding locks.</li><li>Acquire shared resources in deterministic order.</li><li>Retry recognized deadlock/serialization failures with bounded retries and backoff.</li></ul><pre><code>Common examples (vendor-specific):
+PostgreSQL deadlock_detected SQLSTATE: 40P01
+MySQL InnoDB deadlock error number: 1213
 
-          <h3>6.2 Engine Deadlock Detection</h3>
-          <p>
-            Database engines run an active background thread (every 50–500ms) that builds a <strong>Wait-For Graph</strong>. When a directed cycle is detected, the engine breaks the deadlock by <strong>electing a victim transaction</strong> (typically the transaction with the fewest row updates or smallest undo logs), aborting it, and throwing:
-            <br><code>ERROR: deadlock detected (SQLSTATE 40P01)</code>.
-          </p>
-
-          <h3>6.3 Preventing Deadlocks: Global Resource Ordering</h3>
-          <p>
-            The definitive architectural solution to prevent deadlocks is <strong>Strict Global Resource Ordering</strong>: all application transactions must acquire locks in the exact same deterministic order:
-          </p>
-
-          <pre><code class="language-java">// BAD: Order of locking depends on request payload (Causes Deadlocks)
-public void transferMoney(Long fromAccountId, Long toAccountId, BigDecimal amount) {
-    accountRepository.lockById(fromAccountId);
-    accountRepository.lockById(toAccountId);
-}
-
-// OPTIMAL ARCHITECTURE: Deterministic Lock Acquisition Order
-public void transferMoney(Long fromAccountId, Long toAccountId, BigDecimal amount) {
-    Long firstLock  = Math.min(fromAccountId, toAccountId);
-    Long secondLock = Math.max(fromAccountId, toAccountId);
-
-    accountRepository.lockById(firstLock);  // Every thread locks lowest ID first!
-    accountRepository.lockById(secondLock); // Eliminates circular wait condition!
-}</code></pre>
-        </section>
-
-        <!-- SECTION 7: REAL-WORLD PRODUCTION WAR STORIES -->
-        <section>
-          <h2>7. Real-World Production War Stories (RCA & Solutions)</h2>
-
-          <!-- POST-MORTEM 1 -->
-          <div class="callout callout-production">
-            <div class="callout-title">🚨 Incident 1: 15-Minute Global Outage Caused by Non-SARGable LOWER(email)</div>
-            <p><strong>Environment:</strong> FinTech user login API servicing 12 million registered users on PostgreSQL 14.</p>
-            <p><strong>The Failure:</strong> After deploying a security fix for case-insensitive email logins, CPU utilization on the primary database spiked to 100% within 60 seconds. API latency spiked from 25ms to 30 seconds, causing gateway 504 timeouts worldwide.</p>
-            <p><strong>Root Cause Analysis (RCA):</strong></p>
-            <ul>
-              <li>The developers changed the authentication query to: <code>SELECT * FROM users WHERE LOWER(email) = LOWER(:input);</code>.</li>
-              <li>The table had a standard B-Tree index on <code>email</code>.</li>
-              <li>Because the column was wrapped in <code>LOWER()</code>, the optimizer could not use the B-Tree index on <code>email</code>. Every single login triggered a <strong>Sequential Scan of 12 million rows</strong>!</li>
-              <li>With 400 concurrent login requests, the database tried to scan $400 \times 12,000,000 = 4.8 \text{ billion rows}$ simultaneously, instantly saturating all CPU cores.</li>
-            </ul>
-            <p><strong>The Fix:</strong> Create an Expression Index matching the exact function:</p>
-            <pre><code class="language-sql">CREATE INDEX CONCURRENTLY idx_users_email_lower ON users(LOWER(email));</code></pre>
-            <p>PostgreSQL immediately used the functional index via an Index Scan, dropping CPU from 100% to 3% and restoring 20ms login latency.</p>
-          </div>
-
-          <!-- POST-MORTEM 2 -->
-          <div class="callout callout-production">
-            <div class="callout-title">🚨 Incident 2: HikariCP Connection Pool Exhaustion from a Single Slow Report</div>
-            <p><strong>Environment:</strong> E-commerce order service sharing a single database pool between transactional customer checkouts and internal admin analytics.</p>
-            <p><strong>The Failure:</strong> Every morning at 9:00 AM, checkout APIs threw <code>ConnectionTimeoutException: Connection is not available, request timed out after 30000ms</code>.</p>
-            <p><strong>Root Cause Analysis (RCA):</strong></p>
-            <ul>
-              <li>The operations team ran a heavy daily sales reconciliation report executing a 14-table join that took 45 seconds to finish.</li>
-              <li>The service configured a single HikariCP pool of 30 connections shared across all HTTP endpoints.</li>
-              <li>Multiple managers clicked "Refresh Report", capturing and holding all 30 pool connections for 45 seconds each.</li>
-              <li>Customer checkout requests entering the pool found 0 available connections, queued for 30 seconds, and crashed with <code>ConnectionTimeoutException</code>.</li>
-            </ul>
-            <p><strong>The Fix:</strong></p>
-            <ol>
-              <li>Isolate pools: Create a dedicated <strong>Read-Only Replica DataSource</strong> pool for analytical reporting queries and preserve the primary pool exclusively for sub-50ms OLTP transactions.</li>
-              <li>Configure <code>leak-detection-threshold: 3000</code> in HikariCP to flag any transaction holding a connection longer than 3 seconds.</li>
-            </ol>
-          </div>
-        </section>
-
-        <!-- SECTION 8: SENIOR INTERVIEW Q&A -->
-        <section>
-          <h2>8. Senior & Staff Engineer Interview Q&A</h2>
-
-          <div class="callout callout-interview">
-            <div class="callout-title">Q1: Why does increasing the database connection pool size beyond a certain point degrade performance rather than improving it?</div>
-            <p><strong>Answer:</strong></p>
-            <p>
-              A CPU core can execute only one thread at any given instant. When a server with 8 CPU cores has 200 active database connection threads:
-            </p>
-            <ul>
-              <li>The operating system spends substantial CPU cycles performing <strong>thread context switching</strong> (saving and restoring CPU registers and invalidating CPU caches).</li>
-              <li>Disk controllers and SSD read queues become saturated with competing random I/O requests.</li>
-              <li>Buffer pool memory is fragmented across 200 connection session workspaces.</li>
-            </ul>
-            <p>
-              By reducing the pool size to $(2 \times \text{cores}) + \text{spindles}$ (e.g. 17 connections), requests queue briefly in memory instead of thrashing CPU and disk. Transactions finish in 2ms instead of 200ms, resulting in dramatically higher system throughput.
-            </p>
-          </div>
-
-          <div class="callout callout-interview">
-            <div class="callout-title">Q2: What is the difference between a Clustered Index and a Covering Index?</div>
-            <p><strong>Answer:</strong></p>
-            <ul>
-              <li><strong>Clustered Index:</strong> Dictates the physical on-disk storage order of the table. Its leaf pages contain the complete data row. There can be only one clustered index per table.</li>
-              <li><strong>Covering Index:</strong> A secondary index specifically designed to contain all columns requested by a particular query (using indexed keys or the <code>INCLUDE</code> clause). Its leaf nodes do not contain the whole row, but contain everything that query needs, allowing the engine to execute an <strong>Index-Only Scan</strong> without reading the clustered table heap.</li>
-            </ul>
-          </div>
-
-          <div class="callout callout-interview">
-            <div class="callout-title">Q3: How do you detect and fix a database deadlock programmatically?</div>
-            <p><strong>Answer:</strong></p>
-            <ol>
-              <li><strong>Detection:</strong> Databases report deadlocks via specific vendor error codes (e.g. PostgreSQL error code <code>40P01</code>, MySQL error code <code>1213</code>). Deadlock logs can be inspected using <code>SHOW ENGINE INNODB STATUS</code> or PostgreSQL server logs.</li>
-              <li><strong>Application Retry with Exponential Backoff:</strong> Wrap transactional operations in a retry interceptor (e.g. Spring Retry <code>@Retryable(include = CannotAcquireLockException.class, backoff = @Backoff(delay = 100, multiplier = 2))</code>) with jitter to allow the competing transaction to complete.</li>
-              <li><strong>Deterministic Resource Ordering:</strong> Eliminate the deadlock at the root by sorting entity IDs in ascending order before acquiring locks.</li>
-            </ol>
-          </div>
-        </section>
-
-      </main>
-    </div>
-  </div>
-
-  <footer class="footer">
-    <div class="container">
-      <p>&copy; 2026 Interview A-Z Knowledge Base. Designed for Senior & Lead Engineering Interviews.</p>
-    </div>
-  </footer>
-
-  <script src="../../assets/js/main.js"></script>
-</body>
-</html>
+Retry the complete transaction, not just the last SQL statement.
+Ensure retrying cannot duplicate emails, payments, or other external side effects.</code></pre><div class="callout danger"><strong>Important:</strong> a database can roll back the victim transaction, but it cannot automatically undo an external payment, email, or HTTP request your code already performed. Use an outbox/idempotency strategy when external side effects must align with committed state.</div></section>
+    <section id="warstories"><h2>9. Production RCA Scenarios</h2><h3>Incident A: Login API suddenly becomes slow</h3><p><strong>Symptom:</strong> database CPU spikes after a code change to case-insensitive email lookup.</p><p><strong>Root cause hypothesis:</strong> <code>LOWER(email)</code> no longer matches the normal index on <code>email</code>, so many requests scan the table.</p><p><strong>Verify:</strong> inspect the query plan and rows read. <strong>Fix:</strong> normalize data/collation appropriately or create an expression index such as <code>CREATE INDEX ... ON users (LOWER(email))</code> where supported; validate with the plan and workload.</p><h3>Incident B: Checkout times out during reporting</h3><p><strong>Symptom:</strong> checkout requests fail to acquire a pool connection while long reports run.</p><p><strong>Root cause hypothesis:</strong> reports borrow connections for a long time and starve latency-sensitive transactions.</p><p><strong>Verify:</strong> active/idle pool metrics, acquisition wait, query duration, and transaction boundaries. <strong>Fix:</strong> optimize the report, limit concurrency, schedule it, or isolate reporting workload on a read replica/dedicated pool if the architecture and consistency needs allow.</p><h3>Incident C: Transfer service sees intermittent deadlocks</h3><p><strong>Symptom:</strong> occasional deadlock exceptions during simultaneous transfers.</p><p><strong>Root cause hypothesis:</strong> opposite-direction transfers lock accounts in opposite order.</p><p><strong>Verify:</strong> deadlock report and statements involved. <strong>Fix:</strong> lock both accounts in deterministic order, keep the transaction short, and add bounded retry handling.</p></section>
+    <section id="interview"><h2>10. Interview Q&A</h2><details open><summary><strong>Q1. Why do databases use B+ trees?</strong></summary><p>They keep many keys per page and the tree shallow, making point lookups and range scans efficient for page-based storage.</p></details><details><summary><strong>Q2. What is the leftmost-prefix rule?</strong></summary><p>A composite index ordered by (A, B, C) generally supports searches beginning with A, then A+B, then A+B+C. It usually cannot directly seek efficiently by B alone because the index is primarily ordered by A.</p></details><details><summary><strong>Q3. What is a covering index?</strong></summary><p>An index containing all data needed by a particular query, potentially allowing an index-only access path and avoiding base-row fetches.</p></details><details><summary><strong>Q4. What is the difference between EXPLAIN and EXPLAIN ANALYZE?</strong></summary><p>EXPLAIN generally reports the estimated plan; EXPLAIN ANALYZE executes the query and adds actual runtime measurements in supporting engines.</p></details><details><summary><strong>Q5. Why might an index not be used?</strong></summary><p>The query may return many rows, the table may be small, statistics may mislead the optimizer, a function/cast/collation may prevent a matching index path, or the optimizer may estimate a scan is cheaper.</p></details><details><summary><strong>Q6. What is SARGability?</strong></summary><p>It describes predicates that can be used effectively as index search arguments. A function on an indexed column can interfere unless a matching functional index or equivalent strategy exists.</p></details><details><summary><strong>Q7. Why can increasing pool size reduce throughput?</strong></summary><p>More connections increase concurrent work against a finite database capacity and can worsen CPU, I/O, memory, and lock contention. Measure pool waits and database saturation before resizing.</p></details><details><summary><strong>Q8. What causes connection pool exhaustion?</strong></summary><p>Long queries, long transactions, leaked/unreturned connections, a pool that is too small, or database saturation. Diagnose acquisition wait and connection usage before changing the maximum size.</p></details><details><summary><strong>Q9. How do you prevent a transfer deadlock?</strong></summary><p>Lock account rows in a consistent global order, keep transactions short, inspect deadlock reports, and retry the complete transaction for recognized transient failures.</p></details><details><summary><strong>Q10. Should every slow query get another index?</strong></summary><p>No. Read the plan first. The cause may be poor selectivity, inaccurate estimates, excessive result size, an inefficient join, a sort, locks, or application-level connection contention. Each index also has write and storage costs.</p></details></section>
+    <section id="checklist"><h2>11. Study Checklist</h2><p class="muted">Tick topics you can explain without notes.</p><div class="checklist" id="checks"><label><input type="checkbox">Explain what an index does and its write/storage costs.</label><label><input type="checkbox">Explain why B+ trees suit page-oriented database storage.</label><label><input type="checkbox">Design a composite index using query predicates and sort order.</label><label><input type="checkbox">Explain a covering index and its trade-offs.</label><label><input type="checkbox">Read estimated vs actual rows in EXPLAIN ANALYZE.</label><label><input type="checkbox">Identify a potentially non-SARGable predicate and a valid alternative.</label><label><input type="checkbox">Explain OFFSET vs keyset pagination.</label><label><input type="checkbox">Explain connection pool metrics and exhaustion causes.</label><label><input type="checkbox">Explain why a larger pool can hurt throughput.</label><label><input type="checkbox">Diagnose and prevent a database deadlock.</label><label><input type="checkbox">Explain safe retry handling and external side-effect risks.</label><label><input type="checkbox">Describe a measure-plan-change-verify optimization workflow.</label></div><div class="progress"><span id="checkbar"></span></div><div id="checklabel" class="small">0 of 12 completed</div></section>
+    <section id="quick"><h2>12. Final Quick-Revision Sheet</h2><ul><li><strong>Index:</strong> faster access path, with storage and write overhead.</li><li><strong>B+ tree:</strong> shallow multi-way tree; ordered leaves support range access.</li><li><strong>Composite index:</strong> column order matters; consider leading-prefix predicates.</li><li><strong>Covering index:</strong> contains all fields needed by a query.</li><li><strong>Query plan:</strong> operations selected by the optimizer.</li><li><strong>EXPLAIN:</strong> estimated plan; <strong>EXPLAIN ANALYZE:</strong> executes and measures in supporting engines.</li><li><strong>Optimization:</strong> measure, inspect plan, fix predicate/index/cardinality/workload issue, verify.</li><li><strong>Connection pool:</strong> bounded reusable connections; monitor waits, usage, and timeouts.</li><li><strong>Deadlock:</strong> circular lock wait; prevent with deterministic ordering and handle transient retries.</li></ul></section>
+  </main></div><footer class="footer">© 2026 Interview A–Z Knowledge Base · Database Performance & Tuning</footer>
+<script>
+  const sections=[...document.querySelectorAll('main section')],toc=document.getElementById('toc');sections.forEach(s=>{const h=s.querySelector('h2');if(h){const a=document.createElement('a');a.href='#'+s.id;a.textContent=h.textContent;toc.appendChild(a)}});function update(){const boxes=[...document.querySelectorAll('#checks input')],n=boxes.filter(x=>x.checked).length,p=n/boxes.length*100;document.getElementById('checkbar').style.width=p+'%';document.getElementById('checklabel').textContent=n+' of '+boxes.length+' completed';document.getElementById('progressbar').style.width=p+'%';document.getElementById('progresslabel').textContent=Math.round(p)+'% complete'}document.querySelectorAll('#checks input').forEach(x=>x.addEventListener('change',update));update();
+</script></body></html>

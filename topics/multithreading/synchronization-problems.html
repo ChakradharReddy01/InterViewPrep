@@ -3,269 +3,308 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Module 2: Synchronization Problems (Deadlock, Livelock & Contention) | Interview A-Z</title>
-  <link rel="stylesheet" href="../../assets/css/style.css">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <title>Module 2: Java Synchronization Problems Masterclass | Interview A-Z</title>
+  <style>
+    :root{--bg:#0b1120;--panel:#111b2e;--panel2:#162238;--text:#e5edf8;--muted:#a8b7cc;--line:#293a55;--blue:#38bdf8;--violet:#818cf8;--green:#34d399;--amber:#fbbf24;--red:#fb7185;--code:#080e19}
+    *{box-sizing:border-box}html{scroll-behavior:smooth;scroll-padding-top:90px}body{margin:0;background:var(--bg);color:var(--text);font:16px/1.72 Inter,system-ui,-apple-system,Segoe UI,sans-serif}a{color:var(--blue)}
+    .navbar{position:sticky;top:0;z-index:20;display:flex;justify-content:space-between;align-items:center;gap:1rem;padding:.85rem 1.5rem;background:rgba(8,14,25,.96);border-bottom:1px solid var(--line);backdrop-filter:blur(12px)}.brand{display:flex;align-items:center;gap:.7rem;font-weight:800}.brand-badge{font-size:.72rem;letter-spacing:.08em;background:linear-gradient(135deg,var(--blue),var(--violet));color:#08111e;padding:.2rem .5rem;border-radius:6px}.navlinks{display:flex;align-items:center;gap:1rem;flex-wrap:wrap}.navlinks a{font-size:.9rem;text-decoration:none;font-weight:650}.nav-btn{border:0;border-radius:7px;padding:.55rem .85rem;background:linear-gradient(135deg,var(--blue),var(--violet));color:#08111e;font-weight:800;cursor:pointer}
+    .layout{max-width:1550px;margin:auto;padding:1.5rem;display:grid;grid-template-columns:260px minmax(0,1fr);gap:1.5rem}.sidebar{position:sticky;top:88px;align-self:start;max-height:calc(100vh - 105px);overflow:auto;background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:1rem}.sidebar h3{margin:.2rem 0 .8rem;font-size:.95rem}.sidebar a{display:block;padding:.36rem .5rem;color:var(--muted);font-size:.86rem;text-decoration:none;border-radius:6px}.sidebar a:hover{background:var(--panel2);color:var(--blue)}main{min-width:0}.breadcrumb{font-size:.85rem;color:var(--muted);margin:.2rem 0 1rem}.hero{padding:1.7rem;background:linear-gradient(135deg,#132641,#171b38);border:1px solid #304463;border-radius:18px;margin-bottom:1.3rem}.hero h1{font-size:clamp(2rem,4vw,3rem);line-height:1.12;margin:.6rem 0}.hero p{color:#c5d3e7;max-width:950px}.chips{display:flex;flex-wrap:wrap;gap:.5rem}.chip{border:1px solid #395170;border-radius:999px;padding:.2rem .65rem;font-size:.78rem;color:#c5d8f1}.section{background:var(--panel);border:1px solid var(--line);border-radius:15px;padding:1.35rem;margin:1rem 0}.section h2{font-size:1.55rem;margin:.1rem 0 1rem}.section h3{font-size:1.12rem;margin:1.25rem 0 .4rem;color:#c5e7ff}.section p,.section li{color:#d1dced}.muted{color:var(--muted)!important}.grid2,.grid3{display:grid;gap:1rem}.grid2{grid-template-columns:repeat(2,minmax(0,1fr))}.grid3{grid-template-columns:repeat(3,minmax(0,1fr))}.card{padding:1rem;background:var(--panel2);border:1px solid var(--line);border-radius:11px}.card h3{margin-top:0}.callout{margin:1rem 0;padding:1rem 1.1rem;border-left:4px solid var(--blue);background:#102338;border-radius:0 10px 10px 0}.warning{border-color:var(--amber);background:#2a2415}.production{border-color:var(--red);background:#2a1824}.solution{border-color:var(--green);background:#102820}.diagram{overflow:auto;background:#080e19;border:1px solid var(--line);border-radius:10px;padding:1rem;margin:1rem 0;color:#b8e7ff;font:.9rem/1.55 ui-monospace,SFMono-Regular,Consolas,monospace;white-space:pre}.codehead{display:flex;justify-content:space-between;color:var(--muted);font-size:.8rem;padding:.55rem .8rem;background:#0d1626;border:1px solid var(--line);border-bottom:0;border-radius:9px 9px 0 0}.code{margin:0 0 1rem;overflow:auto;background:var(--code);border:1px solid var(--line);border-radius:0 0 9px 9px;padding:1rem;color:#dbeafe;font:.88rem/1.65 ui-monospace,SFMono-Regular,Consolas,monospace;white-space:pre}code{font-family:ui-monospace,SFMono-Regular,Consolas,monospace;color:#b8e7ff;background:#0a1322;padding:.1rem .3rem;border-radius:4px}pre code{background:transparent;padding:0;color:inherit}table{width:100%;border-collapse:collapse;margin:1rem 0;font-size:.92rem}th,td{padding:.75rem;text-align:left;vertical-align:top;border:1px solid var(--line)}th{background:#182943;color:#c5e7ff}td{color:#d1dced}tr:nth-child(even) td{background:#0e192b}.checklist label{display:flex;gap:.65rem;align-items:flex-start;padding:.45rem 0;color:#d1dced}.checklist input{margin-top:.45rem;accent-color:var(--blue)}.progress-wrap{height:8px;background:#26364e;border-radius:99px;overflow:hidden}.progress-bar{height:100%;width:0;background:linear-gradient(90deg,var(--blue),var(--violet));transition:width .2s}.small{font-size:.88rem}.footer{text-align:center;color:var(--muted);padding:2rem 1rem}.qa{padding:.9rem 1rem;margin:.8rem 0;background:#0d192b;border:1px solid var(--line);border-radius:9px}.qa strong{color:#c5e7ff}.qa p{margin:.45rem 0 0}.anchor{scroll-margin-top:90px}
+    @media(max-width:1000px){.layout{grid-template-columns:1fr;padding:1rem}.sidebar{position:relative;top:auto;max-height:none}.navlinks{gap:.55rem}.grid3{grid-template-columns:1fr 1fr}}@media(max-width:650px){.navbar{padding:.7rem .8rem;align-items:flex-start}.brand{font-size:.9rem}.navlinks a:not(.home-link){display:none}.navlinks{justify-content:flex-end}.layout{padding:.65rem}.section{padding:1rem}.grid2,.grid3{grid-template-columns:1fr}.hero{padding:1.1rem}table{display:block;overflow-x:auto}}@media print{body{background:#fff;color:#111;font-size:11pt}.navbar,.sidebar,.no-print{display:none!important}.layout{display:block;padding:0;max-width:none}.hero,.section,.card,.qa{background:#fff!important;color:#111!important;border:1px solid #aaa;break-inside:avoid}.hero p,.section p,.section li,.muted,td{color:#222!important}.section h3,.section h2,.hero h1{color:#111!important}.code,.diagram{background:#f4f4f4!important;color:#111!important;white-space:pre-wrap;overflow-wrap:anywhere}.codehead{background:#eee;color:#111}.callout{background:#f5f5f5!important}.footer{color:#333}}
+  </style>
 </head>
 <body>
-
-  <!-- Top Navigation -->
-    <!-- Top Navigation -->
-    <nav class="navbar">
-    <div class="brand">
-      <a href="../../index.html" class="brand-link" style="display: flex; align-items: center; gap: 0.75rem; text-decoration: none; color: inherit;">
-        <span class="brand-badge" style="background: linear-gradient(135deg, #38bdf8, #818cf8); color: #0f172a; padding: 0.15rem 0.55rem; border-radius: 6px; font-size: 0.75rem; font-weight: 800; letter-spacing: 0.05em; text-transform: uppercase;">Interview A-Z</span>
-        <span style="font-weight: 700; font-size: 1.15rem; color: #fff;">Engineering Handbook</span>
-      </a>
-    </div>
-    <div class="nav-links navlinks" style="display: flex; gap: 1.25rem; align-items: center;">
-      <a href="../../index.html" class="nav-link" style="text-decoration: none; font-weight: 600; font-size: 0.95rem;">🏠 Home</a>
-      <a href="../../index.html#topics" class="nav-link" style="text-decoration: none; font-weight: 600; font-size: 0.95rem;">📚 All Modules</a>
-      <a href="https://github.com/ChakradharReddy01/InterViewPrep" target="_blank" class="nav-link" style="text-decoration: none; font-weight: 600; font-size: 0.95rem;">GitHub</a>
-      <button onclick="document.querySelectorAll('details').forEach(d=>d.open=true);window.print();" class="nav-btn-pdf" title="Save page as PDF" style="display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.35rem 0.85rem; font-size: 0.85rem; font-weight: 700; background: linear-gradient(135deg, #38bdf8, #818cf8); color: #0f172a; border: none; border-radius: 6px; cursor: pointer; transition: transform 0.15s ease, box-shadow 0.15s ease; box-shadow: 0 2px 8px rgba(56,189,248,0.25);">
-        <span>📄</span> Save to PDF
-      </button>
-    </div>
-  </nav>
-
-  <div class="container">
-    <div class="article-layout">
-      <!-- Sticky Sidebar Table of Contents -->
-      <aside class="sidebar-toc">
-        <h3>On This Page</h3>
-        <ul class="toc-links" id="dynamic-toc">
-          <!-- Dynamically populated via main.js -->
-        </ul>
-      </aside>
-
-      <!-- Main Article Content -->
-      <main class="article-content">
-        <!-- Breadcrumb -->
-        <nav class="breadcrumb">
-          <a href="../../index.html">Home</a>
-          <span>/</span>
-          <span>Module 2: Multithreading</span>
-          <span>/</span>
-          <span style="color: #fff;">Synchronization Problems</span>
-        </nav>
-
-        <!-- Article Header -->
-        <header class="article-header">
-          <h1>Module 2: Synchronization Hazards: Deadlock, Starvation & Livelock</h1>
-          <div class="article-meta">
-            <span class="badge badge-multithread">Concurrency Hazards</span>
-            <span class="badge badge-advanced">Senior Systems</span>
-            <span class="badge badge-prod">Production Outages & RCA</span>
-            <span>⏱️ 45 min deep dive</span>
-            <span>Target Roles: SDE-2, SDE-3, Principal Architect</span>
-          </div>
-        </header>
-
-        <!-- SECTION 1: DEADLOCK & COFFMAN CONDITIONS -->
-        <section>
-          <h2>1. Deadlock & The 4 Coffman Conditions</h2>
-
-          <h3>1.1 What is a Deadlock?</h3>
-          <p>
-            A <strong>Deadlock</strong> occurs when two or more threads are permanently blocked, each waiting for a lock held by another thread in the group.
-          </p>
-
-          <pre><code>[ Thread 1 ] ---holds Lock A---&gt; waiting for Lock B ---+
-      ^                                                |
-      |                                                v
-      +--- waiting for Lock A &lt;---holds Lock B--- [ Thread 2 ]</code></pre>
-
-          <h3>1.2 The 4 Coffman Conditions</h3>
-          <p>A deadlock can occur <strong>only if all four</strong> of the following conditions hold simultaneously:</p>
-          <ol>
-            <li><strong>Mutual Exclusion:</strong> At least one resource must be held in a non-shareable mode.</li>
-            <li><strong>Hold and Wait:</strong> A thread must hold at least one resource while waiting to acquire additional resources held by other threads.</li>
-            <li><strong>No Preemption:</strong> Resources cannot be forcefully taken away from a thread; they can only be released voluntarily by the holding thread.</li>
-            <li><strong>Circular Wait:</strong> A closed chain of threads exists such that each thread holds at least one resource needed by the next thread in the chain.</li>
-          </ol>
-
-          <h3>1.3 Preventing Deadlocks: Global Resource Ordering</h3>
-          <p>
-            The most reliable enterprise strategy to eliminate deadlocks is to <strong>break the Circular Wait condition</strong> by enforcing a strict global lock acquisition order:
-          </p>
-
-          <div class="code-header">
-            <span>Deadlock-Free Fund Transfer with Resource Ordering</span>
-            <span>Java</span>
-          </div>
-          <pre><code>public void transferMoney(Account fromAccount, Account toAccount, BigDecimal amount) {
-    // 1. Enforce a deterministic global locking order based on account ID:
-    Account firstLock = fromAccount.getId().compareTo(toAccount.getId()) &lt; 0 ? fromAccount : toAccount;
-    Account secondLock = fromAccount.getId().compareTo(toAccount.getId()) &lt; 0 ? toAccount : fromAccount;
-
-    // 2. Always acquire locks in identical global order across all threads:
-    synchronized (firstLock) {
-        synchronized (secondLock) {
-            fromAccount.debit(amount);
-            toAccount.credit(amount);
-        }
-    }
-}</code></pre>
-        </section>
-
-        <!-- SECTION 2: STARVATION & LIVELOCK -->
-        <section>
-          <h2>2. Thread Starvation & Livelock</h2>
-
-          <h3>2.1 Thread Starvation</h3>
-          <p>
-            <strong>Starvation</strong> occurs when a runnable thread is perpetually denied CPU time-slices or lock acquisition because "greedy" threads or higher-priority threads consistently monopolize the resources.
-          </p>
-          <ul>
-            <li><strong>Causes:</strong> Thread priority abuse (<code>Thread.setPriority()</code>), non-fair locking mechanisms where new threads "barge in" ahead of waiting threads, or long-running critical sections.</li>
-            <li><strong>Solutions:</strong> Use fair synchronization primitives (e.g., <code>new ReentrantLock(true)</code>) and standard priority levels.</li>
-          </ul>
-
-          <h3>2.2 Livelock</h3>
-          <p>
-            Unlike deadlock (where threads are parked and frozen), in a <strong>Livelock</strong>, threads are <strong>actively executing and burning CPU</strong>, but constantly reacting to each other's state changes in a way that prevents any forward progress!
-          </p>
-          <p>
-            <em>Real-world analogy:</em> Two polite people trying to pass each other in a narrow hallway, simultaneously stepping to the left, then simultaneously stepping to the right, over and over again without ever walking past.
-          </p>
-
-          <div class="code-header">
-            <span>Resolving Livelock with Exponential Backoff + Random Jitter</span>
-            <span>Java</span>
-          </div>
-          <pre><code>// Preventing livelock during transaction retry collisions:
-public void executeWithJitterRetry() {
-    int attempts = 0;
-    while (attempts &lt; MAX_RETRIES) {
-        if (tryAcquireResources()) {
-            performWork();
-            return;
-        }
-        attempts++;
-        // Random jitter breaks synchronized collision loops:
-        long sleepMs = (long) (Math.pow(2, attempts) * 100) + ThreadLocalRandom.current().nextInt(50);
-        Thread.sleep(sleepMs);
-    }
-}</code></pre>
-        </section>
-
-        <!-- SECTION 3: THREAD CONTENTION -->
-        <section>
-          <h2>3. Thread Contention & Performance Degradation</h2>
-          <p>
-            <strong>Thread Contention</strong> occurs when multiple threads attempt to access a synchronized monitor or lock at the same instant.
-          </p>
-          <ul>
-            <li><strong>Symptoms:</strong> CPU utilization spikes, application throughput drops, and threads spend &gt;90% of their lifecycle parked in <code>BLOCKED</code> or <code>WAITING</code>.</li>
-            <li><strong>Solutions:</strong>
-              <ol>
-                <li><strong>Reduce Lock Hold Time:</strong> Move I/O, validations, and computation completely outside the synchronized block.</li>
-                <li><strong>Lock Striping:</strong> Instead of locking an entire structure, lock independent partitions (as demonstrated by <code>ConcurrentHashMap</code>).</li>
-                <li><strong>Read/Write Splitting:</strong> Replace mutual exclusion with <code>ReentrantReadWriteLock</code> or <code>StampedLock</code>.</li>
-                <li><strong>Lock-Free Alternatives:</strong> Migrate to atomic variables (<code>AtomicLong</code>, <code>LongAdder</code>).</li>
-              </ol>
-            </li>
-          </ul>
-        </section>
-
-        <!-- SECTION 4: REAL-TIME PRODUCTION ISSUES -->
-        <section>
-          <h2>4. Real-Time Production Issues & Post-Mortems</h2>
-
-          <!-- Incident 1 -->
-          <div class="callout callout-production">
-            <div class="callout-title">🚨 Incident 1: Cross-Account Deadlock Freezing All Payment Gateways</div>
-            <p><strong>Scenario:</strong> A peer-to-peer mobile payments platform froze during high-traffic evening hours. Thread dumps revealed over 180 Tomcat worker threads in <code>BLOCKED</code> state, resulting in complete outage.</p>
-          </div>
-
-          <div class="callout callout-warning">
-            <div class="callout-title">🔍 Root Cause Analysis (RCA)</div>
-            <p>
-              The transfer method locked accounts in the order they were passed in arguments:
-              <code>synchronized(from) { synchronized(to) { ... } }</code>.
-              <br><br>
-              User 1 transferred $10 from Account A to Account B (Thread 1 locked A, waiting for B). Simultaneously, User 2 transferred $5 from Account B to Account A (Thread 2 locked B, waiting for A). A circular wait was formed, deadlocking both worker threads. Subsequent transfers involving Account A or B also deadlocked, triggering a cascading thread freeze.
-            </p>
-          </div>
-
-          <div class="callout callout-solution">
-            <div class="callout-title">💡 Production Resolution</div>
-            <p>Implemented strict <strong>Account ID ordering</strong> before acquiring locks, mathematically eliminating circular wait dependencies.</p>
-          </div>
-
-          <!-- Incident 2 -->
-          <div class="callout callout-production">
-            <div class="callout-title">🚨 Incident 2: High-CPU Livelock in Distributed Lock Lease Negotiation</div>
-            <p><strong>Scenario:</strong> A scheduled reconciliation job spiked CPU to 100% across all Kubernetes pods. No database records were updated, yet all pods remained in tight loops.</p>
-          </div>
-
-          <div class="callout callout-warning">
-            <div class="callout-title">🔍 Root Cause Analysis (RCA)</div>
-            <p>
-              When a pod failed to acquire a distributed lock, it released its partial resources and immediately slept for an identical fixed interval of <code>50ms</code>. All 10 pods woke up on the exact same millisecond, re-attempted the lock, collided again, and released again in an infinite livelock cycle.
-            </p>
-          </div>
-
-          <div class="callout callout-solution">
-            <div class="callout-title">💡 Production Resolution</div>
-            <p>Injected <strong>exponential backoff with randomized jitter</strong> into the retry loop to desynchronize thread wakeups.</p>
-          </div>
-        </section>
-
-        <!-- SECTION 5: PRODUCTION DIAGNOSTICS TOOLKIT -->
-        <section>
-          <h2>5. Production Triage & Inspection Toolkit</h2>
-
-          <div class="code-header">
-            <span>Automated Deadlock Detection in Production</span>
-            <span>Bash</span>
-          </div>
-          <pre><code># 1. Trigger automated JVM Deadlock Detection via jstack
-jstack -l &lt;PID&gt;
-
-# If a deadlock exists, HotSpot appends this explicit report at the bottom:
-# Found one Java-level deadlock:
-# =============================
-# "Thread-1":
-#   waiting to lock monitor 0x00007f (object 0x1234, a com.Account),
-#   which is held by "Thread-2"
-# "Thread-2":
-#   waiting to lock monitor 0x00007e (object 0x5678, a com.Account),
-#   which is held by "Thread-1"
-
-# 2. Programmatic Deadlock Detection using JVM ThreadMXBean
-ThreadMXBean threadBean = ManagementFactory.getThreadMXBean();
-long[] deadlockedThreadIds = threadBean.findDeadlockedThreads();
-if (deadlockedThreadIds != null) {
-    logger.error("ALERT: Deadlocked threads detected in JVM!");
-}</code></pre>
-        </section>
-
-        <!-- SECTION 6: SENIOR INTERVIEW Q&A -->
-        <section>
-          <h2>6. Senior / Staff Technical Interview Q&A</h2>
-
-          <div class="callout callout-interview">
-            <div class="callout-title">🎯 Q1: How can tryLock() prevent deadlocks?</div>
-            <p><strong>Answer:</strong> <code>ReentrantLock.tryLock()</code> attempts to acquire a lock without blocking indefinitely. If a thread acquires Lock A but fails to acquire Lock B within a specified timeout (e.g. <code>lockB.tryLock(500, TimeUnit.MILLISECONDS)</code>), the thread can voluntarily release Lock A, back off, and retry later. This breaks the <strong>Hold and Wait</strong> condition, preventing permanent deadlocks.</p>
-          </div>
-
-          <div class="callout callout-interview">
-            <div class="callout-title">🎯 Q2: What is the fundamental difference between a Deadlock and a Livelock?</div>
-            <p><strong>Answer:</strong> In a <strong>Deadlock</strong>, threads are blocked in the <code>BLOCKED</code> or <code>WAITING</code> state, consuming 0% CPU while permanently waiting for locks held by each other. In a <strong>Livelock</strong>, threads are actively running in the <code>RUNNABLE</code> state, consuming high CPU cycles while continuously modifying their state in response to other threads without making any forward business progress.</p>
-          </div>
-        </section>
-
-      </main>
-    </div>
+<nav class="navbar">
+  <div class="brand"><span class="brand-badge">INTERVIEW A-Z</span><span>Engineering Handbook</span></div>
+  <div class="navlinks">
+    <a class="home-link" href="../../index.html">🏠 Home Directory</a>
+    <a href="../../index.html#topics">📚 All Modules</a>
+    <a href="https://github.com/ChakradharReddy01/InterViewPrep" target="_blank" rel="noopener">GitHub</a>
+    <button class="nav-btn" onclick="window.print()">📄 Save to PDF</button>
   </div>
+</nav>
+<div class="layout">
+  <aside class="sidebar"><h3>On This Page</h3><div id="toc"></div><hr style="border-color:var(--line);margin:1rem 0"><div class="small muted">Study progress</div><div class="progress-wrap"><div id="progressBar" class="progress-bar"></div></div><div id="progressText" class="small muted">0 / 7 sections complete</div></aside>
+  <main>
+    <div class="breadcrumb"><a href="../../index.html">Home</a> / Module 2: Multithreading / <span style="color:#fff">Synchronization Problems</span></div>
+    <header class="hero"><div class="chips"><span class="chip">Concurrency Hazards</span><span class="chip">Deadlock & Livelock</span><span class="chip">Production RCA</span><span class="chip">Interview Deep Dive</span></div><h1>Synchronization Problems Masterclass</h1><p>Learn to distinguish deadlock, starvation, livelock, race conditions, and thread contention. Each problem has a different symptom, root cause, diagnostic approach, and fix. This guide connects the concepts to Java code and production debugging.</p><p class="muted small">Suggested study time: 45–60 minutes · Java 17 examples · Includes diagrams, diagnostic commands, prevention patterns, and interview Q&A.</p></header>
 
-  <footer>
-    <p>Interview A-Z Handbook &bull; Built for GitHub Pages &bull; Production Grade Interview Prep</p>
-  </footer>
+    <section class="section anchor" id="race"><h2>1. Race condition</h2>
+      <p>A <strong>race condition</strong> occurs when the correctness of a result depends on the timing or interleaving of concurrent operations. A common example is two threads incrementing the same non-atomic variable: both read the old value, both calculate the same next value, and one update overwrites the other.</p>
+      <div class="diagram">Initial count = 10
 
-  <script src="../../assets/js/main.js"></script>
+        Thread A: read 10 ── add 1 ── write 11
+        Thread B:      read 10 ── add 1 ── write 11
+
+        Expected result after two increments: 12
+        Actual result in this interleaving:  11  (lost update)</div>
+      <div class="codehead"><span>Incorrect shared counter</span><span>Java</span></div><pre class="code"><code>class UnsafeCounter {
+    private int count;
+
+    void increment() {
+        count++; // read + add + write: not atomic
+    }
+
+    int get() {
+        return count;
+    }
+}</code></pre>
+      <h3>1.1 Why count++ is not atomic</h3><p>Conceptually, <code>count++</code> involves reading the field, computing a new value, and writing it back. The JVM may interleave these steps with another thread. Marking the field <code>volatile</code> makes reads and writes visible but does not turn the compound increment into one atomic operation.</p>
+      <div class="codehead"><span>Three common safe alternatives</span><span>Java</span></div><pre class="code"><code>// Option A: mutual exclusion
+class SynchronizedCounter {
+    private int count;
+    synchronized void increment() { count++; }
+    synchronized int get() { return count; }
+}
+
+// Option B: atomic read-modify-write
+AtomicInteger atomic = new AtomicInteger();
+atomic.incrementAndGet();
+
+// Option C: high-contention statistics counter
+LongAdder adder = new LongAdder();
+adder.increment();
+long observed = adder.sum();</code></pre>
+      <p>Use synchronized/locks when several pieces of state must change together. Use atomic variables for simple atomic state transitions. <code>LongAdder</code> is often suitable for high-contention statistics, but its sum is not a transactional snapshot while updates are happening.</p>
+      <h3>1.2 Visibility vs atomicity vs ordering</h3>
+      <table><thead><tr><th>Concept</th><th>Question answered</th><th>Example</th></tr></thead><tbody>
+      <tr><td>Atomicity</td><td>Can another thread observe a partially completed operation?</td><td><code>AtomicInteger.incrementAndGet()</code> is atomic.</td></tr>
+      <tr><td>Visibility</td><td>When one thread writes, when can another see the write?</td><td>A volatile write happens-before a subsequent read of that field.</td></tr>
+      <tr><td>Ordering</td><td>Can operations be observed in an unexpected order?</td><td>Synchronization and volatile establish specified happens-before relationships.</td></tr>
+      </tbody></table>
+      <div class="callout warning"><strong>Interview trap:</strong> <code>volatile int count; count++;</code> is still a race. Volatile does not make read-modify-write sequences atomic.</div>
+    </section>
+
+    <section class="section anchor" id="deadlock"><h2>2. Deadlock</h2>
+      <p>A <strong>deadlock</strong> occurs when a group of threads waits forever because each thread is waiting for a resource held by another thread in that group. The threads cannot make progress because the required locks will not be released until the waiting threads proceed.</p>
+      <div class="diagram">Thread A owns Lock 1                 Thread B owns Lock 2
+        |                                      |
+        v                                      v
+        waits for Lock 2  <----------------->  waits for Lock 1
+
+        A cannot proceed until B releases Lock 2.
+        B cannot proceed until A releases Lock 1.</div>
+      <h3>2.1 The four Coffman conditions</h3><p>These four conditions must all hold for a classic resource deadlock:</p>
+      <ol><li><strong>Mutual exclusion:</strong> at least one resource cannot be shared simultaneously.</li><li><strong>Hold and wait:</strong> a thread holds one resource while waiting for another.</li><li><strong>No preemption:</strong> resources cannot simply be taken away; the holder releases them.</li><li><strong>Circular wait:</strong> there is a cycle in which each thread waits for a resource held by the next.</li></ol>
+      <h3>2.2 Reproducing the lock-ordering bug</h3>
+      <div class="codehead"><span>Dangerous pattern — do not run in a production process</span><span>Java</span></div><pre class="code"><code>Object accountA = new Object();
+Object accountB = new Object();
+
+Thread t1 = new Thread(() -&gt; {
+    synchronized (accountA) {
+        sleepBriefly();
+        synchronized (accountB) {
+            System.out.println("A then B");
+        }
+    }
+});
+
+Thread t2 = new Thread(() -&gt; {
+    synchronized (accountB) {
+        sleepBriefly();
+        synchronized (accountA) {
+            System.out.println("B then A");
+        }
+    }
+});
+
+t1.start();
+t2.start(); // Both can wait forever if each acquired its first lock.</code></pre>
+      <h3>2.3 Prevention: global lock ordering</h3>
+      <p>When a workflow must lock multiple accounts/resources, assign a stable ordering (for example, account ID) and always acquire locks in that order, regardless of argument order.</p>
+      <div class="codehead"><span>Lock resources in deterministic order</span><span>Java</span></div><pre class="code"><code>void transfer(Account from, Account to, BigDecimal amount) {
+    if (from == to) {
+        return; // or handle self-transfer according to domain rules
+    }
+
+    Account first = from.id().compareTo(to.id()) &lt; 0 ? from : to;
+    Account second = first == from ? to : from;
+
+    synchronized (first) {
+        synchronized (second) {
+            from.debit(amount);
+            to.credit(amount);
+        }
+    }
+}</code></pre>
+      <p>Other strategies include avoiding nested locks, reducing the number of shared resources, using a single lock for a small invariant, or using timed <code>tryLock</code> with a carefully designed release-and-retry strategy. Timeouts detect or limit indefinite waiting; they do not automatically make a business operation correct.</p>
+      <div class="callout production"><strong>Production pattern:</strong> payment requests freeze and request latency climbs. A thread dump reveals one group of request threads waiting for account locks in opposite orders. Fix the acquisition order, add deadlock diagnostics, and test reverse-direction transfers under concurrency.</div>
+    </section>
+
+    <section class="section anchor" id="starvation"><h2>3. Starvation</h2>
+      <p><strong>Starvation</strong> occurs when a thread is continually denied the CPU, a lock, a connection, or another required resource while other threads keep making progress. Unlike deadlock, the system may still be doing useful work; the problem is that one or more threads repeatedly lose access.</p>
+      <h3>3.1 Common causes</h3><ul><li><strong>Unfair lock acquisition:</strong> newly arriving threads repeatedly acquire a lock before older waiters.</li><li><strong>Long critical sections:</strong> a thread holds a shared lock for too long, leaving others waiting.</li><li><strong>Priority imbalance:</strong> higher-priority runnable threads can dominate lower-priority work in some environments; Java thread priority is only a scheduling hint and is not portable fairness control.</li><li><strong>Thread-pool starvation:</strong> all workers block on tasks that require the same exhausted pool to make progress.</li><li><strong>Resource-pool starvation:</strong> a subset of requests monopolizes database connections or permits.</li></ul>
+      <h3>3.2 Example: tasks starved in a constrained pool</h3>
+      <div class="diagram">Pool has 4 workers
+        worker 1: parent task waits for child task
+        worker 2: parent task waits for child task
+        worker 3: parent task waits for child task
+        worker 4: parent task waits for child task
+        queue:    child 1, child 2, child 3, child 4
+
+        All workers are occupied by waiting parents.
+        No worker can execute the queued children.</div>
+      <p>This is commonly called thread-pool starvation and can become a starvation deadlock. Avoid blocking on child tasks submitted to the same small pool; use asynchronous composition, separate pools by workload, or redesign dependencies.</p>
+      <h3>3.3 Mitigation</h3><ul><li>Use fair locks only where fairness matters: <code>new ReentrantLock(true)</code> can reduce barging, often with throughput trade-offs. Fairness is not a universal guarantee of end-to-end business fairness.</li><li>Keep critical sections short; do not perform network calls or blocking I/O while holding application locks.</li><li>Use bounded work queues, sensible timeouts, and separate pools for unrelated workloads.</li><li>Track wait time per task/request, not just average throughput.</li></ul>
+      <div class="callout warning"><strong>Important:</strong> making a lock fair can reduce one source of starvation, but it cannot fix a thread that is waiting on the wrong resource, a dependency cycle, or an overloaded downstream system.</div>
+    </section>
+
+    <section class="section anchor" id="livelock"><h2>4. Livelock</h2>
+      <p><strong>Livelock</strong> occurs when threads remain active and repeatedly react to one another, but their actions prevent forward progress. Unlike a deadlock, the threads are not simply frozen waiting for locks; they keep running, retrying, yielding, or changing state.</p>
+      <div class="diagram">Thread A: detects conflict -> backs off
+        Thread B: detects conflict -> backs off
+        Both retry at nearly the same time
+        Both collide again
+        Both back off and retry forever
+
+        CPU activity continues, business progress does not.</div>
+      <h3>4.1 Real-world analogy</h3><p>Two people meet in a narrow hallway. Both step left to be polite; both then step right; both repeat the same reaction and never pass. In software, coordinated retries can create the same pattern.</p>
+      <h3>4.2 Prevention: bounded retries and randomized backoff</h3>
+      <div class="codehead"><span>Retry with exponential backoff and jitter</span><span>Java</span></div><pre class="code"><code>boolean executeWithRetry() throws InterruptedException {
+    int maxAttempts = 5;
+
+    for (int attempt = 0; attempt &lt; maxAttempts; attempt++) {
+        if (tryPerformOperation()) {
+            return true;
+        }
+
+        long capMillis = Math.min(1_000L, 50L &lt;&lt; attempt);
+        long delayMillis = ThreadLocalRandom.current()
+                .nextLong(capMillis + 1);
+
+        Thread.sleep(delayMillis);
+    }
+
+    return false; // report a controlled failure or schedule a later retry
+}</code></pre>
+      <p>Jitter spreads retries over time so competing workers are less likely to collide again simultaneously. Always use a retry limit, an overall deadline, and an idempotency strategy where the operation may have partially succeeded. Restore interruption or propagate <code>InterruptedException</code>; do not swallow cancellation signals.</p>
+      <div class="callout production"><strong>Production pattern:</strong> several application replicas retry a distributed lock every fixed 50 ms. They wake together, collide together, and make no progress. Exponential backoff with random jitter, a bounded deadline, and clear lock ownership/lease semantics help break the synchronized retry cycle.</div>
+    </section>
+
+    <section class="section anchor" id="contention"><h2>5. Thread contention</h2>
+      <p><strong>Thread contention</strong> happens when multiple threads compete for the same limited resource—often a monitor or lock. Contention is not automatically a correctness bug; it becomes a performance problem when waiting consumes significant time, throughput falls, or tail latency grows.</p>
+      <div class="diagram">Many request threads
+        |  |  |  |  |
+        v  v  v  v  v
+        +-------------------+
+        | One shared lock   |  <-- one thread enters
+        +-------------------+
+        |  |  |  |
+        v  v  v  v
+        waiting / parked threads
+
+        Result: serialized work despite many request threads.</div>
+      <h3>5.1 Symptoms and measurements</h3><ul><li>Throughput stops increasing as thread count increases.</li><li>p95/p99 latency rises while many threads are <code>BLOCKED</code>, <code>WAITING</code>, or parked.</li><li>CPU can be high under spin/retry contention, or low when most threads are blocked. CPU alone does not diagnose contention.</li><li>Profiles show time in lock acquisition, monitor entry, condition waits, or a hot synchronized method.</li></ul>
+      <h3>5.2 Common sources</h3><ul><li>One global lock around unrelated data.</li><li>Long synchronized blocks that include logging, serialization, database calls, or HTTP requests.</li><li>High-frequency writes to a shared counter or cache entry.</li><li>Too many threads competing for a small database connection pool or semaphore.</li><li>Excessive retries that amplify load during a dependency slowdown.</li></ul>
+      <h3>5.3 Reduce contention</h3>
+      <div class="grid2">
+        <div class="card"><h3>Shorten the critical section</h3><p class="small">Compute and validate outside the lock where safe. Keep only the invariant-preserving state change inside.</p></div>
+        <div class="card"><h3>Reduce shared state</h3><p class="small">Use immutable data, thread confinement, or local accumulation when possible.</p></div>
+        <div class="card"><h3>Partition work</h3><p class="small">Lock striping or partitioned data can let independent keys proceed concurrently.</p></div>
+        <div class="card"><h3>Choose suitable primitives</h3><p class="small">Use atomic variables for simple state, read/write locks for suitable read-heavy access, and concurrent collections for shared structures.</p></div>
+      </div>
+      <div class="codehead"><span>Bad: slow I/O while holding a lock</span><span>Java</span></div><pre class="code"><code>synchronized (cacheLock) {
+    CacheEntry entry = cache.get(key);
+    RemoteService.refresh(entry); // slow network call blocks every lock user
+    cache.put(key, entry);
+}</code></pre>
+      <div class="codehead"><span>Better: snapshot under lock, perform I/O outside, then validate/update</span><span>Java pattern</span></div><pre class="code"><code>CacheEntry snapshot;
+long version;
+
+synchronized (cacheLock) {
+    snapshot = cache.get(key).copy();
+    version = cache.versionOf(key);
+}
+
+CacheEntry refreshed = remoteService.refresh(snapshot); // no shared lock held
+
+synchronized (cacheLock) {
+    if (cache.versionOf(key) == version) {
+        cache.put(key, refreshed);
+    } else {
+        // Another writer changed the entry: reconcile or retry.
+    }
+}</code></pre>
+      <p>This optimistic pattern is illustrative: the version check and update must be atomic with respect to competing writers, and the copied state must be safe to use outside the lock. Real code may use a per-key lock, a versioned value, or a database compare-and-set.</p>
+    </section>
+
+    <section class="section anchor" id="diagnostics"><h2>6. Production diagnosis toolkit</h2>
+      <h3>6.1 Capture and inspect thread dumps</h3>
+      <div class="codehead"><span>Commands</span><span>Shell / JVM</span></div><pre class="code"><code># Identify the JVM process
+jcmd -l
+
+# Capture a thread dump (replace PID)
+jcmd &lt;PID&gt; Thread.print
+
+# Alternative on supported JDK installations
+jstack -l &lt;PID&gt;</code></pre>
+      <p>Capture several thread dumps a few seconds apart. A single dump is a snapshot; repeated dumps help distinguish a persistent deadlock from a transient slow operation or repeated contention. Protect dumps because they may contain class names, request details, and other operational information.</p>
+      <h3>6.2 Programmatic deadlock detection</h3>
+      <div class="codehead"><span>ThreadMXBean</span><span>Java</span></div><pre class="code"><code>import java.lang.management.ManagementFactory;
+import java.lang.management.ThreadInfo;
+import java.lang.management.ThreadMXBean;
+
+ThreadMXBean bean = ManagementFactory.getThreadMXBean();
+long[] ids = bean.findDeadlockedThreads();
+
+if (ids != null) {
+    ThreadInfo[] info = bean.getThreadInfo(ids, true, true);
+    for (ThreadInfo thread : info) {
+        System.err.println(thread);
+    }
+}</code></pre>
+      <p><code>findDeadlockedThreads()</code> can detect cycles involving object monitors and ownable synchronizers on supported JVMs. This is a diagnostic aid, not a substitute for capturing thread dumps and investigating the application-level lock order.</p>
+      <h3>6.3 What to look for</h3><table><thead><tr><th>Symptom</th><th>Likely direction</th><th>Next step</th></tr></thead><tbody>
+      <tr><td>Explicit “Found one Java-level deadlock” report</td><td>Deadlock</td><td>Map each thread's held lock and requested lock; break the cycle.</td></tr>
+      <tr><td>One thread waits much longer than peers</td><td>Starvation or unfair access</td><td>Measure wait duration, fairness, pool saturation, and dependency limits.</td></tr>
+      <tr><td>High CPU with repeated retries, little progress</td><td>Livelock or spin/retry loop</td><td>Inspect retry cadence, collision patterns, backoff, and idempotency.</td></tr>
+      <tr><td>Many threads blocked at the same monitor</td><td>Contention</td><td>Find the lock owner and shorten or partition the critical section.</td></tr>
+      <tr><td>Counter/state differs under load</td><td>Race condition</td><td>Identify shared mutable state and replace check-then-act with an atomic operation.</td></tr>
+      </tbody></table>
+    </section>
+
+    <section class="section anchor" id="compare"><h2>7. Compare the five synchronization problems</h2>
+      <table><thead><tr><th>Problem</th><th>What happens?</th><th>Typical symptom</th><th>Primary mitigation</th></tr></thead><tbody>
+      <tr><td><strong>Race condition</strong></td><td>Outcome depends on timing/interleaving.</td><td>Lost update, inconsistent state, intermittent incorrect result.</td><td>Atomic operation, lock, immutable state, or proper concurrency design.</td></tr>
+      <tr><td><strong>Deadlock</strong></td><td>Threads wait cyclically for resources.</td><td>Permanent waits; throughput can collapse.</td><td>Global lock order, remove nested locks, timed acquisition with safe rollback.</td></tr>
+      <tr><td><strong>Starvation</strong></td><td>A thread repeatedly fails to get a resource while others progress.</td><td>Extreme wait time for a subset of work.</td><td>Fairness where appropriate, shorter critical sections, resource isolation.</td></tr>
+      <tr><td><strong>Livelock</strong></td><td>Threads remain active but repeatedly prevent progress.</td><td>High activity/retries but little useful work.</td><td>Randomized backoff, bounded retries, coordination redesign.</td></tr>
+      <tr><td><strong>Contention</strong></td><td>Threads compete for the same limited resource.</td><td>Lock-wait time, reduced throughput, higher tail latency.</td><td>Reduce shared access, shorten locks, partition data, choose suitable primitives.</td></tr>
+      </tbody></table>
+      <div class="callout"><strong>Memory aid:</strong> Race = wrong result; Deadlock = nobody in the cycle progresses; Starvation = one thread is left behind; Livelock = everyone reacts but progress stalls; Contention = many threads compete for a bottleneck.</div>
+    </section>
+
+    <section class="section anchor" id="interview"><h2>8. Interview questions and answer outlines</h2>
+      <div class="qa"><strong>Q1. What are the four Coffman conditions?</strong><p>Mutual exclusion, hold and wait, no preemption, and circular wait. A classic deadlock requires all four; prevention strategies aim to break at least one.</p></div>
+      <div class="qa"><strong>Q2. Why doesn't volatile fix count++?</strong><p>Volatile provides visibility and ordering guarantees for field access, but increment is a compound read-modify-write operation. Use an atomic type or synchronization.</p></div>
+      <div class="qa"><strong>Q3. Deadlock vs starvation?</strong><p>In deadlock, a cycle of waiting prevents the involved threads from progressing. In starvation, other work may continue while one thread repeatedly fails to obtain CPU or a resource.</p></div>
+      <div class="qa"><strong>Q4. Deadlock vs livelock?</strong><p>Deadlocked threads wait without progress. Livelocked threads keep executing or retrying, but their interactions prevent useful progress.</p></div>
+      <div class="qa"><strong>Q5. Is contention always a bug?</strong><p>No. Some contention is expected when sharing a resource. It becomes a performance concern when wait time reduces throughput or violates latency goals.</p></div>
+      <div class="qa"><strong>Q6. How does global lock ordering prevent deadlock?</strong><p>If every thread acquires locks in the same strict order, the circular-wait cycle cannot form for those locks.</p></div>
+      <div class="qa"><strong>Q7. Can fair locks eliminate starvation?</strong><p>They can reduce starvation caused by unfair lock acquisition, but they cannot solve starvation caused by thread-pool exhaustion, downstream limits, scheduling, or dependency cycles. Fairness may reduce throughput.</p></div>
+      <div class="qa"><strong>Q8. How do you mitigate livelock?</strong><p>Use randomized exponential backoff, bounded retries, deadlines, and a coordination strategy that prevents all contenders from retrying in lockstep.</p></div>
+      <div class="qa"><strong>Q9. How would you diagnose a production deadlock?</strong><p>Capture thread dumps with jcmd or jstack, identify each thread's held and requested locks, check the JVM deadlock report, then trace the lock order back to the code path.</p></div>
+      <div class="qa"><strong>Q10. How do you reduce lock contention?</strong><p>Shorten critical sections, move I/O outside locks where safe, reduce shared mutable state, partition data, and use atomic or concurrent data structures when their semantics fit.</p></div>
+      <div class="qa"><strong>Q11. What is thread-pool starvation deadlock?</strong><p>All workers are occupied by tasks waiting for child tasks queued in the same pool. No worker remains to execute the children. Avoid blocking task dependency cycles.</p></div>
+      <div class="qa"><strong>Q12. Why should retries use jitter?</strong><p>Identical fixed delays cause contenders to wake simultaneously and collide again. Randomized delays spread retries over time and reduce synchronized collisions.</p></div>
+    </section>
+
+    <section class="section anchor" id="tracker"><h2>9. Study progress tracker</h2><p class="muted">Mark a topic complete after you can explain it, recognize it in a thread dump or code review, and describe a mitigation.</p><div class="checklist" id="checklist">
+      <label><input type="checkbox"> I can identify a race condition and fix a compound update safely.</label>
+      <label><input type="checkbox"> I can explain the four Coffman conditions and prevent lock-order deadlocks.</label>
+      <label><input type="checkbox"> I can distinguish starvation from deadlock.</label>
+      <label><input type="checkbox"> I can explain livelock and implement bounded retry with jitter.</label>
+      <label><input type="checkbox"> I can recognize contention and suggest performance improvements.</label>
+      <label><input type="checkbox"> I can capture thread dumps and use ThreadMXBean for deadlock detection.</label>
+      <label><input type="checkbox"> I can compare all five problems in an interview.</label>
+    </div></section>
+    <footer class="footer">Interview A-Z Handbook · Java Backend Interview Preparation · Built for GitHub Pages</footer>
+  </main></div>
+<script>
+  const sections=[...document.querySelectorAll('main section[id]')];
+  sections.forEach((s,i)=>{const a=document.createElement('a');a.href='#'+s.id;a.textContent=(i+1)+'. '+s.querySelector('h2').textContent.replace(/^\\d+\\.\\s*/,'');document.getElementById('toc').appendChild(a)});
+  const boxes=[...document.querySelectorAll('#checklist input')];
+  function update(){const n=boxes.filter(b=>b.checked).length;document.getElementById('progressBar').style.width=(n/boxes.length*100)+'%';document.getElementById('progressText').textContent=n+' / '+boxes.length+' topics complete'}
+  boxes.forEach(b=>b.addEventListener('change',update));update();
+</script>
 </body>
 </html>

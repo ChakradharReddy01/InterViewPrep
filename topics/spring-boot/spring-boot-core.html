@@ -1,587 +1,488 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Module 4: Spring Boot Architecture, REST APIs & Production Patterns | Interview A-Z</title>
-  <link rel="stylesheet" href="../../assets/css/style.css">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+    <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Module 6: Spring Framework Core Masterclass | Interview A-Z</title>
+    <style>
+        :root{--bg:#0b1120;--panel:#111b2e;--panel2:#162238;--text:#e5edf8;--muted:#a8b7cc;--line:#293a55;--blue:#38bdf8;--violet:#818cf8;--green:#34d399;--amber:#fbbf24;--red:#fb7185;--code:#080e19}
+        *{box-sizing:border-box}html{scroll-behavior:smooth;scroll-padding-top:90px}body{margin:0;background:var(--bg);color:var(--text);font:16px/1.72 Inter,system-ui,-apple-system,Segoe UI,sans-serif}a{color:var(--blue)}.navbar{position:sticky;top:0;z-index:20;display:flex;justify-content:space-between;align-items:center;gap:1rem;padding:.85rem 1.5rem;background:rgba(8,14,25,.97);border-bottom:1px solid var(--line)}.brand{display:flex;align-items:center;gap:.7rem;font-weight:800}.brand-badge{font-size:.72rem;letter-spacing:.08em;background:linear-gradient(135deg,var(--blue),var(--violet));color:#08111e;padding:.2rem .5rem;border-radius:6px}.navlinks{display:flex;align-items:center;gap:1rem;flex-wrap:wrap}.navlinks a{font-size:.9rem;text-decoration:none;font-weight:650}.nav-btn{border:0;border-radius:7px;padding:.55rem .85rem;background:linear-gradient(135deg,var(--blue),var(--violet));color:#08111e;font-weight:800;cursor:pointer}.layout{max-width:1550px;margin:auto;padding:1.5rem;display:grid;grid-template-columns:270px minmax(0,1fr);gap:1.5rem}.sidebar{position:sticky;top:88px;align-self:start;max-height:calc(100vh - 105px);overflow:auto;background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:1rem}.sidebar h3{margin:.2rem 0 .8rem;font-size:.95rem}.sidebar a{display:block;padding:.36rem .5rem;color:var(--muted);font-size:.85rem;text-decoration:none;border-radius:6px}.sidebar a:hover{background:var(--panel2);color:var(--blue)}main{min-width:0}.breadcrumb{font-size:.85rem;color:var(--muted);margin:.2rem 0 1rem}.hero{padding:1.7rem;background:linear-gradient(135deg,#132641,#171b38);border:1px solid #304463;border-radius:18px;margin-bottom:1.3rem}.hero h1{font-size:clamp(2rem,4vw,3rem);line-height:1.12;margin:.6rem 0}.hero p{color:#c5d3e7;max-width:1000px}.chips{display:flex;flex-wrap:wrap;gap:.5rem}.chip{border:1px solid #395170;border-radius:999px;padding:.2rem .65rem;font-size:.78rem;color:#c5d8f1}.section{background:var(--panel);border:1px solid var(--line);border-radius:15px;padding:1.35rem;margin:1rem 0}.section h2{font-size:1.5rem;margin:.1rem 0 1rem}.section h3{font-size:1.12rem;margin:1.25rem 0 .4rem;color:#c5e7ff}.section p,.section li{color:#d1dced}.muted{color:var(--muted)!important}.grid2,.grid3{display:grid;gap:1rem}.grid2{grid-template-columns:repeat(2,minmax(0,1fr))}.grid3{grid-template-columns:repeat(3,minmax(0,1fr))}.card{padding:1rem;background:var(--panel2);border:1px solid var(--line);border-radius:11px}.card h3{margin-top:0}.callout{margin:1rem 0;padding:1rem 1.1rem;border-left:4px solid var(--blue);background:#102338;border-radius:0 10px 10px 0}.warning{border-color:var(--amber);background:#2a2415}.production{border-color:var(--red);background:#2a1824}.solution{border-color:var(--green);background:#102820}.diagram{overflow:auto;background:#080e19;border:1px solid var(--line);border-radius:10px;padding:1rem;margin:1rem 0;color:#b8e7ff;font:.9rem/1.55 ui-monospace,SFMono-Regular,Consolas,monospace;white-space:pre}.codehead{display:flex;justify-content:space-between;color:var(--muted);font-size:.8rem;padding:.55rem .8rem;background:#0d1626;border:1px solid var(--line);border-bottom:0;border-radius:9px 9px 0 0}.code{margin:0 0 1rem;overflow:auto;background:var(--code);border:1px solid var(--line);border-radius:0 0 9px 9px;padding:1rem;color:#dbeafe;font:.86rem/1.65 ui-monospace,SFMono-Regular,Consolas,monospace;white-space:pre}code{font-family:ui-monospace,SFMono-Regular,Consolas,monospace;color:#b8e7ff;background:#0a1322;padding:.1rem .3rem;border-radius:4px}pre code{background:transparent;padding:0;color:inherit}table{width:100%;border-collapse:collapse;margin:1rem 0;font-size:.91rem}th,td{padding:.72rem;text-align:left;vertical-align:top;border:1px solid var(--line)}th{background:#182943;color:#c5e7ff}td{color:#d1dced}tr:nth-child(even) td{background:#0e192b}.checklist label{display:flex;gap:.65rem;align-items:flex-start;padding:.45rem 0;color:#d1dced}.checklist input{margin-top:.45rem;accent-color:var(--blue)}.progress-wrap{height:8px;background:#26364e;border-radius:99px;overflow:hidden}.progress-bar{height:100%;width:0;background:linear-gradient(90deg,var(--blue),var(--violet));transition:width .2s}.small{font-size:.88rem}.footer{text-align:center;color:var(--muted);padding:2rem 1rem}.qa{padding:.9rem 1rem;margin:.8rem 0;background:#0d192b;border:1px solid var(--line);border-radius:9px}.qa strong{color:#c5e7ff}.qa p{margin:.45rem 0 0}.anchor{scroll-margin-top:90px}
+        @media(max-width:1000px){.layout{grid-template-columns:1fr;padding:1rem}.sidebar{position:relative;top:auto;max-height:none}.grid3{grid-template-columns:1fr 1fr}}@media(max-width:650px){.navbar{padding:.7rem .8rem;align-items:flex-start}.brand{font-size:.9rem}.navlinks a:not(.home-link){display:none}.layout{padding:.65rem}.section{padding:1rem}.grid2,.grid3{grid-template-columns:1fr}.hero{padding:1.1rem}table{display:block;overflow-x:auto}}@media print{body{background:#fff;color:#111;font-size:10.5pt}.navbar,.sidebar{display:none!important}.layout{display:block;padding:0;max-width:none}.hero,.section,.card,.qa{background:#fff!important;color:#111!important;border:1px solid #aaa;break-inside:avoid}.hero p,.section p,.section li,.muted,td{color:#222!important}.section h3,.section h2,.hero h1{color:#111!important}.code,.diagram{background:#f4f4f4!important;color:#111!important;white-space:pre-wrap;overflow-wrap:anywhere}.codehead{background:#eee;color:#111}.callout{background:#f5f5f5!important}.footer{color:#333}}
+    </style>
 </head>
 <body>
+<nav class="navbar"><div class="brand"><span class="brand-badge">INTERVIEW A-Z</span><span>Engineering Handbook</span></div><div class="navlinks"><a class="home-link" href="../../index.html">🏠 Home Directory</a><a href="../../index.html#topics">📚 All Modules</a><a href="https://github.com/ChakradharReddy01/InterViewPrep" target="_blank" rel="noopener">GitHub</a><button class="nav-btn" onclick="window.print()">📄 Save to PDF</button></div></nav>
+<div class="layout"><aside class="sidebar"><h3>On This Page</h3><div id="toc"></div><hr style="border-color:var(--line);margin:1rem 0"><div class="small muted">Study progress</div><div class="progress-wrap"><div id="progressBar" class="progress-bar"></div></div><div id="progressText" class="small muted">0 / 24 topics complete</div></aside><main>
+    <div class="breadcrumb"><a href="../../index.html">Home</a> / Module 6: Spring Framework / <span style="color:#fff">Core Container & AOP</span></div>
+    <header class="hero"><div class="chips"><span class="chip">Spring Framework 6</span><span class="chip">Spring Boot 3</span><span class="chip">IoC / DI</span><span class="chip">Bean Lifecycle</span><span class="chip">AOP Proxies</span></div><h1>Module 6: Spring Framework Core Masterclass</h1><p>In-depth, practical coverage of every requested Spring Framework topic—from IoC and bean creation to scopes, configuration, profiles, and proxy-based AOP. Examples use modern constructor injection and Java configuration, with tough enterprise scenarios and interview-ready explanations.</p><p class="muted small">Suggested study time: 2–3 hours · Examples target Spring Framework 6 / Spring Boot 3. Some scope and proxy behavior depends on application type and configuration.</p></header>
 
-  <!-- Top Navigation -->
-    <!-- Top Navigation -->
-    <nav class="navbar">
-    <div class="brand">
-      <a href="../../index.html" class="brand-link" style="display: flex; align-items: center; gap: 0.75rem; text-decoration: none; color: inherit;">
-        <span class="brand-badge" style="background: linear-gradient(135deg, #38bdf8, #818cf8); color: #0f172a; padding: 0.15rem 0.55rem; border-radius: 6px; font-size: 0.75rem; font-weight: 800; letter-spacing: 0.05em; text-transform: uppercase;">Interview A-Z</span>
-        <span style="font-weight: 700; font-size: 1.15rem; color: #fff;">Engineering Handbook</span>
-      </a>
-    </div>
-    <div class="nav-links navlinks" style="display: flex; gap: 1.25rem; align-items: center;">
-      <a href="../../index.html" class="nav-link" style="text-decoration: none; font-weight: 600; font-size: 0.95rem;">🏠 Home</a>
-      <a href="../../index.html#topics" class="nav-link" style="text-decoration: none; font-weight: 600; font-size: 0.95rem;">📚 All Modules</a>
-      <a href="https://github.com/ChakradharReddy01/InterViewPrep" target="_blank" class="nav-link" style="text-decoration: none; font-weight: 600; font-size: 0.95rem;">GitHub</a>
-      <button onclick="document.querySelectorAll('details').forEach(d=>d.open=true);window.print();" class="nav-btn-pdf" title="Save page as PDF" style="display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.35rem 0.85rem; font-size: 0.85rem; font-weight: 700; background: linear-gradient(135deg, #38bdf8, #818cf8); color: #0f172a; border: none; border-radius: 6px; cursor: pointer; transition: transform 0.15s ease, box-shadow 0.15s ease; box-shadow: 0 2px 8px rgba(56,189,248,0.25);">
-        <span>📄</span> Save to PDF
-      </button>
-    </div>
-  </nav>
+    <section class="section anchor" id="ioc"><h2>1. IoC — Inversion of Control</h2><p><strong>Inversion of Control (IoC)</strong> means application code does not control every object’s creation and wiring. Instead, a framework/container creates managed objects, supplies their dependencies, and coordinates lifecycle callbacks. IoC is the broader principle; Dependency Injection is one common way Spring implements it.</p><div class="diagram">Without IoC:
+        OrderService -> new MySqlOrderRepository()
+        -> new StripePaymentClient()
 
-  <div class="container">
-    <div class="article-layout">
-      <!-- Sticky Sidebar Table of Contents -->
-      <aside class="sidebar-toc">
-        <h3>On This Page</h3>
-        <ul class="toc-links" id="dynamic-toc">
-          <!-- Dynamically populated via main.js -->
-        </ul>
-      </aside>
+        With Spring IoC:
+        ApplicationContext creates Repository + PaymentClient
+        -> injects them into OrderService
+        -> manages configured lifecycle and scopes</div>
+        <div class="codehead"><span>Tightly coupled version</span><span>Java</span></div><pre class="code"><code>class OrderService {
+    private final MySqlOrderRepository repository =
+        new MySqlOrderRepository(); // hard-coded implementation
+}</code></pre>
+        <div class="codehead"><span>IoC-friendly version</span><span>Java</span></div><pre class="code"><code>interface OrderRepository {
+    void save(Order order);
+}
 
-      <!-- Main Article Content -->
-      <main class="article-content">
-        <!-- Breadcrumb -->
-        <nav class="breadcrumb">
-          <a href="../../index.html">Home</a>
-          <span>/</span>
-          <span>Module 4: Spring Boot</span>
-          <span>/</span>
-          <span style="color: #fff;">Spring Boot Core & REST</span>
-        </nav>
+@Service
+class OrderService {
+    private final OrderRepository repository;
 
-        <!-- Article Header -->
-        <header class="article-header">
-          <h1>Module 4: Spring Boot Architecture, Production REST APIs & Enterprise Patterns</h1>
-          <div class="article-meta">
-            <span class="badge badge-spring">Spring Boot 3.x</span>
-            <span class="badge badge-advanced">Enterprise REST</span>
-            <span class="badge badge-prod">Production Hardening</span>
-            <span>⏱️ 60 min deep dive</span>
-            <span>Target Roles: SDE-2, SDE-3, Backend Tech Lead, Cloud Architect</span>
-          </div>
-        </header>
+    OrderService(OrderRepository repository) {
+        this.repository = repository;
+    }
+}</code></pre>
+        <p>Spring can supply a configured repository implementation. The service depends on an abstraction rather than constructing a concrete dependency itself. This improves testability, replaceability, and centralized configuration.</p>
+        <div class="callout production"><strong>Tough use case — multi-tenant payments:</strong> An order service must route payments to different providers by tenant and environment. Hard-coding <code>new StripeClient()</code> across business classes spreads provider logic everywhere. Inject a <code>PaymentGateway</code> interface and choose implementations through configuration or a routing service. IoC makes the object graph configurable; it does not automatically design the routing policy for you.</div></section>
 
-        <!-- SECTION 1: SPRING BOOT PHILOSOPHY & STARTERS -->
-        <section>
-          <h2>1. Spring Boot Philosophy, Starters & Auto-Configuration</h2>
+    <section class="section anchor" id="di"><h2>2. Dependency Injection (DI)</h2><p>DI is the technique of supplying an object’s collaborators from outside instead of having the object construct or locate them. Spring resolves beans by type, qualifiers, primary preference, and other metadata during context creation.</p><div class="diagram">ApplicationContext
+        | resolves OrderRepository bean
+        | resolves PaymentGateway bean
+        v
+        OrderService(repository, paymentGateway)</div>
+        <div class="codehead"><span>Constructor injection — preferred default</span><span>Java</span></div><pre class="code"><code>@Service
+class CheckoutService {
+    private final OrderRepository orders;
+    private final PaymentGateway gateway;
 
-          <h3>1.1 The Core Philosophy</h3>
-          <p>
-            Spring Boot was created to solve the massive XML configuration overhead, dependency version mismatches, and deployment friction of traditional Spring applications. It operates on <strong>Opinionated Defaults</strong> and <strong>Convention over Configuration</strong>:
-          </p>
-          <ul>
-            <li><strong>Standalone Executable Fat JARs:</strong> Packages application bytecode, third-party libraries, and an embedded servlet container into a single deployable artifact executed via <code>java -jar app.jar</code>.</li>
-            <li><strong>Starter POMs:</strong> Curated dependency bundles that aggregate cohesive libraries and provide compatible, pre-tested transitive versions managed by <code>spring-boot-dependencies</code>.</li>
-          </ul>
+    CheckoutService(OrderRepository orders, PaymentGateway gateway) {
+        this.orders = orders;
+        this.gateway = gateway;
+    }
+}</code></pre>
+        <p>With a single constructor, Spring can use it without requiring <code>@Autowired</code>. If multiple candidates implement an interface, use <code>@Qualifier</code>, <code>@Primary</code>, or a deliberate collection/map injection strategy.</p>
+        <div class="codehead"><span>Resolve multiple implementations explicitly</span><span>Java</span></div><pre class="code"><code>@Service("cardGateway")
+class CardGateway implements PaymentGateway { /* ... */ }
 
-          <h3>1.2 How Auto-Configuration Works Under the Hood</h3>
-          <p>
-            When you add a starter like <code>spring-boot-starter-web</code>, Spring Boot automatically configures Tomcat, DispatcherServlet, Jackson ObjectMapper, and validation validators.
-          </p>
-          <ol>
-            <li><strong>AutoConfiguration Discovery:</strong>
-              <ul>
-                <li>In Spring Boot 2.x: Loaded from <code>META-INF/spring.factories</code>.</li>
-                <li>In Spring Boot 3.x+: Loaded from <code>META-INF/spring/org.springframework.boot.autoconfigure.AutoConfiguration.imports</code>.</li>
-              </ul>
-            </li>
-            <li><strong>Conditional Evaluation (<code>@Conditional</code> family):</strong> Auto-configuration classes evaluate conditions before loading beans:
-              <ul>
-                <li><code>@ConditionalOnClass(ObjectMapper.class)</code>: Loads only if Jackson is on the classpath.</li>
-                <li><code>@ConditionalOnMissingBean(DataSource.class)</code>: Provides a default DataSource <em>only if</em> the developer has not declared their own custom DataSource bean.</li>
-                <li><code>@ConditionalOnProperty(name = "feature.enabled", havingValue = "true")</code>: Evaluates configuration flags.</li>
-              </ul>
-            </li>
-          </ol>
+@Service("bankGateway")
+class BankGateway implements PaymentGateway { /* ... */ }
 
-          <h3>1.3 Anatomy of <code>@SpringBootApplication</code></h3>
-          <p>
-            <code>@SpringBootApplication</code> is a composite meta-annotation that bundles:
-          </p>
-          <ul>
-            <li><strong><code>@SpringBootConfiguration</code>:</strong> Specialization of <code>@Configuration</code> marking the class as a configuration source.</li>
-            <li><strong><code>@EnableAutoConfiguration</code>:</strong> Triggers the auto-configuration imports mechanism.</li>
-            <li><strong><code>@ComponentScan</code>:</strong> Automatically scans for <code>@Component</code>, <code>@Service</code>, <code>@Repository</code>, and <code>@RestController</code> within the current package and its sub-packages.</li>
-          </ul>
-        </section>
+@Service
+class PaymentRouter {
+    private final PaymentGateway gateway;
 
-        <!-- SECTION 2: CONFIGURATION, PROFILES & PROPERTIES -->
-        <section>
-          <h2>2. Configuration, Profiles, YAML & Type-Safe Properties</h2>
+    PaymentRouter(@Qualifier("bankGateway") PaymentGateway gateway) {
+        this.gateway = gateway;
+    }
+}</code></pre>
+        <div class="callout warning"><strong>DI is not service location:</strong> calling <code>context.getBean(...)</code> throughout business logic hides dependencies and couples code to Spring. Prefer declaring required collaborators in constructors.</div></section>
 
-          <h3>2.1 <code>application.properties</code> vs. <code>application.yml</code></h3>
-          <p>
-            YAML (YAML Ain't Markup Language) is the enterprise standard because of hierarchical nesting, list representations, and multi-profile documents:
-          </p>
-          <div class="code-header">
-            <span>application.yml (Multi-Environment Setup)</span>
-            <span>YAML</span>
-          </div>
-          <pre><code>spring:
-  application:
-    name: order-service
+    <section class="section anchor" id="bean"><h2>3. Spring Bean</h2><p>A <strong>Spring bean</strong> is an object instantiated, assembled, and managed by the Spring IoC container. Not every Java object is a Spring bean: an object created with <code>new</code> by application code is not automatically managed unless it is registered or otherwise handed into the container through a supported mechanism.</p><h3>Ways to register beans</h3><ul><li>Classpath scanning: <code>@Component</code> and its stereotypes.</li><li>Explicit Java configuration: a method annotated with <code>@Bean</code>.</li><li>Framework auto-configuration: configuration classes register beans conditionally.</li></ul>
+        <div class="codehead"><span>Bean registered using configuration</span><span>Java</span></div><pre class="code"><code>@Configuration
+class PaymentConfiguration {
+    @Bean
+    PaymentGateway paymentGateway() {
+        return new BankGateway(/* constructor args */);
+    }
+}</code></pre>
+        <p>The bean name defaults to the factory-method name (<code>paymentGateway</code> here), unless explicitly configured. Bean definitions carry metadata such as type, scope, qualifiers, lazy behavior, and lifecycle callbacks.</p>
+        <div class="callout production"><strong>Tough use case — third-party SDK:</strong> You cannot annotate a vendor SDK class with <code>@Component</code>. Register it with <code>@Bean</code>, configure credentials and timeouts from external properties, and inject the SDK wrapper into your services. Keep secrets out of source code.</div></section>
+
+    <section class="section anchor" id="context"><h2>4. ApplicationContext</h2><p><code>ApplicationContext</code> is Spring’s full-featured container interface. It builds on BeanFactory capabilities and adds facilities such as internationalization, event publication, resource loading, and integration with application infrastructure. In typical Spring Boot applications, the context is the central container used during startup.</p><div class="grid2"><div class="card"><h3>During startup</h3><ul><li>Loads bean definitions</li><li>Processes configuration and scans</li><li>Creates eager singleton beans</li><li>Applies post-processors and proxies</li><li>Publishes lifecycle events</li></ul></div><div class="card"><h3>During runtime</h3><ul><li>Resolves managed dependencies</li><li>Provides configured beans</li><li>Publishes application events</li><li>Resolves messages and resources</li></ul></div></div>
+        <div class="codehead"><span>Boot application context access — use sparingly</span><span>Java</span></div><pre class="code"><code>@Component
+class StartupReporter implements ApplicationRunner {
+    private final ApplicationContext context;
+
+    StartupReporter(ApplicationContext context) {
+        this.context = context;
+    }
+
+    @Override
+    public void run(ApplicationArguments args) {
+        System.out.println("Bean count: " + context.getBeanDefinitionCount());
+    }
+}</code></pre>
+        <p>Injecting the context is legitimate for infrastructure or dynamic integration cases, but business services should usually receive specific dependencies directly. A global context lookup can make dependencies invisible and unit tests harder.</p></section>
+
+    <section class="section anchor" id="beanfactory"><h2>5. BeanFactory</h2><p><code>BeanFactory</code> is the foundational IoC container contract for retrieving beans and managing their definitions. <code>ApplicationContext</code> extends it with broader application features. For ordinary Spring Boot application code, use the context and normal DI rather than manually using BeanFactory.</p><table><thead><tr><th>Capability</th><th>BeanFactory</th><th>ApplicationContext</th></tr></thead><tbody><tr><td>Bean lookup and IoC basics</td><td>Yes</td><td>Yes (inherits the contract)</td></tr><tr><td>Application events</td><td>Not its core contract</td><td>Yes</td></tr><tr><td>MessageSource/i18n integration</td><td>Not its core contract</td><td>Yes</td></tr><tr><td>Typical role</td><td>Foundational container abstraction</td><td>Application-level container</td></tr></tbody></table>
+        <p>Historically, BeanFactory is often described as more minimal and lazy in some default behaviors, while ApplicationContext eagerly creates non-lazy singleton beans during refresh. Avoid reducing the distinction to “one creates beans and the other does not”: both participate in bean creation and retrieval; their features and default container behavior differ.</p></section>
+
+    <section class="section anchor" id="scanning"><h2>6. Component Scanning</h2><p>Component scanning discovers candidate classes annotated with component stereotypes in configured base packages and registers bean definitions. In Spring Boot, <code>@SpringBootApplication</code> includes component scanning rooted at the package containing the application class, covering its subpackages by default.</p><div class="codehead"><span>Recommended package layout</span><span>Java</span></div><pre class="code"><code>com.example.orders
+  OrdersApplication.java  // @SpringBootApplication
+  controller/
+  service/
+  repository/
+  config/
+  client/</code></pre>
+        <p>Place the application class at a root package above application components. If the class sits in <code>com.example.orders.boot</code> while services are in <code>com.example.orders.service</code>, default scanning may miss sibling packages. Set an explicit scan base only when the package design requires it.</p>
+        <div class="codehead"><span>Explicit scanning when needed</span><span>Java</span></div><pre class="code"><code>@SpringBootApplication(scanBasePackages = {
+    "com.example.orders",
+    "com.example.shared"
+})
+public class OrdersApplication { }</code></pre>
+        <div class="callout production"><strong>Tough use case — bean exists in IDE but app fails in production:</strong> a shared library component lives outside the application’s scan root, causing <code>NoSuchBeanDefinitionException</code>. Verify package roots, conditional configuration, active profiles, and whether the library exposes an auto-configuration. Avoid broad scanning of unrelated packages, which can create accidental bean collisions.</div></section>
+
+    <section class="section anchor" id="lifecycle"><h2>7. Bean Lifecycle</h2><p>For a typical singleton bean, Spring first creates the instance, injects dependencies, runs awareness callbacks where applicable, applies BeanPostProcessors before initialization, invokes initialization callbacks, and then applies post-processors after initialization. A proxy may be returned instead of the raw target. On context shutdown, destruction callbacks are invoked for managed singleton beans.</p><div class="diagram">Bean definition
+        -> instantiate
+        -> inject dependencies / populate properties
+        -> aware callbacks (where applicable)
+        -> BeanPostProcessor.beforeInitialization
+        -> @PostConstruct
+        -> InitializingBean.afterPropertiesSet()
+        -> custom init method
+        -> BeanPostProcessor.afterInitialization (proxy may be created)
+        -> bean ready for use
+        -> context shutdown
+        -> @PreDestroy / DisposableBean / custom destroy</div>
+        <div class="codehead"><span>Initialization and destruction hooks</span><span>Java</span></div><pre class="code"><code>@Component
+class SearchIndexClient {
+    @PostConstruct
+    void initialize() {
+        // Validate config and prepare local resources.
+    }
+
+    @PreDestroy
+    void close() {
+        // Release owned resources gracefully.
+    }
+}</code></pre>
+        <p>Use <code>@PostConstruct</code> from <code>jakarta.annotation</code> in modern Spring Boot 3. Initialization callbacks should not assume every other bean has completed all application-level startup work. For long-running startup tasks, consider <code>ApplicationRunner</code>, lifecycle interfaces, or explicit readiness coordination.</p>
+        <div class="callout warning"><strong>Prototype lifecycle caveat:</strong> Spring creates and initializes prototype beans but does not manage their full destruction lifecycle after handing them to the caller. If a prototype owns resources, the application must close them or use a different resource-management design.</div>
+        <div class="callout production"><strong>Tough use case — startup traffic before warm-up:</strong> a bean’s constructor succeeds, but its cache is not yet warmed when requests arrive. Bean initialization is not the same as application readiness. Use explicit readiness/lifecycle coordination and ensure the readiness probe stays false until critical startup work is complete.</div></section>
+
+    <section class="section anchor" id="scope"><h2>8. Bean Scope overview</h2><p>Scope controls how many instances Spring creates and how long the container associates them with a context. Scope does not automatically make an object thread-safe.</p><table><thead><tr><th>Scope</th><th>Instance semantics</th><th>Typical context</th><th>Risk / note</th></tr></thead><tbody><tr><td><code>singleton</code></td><td>One instance per bean definition per container</td><td>Most services and repositories</td><td>Shared across concurrent requests; avoid mutable request-specific fields.</td></tr><tr><td><code>prototype</code></td><td>New instance each time requested from container</td><td>Short-lived stateful helper</td><td>Destruction is not fully managed by Spring after handoff.</td></tr><tr><td><code>request</code></td><td>One instance per HTTP request</td><td>Web application</td><td>Not available outside an active request unless appropriately proxied/contextualized.</td></tr><tr><td><code>session</code></td><td>One instance per HTTP session</td><td>Stateful web session</td><td>Can retain memory for long periods; session concurrency matters.</td></tr></tbody></table>
+        <p>Use <code>@Scope("singleton")</code>, <code>@Scope("prototype")</code>, <code>@RequestScope</code>, or <code>@SessionScope</code> where appropriate. Singleton is the default scope.</p></section>
+
+    <section class="section anchor" id="singleton"><h2>9. Singleton scope</h2><p>A Spring singleton is one instance per bean definition in a particular IoC container—not necessarily one instance for the entire JVM. Multiple application contexts can each own their own singleton instance. The singleton bean is shared, so its design should normally be stateless or safely concurrent.</p><div class="codehead"><span>Safe stateless service</span><span>Java</span></div><pre class="code"><code>@Service
+class TaxService {
+    BigDecimal calculate(BigDecimal subtotal, BigDecimal rate) {
+        return subtotal.multiply(rate);
+    }
+}</code></pre>
+        <div class="codehead"><span>Dangerous mutable request state</span><span>Java</span></div><pre class="code"><code>@Service
+class DangerousCheckoutService {
+    private String currentUserId; // shared by all request threads!
+
+    void checkout(String userId) {
+        this.currentUserId = userId;
+        // Another request can overwrite this field before it is used.
+    }
+}</code></pre>
+        <div class="callout production"><strong>Tough use case — cross-customer invoice corruption:</strong> a singleton service stores the current invoice/customer in an instance field while two HTTP requests execute concurrently. Request A can observe request B’s value. Keep per-invocation state in local variables, method arguments, or an explicitly scoped/context-propagated mechanism.</div></section>
+
+    <section class="section anchor" id="prototype"><h2>10. Prototype scope</h2><p>A prototype bean is created each time it is requested from the container. However, injecting a prototype directly into a singleton generally resolves the prototype once when the singleton is created; it does not automatically create a fresh prototype for every method call.</p><div class="codehead"><span>Prototype bean</span><span>Java</span></div><pre class="code"><code>@Component
+@Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
+class CsvImportJob {
+    private final String jobId = UUID.randomUUID().toString();
+    String jobId() { return jobId; }
+}</code></pre>
+        <div class="codehead"><span>Use ObjectProvider for repeated lookup</span><span>Java</span></div><pre class="code"><code>@Service
+class ImportCoordinator {
+    private final ObjectProvider&lt;CsvImportJob&gt; jobs;
+
+    ImportCoordinator(ObjectProvider&lt;CsvImportJob&gt; jobs) {
+        this.jobs = jobs;
+    }
+
+    CsvImportJob newJob() {
+        return jobs.getObject(); // new prototype instance per lookup
+    }
+}</code></pre>
+        <p>Other options include method injection or a scoped proxy depending on the use case. Be deliberate about who owns cleanup for any resources held by prototype instances.</p></section>
+
+    <section class="section anchor" id="request"><h2>11. Request scope</h2><p>Request scope creates one bean instance per HTTP request. It is useful for request-local metadata, but request-scoped objects should not be treated as durable storage and should not be accessed from arbitrary background threads after the request ends.</p><div class="codehead"><span>Request-scoped request metadata</span><span>Java</span></div><pre class="code"><code>@Component
+@RequestScope
+class RequestMetadata {
+    private String correlationId;
+    public String getCorrelationId() { return correlationId; }
+    public void setCorrelationId(String id) { this.correlationId = id; }
+}</code></pre>
+        <p>When a singleton needs a request-scoped dependency, Spring commonly uses a scoped proxy or a provider so the current request’s instance is resolved at use time. A raw request-scoped target cannot be safely used when there is no active web request.</p>
+        <div class="callout production"><strong>Tough use case — async order processing:</strong> a controller reads request-scoped tenant metadata and submits a task to an executor. The worker runs after the HTTP request has completed, so the request scope may no longer be active. Copy required immutable values into the task command explicitly instead of passing a request-scoped bean to background work.</div></section>
+
+    <section class="section anchor" id="session"><h2>12. Session scope</h2><p>Session scope creates one bean instance per HTTP session. It can hold session-level workflow state, but should be used sparingly in horizontally scaled services. Large session objects increase memory use, concurrent requests can mutate the same session state, and load-balanced deployments may need sticky sessions or distributed session storage.</p><div class="codehead"><span>Example session-scoped wizard state</span><span>Java</span></div><pre class="code"><code>@Component
+@SessionScope
+class CheckoutWizardState {
+    private String cartId;
+    private int currentStep;
+
+    public String getCartId() { return cartId; }
+    public void setCartId(String id) { this.cartId = id; }
+    public int getCurrentStep() { return currentStep; }
+    public void setCurrentStep(int step) { this.currentStep = step; }
+}</code></pre>
+        <div class="callout warning"><strong>Security and scale:</strong> do not store passwords, payment secrets, or unbounded object graphs in session state. A session-scoped bean is not automatically thread-safe; multiple browser requests can overlap.</div></section>
+
+    <section class="section anchor" id="injection"><h2>13. Constructor, Setter, and Field Injection</h2><table><thead><tr><th>Style</th><th>Advantages</th><th>Trade-offs</th><th>Recommendation</th></tr></thead><tbody><tr><td>Constructor</td><td>Explicit required dependencies, supports final fields, easy unit tests, exposes circular dependencies early</td><td>Large constructors can reveal too many responsibilities</td><td>Preferred for required dependencies</td></tr><tr><td>Setter</td><td>Can represent optional or reconfigurable dependency</td><td>Object may be temporarily incomplete; mutation is possible</td><td>Use selectively for optional dependencies</td></tr><tr><td>Field</td><td>Concise syntax</td><td>Hidden dependencies, awkward plain unit tests, cannot use final fields normally</td><td>Avoid in application service code</td></tr></tbody></table>
+        <h3>13.1 Constructor injection</h3><pre class="code"><code>@Service
+class ReportService {
+    private final ReportRepository repository;
+
+    ReportService(ReportRepository repository) {
+        this.repository = repository;
+    }
+}</code></pre>
+        <h3>13.2 Setter injection</h3><pre class="code"><code>@Component
+class NotificationService {
+    private TemplateRenderer renderer;
+
+    @Autowired
+    void setRenderer(TemplateRenderer renderer) {
+        this.renderer = renderer;
+    }
+}</code></pre>
+        <h3>13.3 Field injection</h3><pre class="code"><code>@Component
+class LegacyReportService {
+    @Autowired
+    private ReportRepository repository;
+}</code></pre>
+        <p>Field injection can work, but a plain unit test cannot construct the class with all dependencies passed explicitly. Constructor injection makes the required object graph visible and easier to test.</p>
+        <div class="callout production"><strong>Tough use case — circular dependency:</strong> <code>OrderService</code> constructor-injects <code>InvoiceService</code>, which constructor-injects <code>OrderService</code>. Spring cannot build either object because each requires the other first. Avoid the cycle by extracting a third collaborator, reversing an event/command dependency, or moving orchestration to a higher-level service. Do not use lazy injection as a reflexive band-aid.</div></section>
+
+    <section class="section anchor" id="stereotypes"><h2>14. @Component</h2><p><code>@Component</code> is the generic stereotype marking a class as a component candidate for scanning. Use it for components that do not fit a more specific architectural role.</p><pre class="code"><code>@Component
+class CurrencyFormatter {
+    String format(BigDecimal amount, Currency currency) {
+        return currency.getCurrencyCode() + " " + amount;
+    }
+}</code></pre><p>Component scanning registers a bean definition; the annotation does not mean a new instance is created for every injection. Scope and lifecycle still apply.</p></section>
+
+    <section class="section anchor" id="service"><h2>15. @Service</h2><p><code>@Service</code> is a specialized component stereotype commonly used for business/application services. Its primary benefit is semantic clarity and architectural intent; it is still a Spring component and can be discovered by component scanning.</p><pre class="code"><code>@Service
+class RefundService {
+    private final PaymentGateway gateway;
+    private final RefundRepository refunds;
+
+    RefundService(PaymentGateway gateway, RefundRepository refunds) {
+        this.gateway = gateway;
+        this.refunds = refunds;
+    }
+
+    Refund issue(RefundRequest request) {
+        // Validate business rules, call gateway, persist refund state.
+        return refunds.save(gateway.refund(request));
+    }
+}</code></pre><p>Put business rules and orchestration here, not in controllers or repository implementations.</p></section>
+
+    <section class="section anchor" id="repository"><h2>16. @Repository</h2><p><code>@Repository</code> marks a persistence/data-access component. With the appropriate Spring persistence exception-translation infrastructure, exceptions from supported persistence technologies can be translated into Spring’s consistent <code>DataAccessException</code> hierarchy.</p><pre class="code"><code>@Repository
+class JdbcOrderRepository {
+    private final JdbcTemplate jdbc;
+
+    JdbcOrderRepository(JdbcTemplate jdbc) {
+        this.jdbc = jdbc;
+    }
+
+    Order findById(long id) {
+        return jdbc.queryForObject(
+            "select id, status from orders where id = ?",
+            (rs, row) -&gt; new Order(rs.getLong("id"), rs.getString("status")),
+            id
+        );
+    }
+}</code></pre><p>Use parameterized queries, transaction boundaries appropriate to the operation, and indexes validated against real query plans. Never concatenate untrusted values into SQL.</p></section>
+
+    <section class="section anchor" id="controller"><h2>17. @Controller</h2><p><code>@Controller</code> marks a Spring MVC web component. In classic MVC, handler methods often return view names. For a JSON response from a regular <code>@Controller</code>, use <code>@ResponseBody</code> on the method or class; <code>@RestController</code> combines <code>@Controller</code> and <code>@ResponseBody</code>.</p><pre class="code"><code>@Controller
+class AccountPageController {
+    @GetMapping("/account")
+    String accountPage(Model model) {
+        model.addAttribute("title", "Account");
+        return "account"; // resolves a view such as account.html/JSP
+    }
+
+    @GetMapping("/api/account/status")
+    @ResponseBody
+    AccountStatus status() {
+        return new AccountStatus("ACTIVE");
+    }
+}</code></pre><p>Controllers should translate HTTP input/output and delegate business behavior to services. Avoid embedding transaction workflows or direct SQL in controller methods.</p></section>
+
+    <section class="section anchor" id="configuration"><h2>18. @Configuration</h2><p><code>@Configuration</code> declares a class containing bean definitions and configuration methods. In standard full configuration mode, Spring enhances the class so calls between <code>@Bean</code> methods can be intercepted to preserve container-managed bean semantics. With <code>proxyBeanMethods = false</code>, methods are not intercepted; avoid direct calls between factory methods if you need container-managed references.</p><pre class="code"><code>@Configuration(proxyBeanMethods = false)
+class ClientConfiguration {
+    @Bean
+    Clock applicationClock() {
+        return Clock.systemUTC();
+    }
+
+    @Bean
+    RetryPolicy retryPolicy() {
+        return new RetryPolicy(3, Duration.ofMillis(200));
+    }
+}</code></pre><p>Use configuration classes to define infrastructure and third-party objects; keep them small and focused.</p></section>
+
+    <section class="section anchor" id="bean-annotation"><h2>19. @Bean</h2><p><code>@Bean</code> marks a method whose returned object is registered in the application context. It is especially useful for third-party classes, factory APIs, and explicit wiring. The method name is the default bean name.</p><pre class="code"><code>@Configuration(proxyBeanMethods = false)
+class HttpClientConfiguration {
+    @Bean
+    HttpClient paymentHttpClient() {
+        return HttpClient.newBuilder()
+            .connectTimeout(Duration.ofSeconds(2))
+            .followRedirects(HttpClient.Redirect.NEVER)
+            .build();
+    }
+}</code></pre><p>For production clients, configure request timeouts too, handle retries carefully, and avoid logging credentials. A connection timeout alone does not guarantee a total request deadline.</p></section>
+
+    <section class="section anchor" id="profiles"><h2>20. Profiles</h2><p>Profiles conditionally activate bean definitions and configuration for an environment or deployment mode. Common examples are <code>dev</code>, <code>test</code>, and <code>prod</code>. Profiles are not a secure secret-management system and should not be used to bake production credentials into source control.</p><pre class="code"><code>@Configuration
+class PaymentProviderConfiguration {
+    @Bean
+    @Profile("dev")
+    PaymentGateway sandboxGateway() {
+        return new SandboxPaymentGateway();
+    }
+
+    @Bean
+    @Profile("prod")
+    PaymentGateway productionGateway(PaymentProperties properties) {
+        return new RealPaymentGateway(properties);
+    }
+}</code></pre><pre class="code"><code># application.yml
+spring:
   profiles:
     active: dev
 
----
-# Development Profile Configuration
-spring:
-  config:
-    activate:
-      on-profile: dev
-server:
-  port: 8080
-logging:
-  level:
-    com.myapp: DEBUG
+# Override when deploying:
+# java -jar app.jar --spring.profiles.active=prod</code></pre><div class="callout production"><strong>Tough use case — production accidentally uses sandbox:</strong> multiple profile-specific beans or a hard-coded active profile can select the wrong payment provider. Validate the active profile and provider configuration at startup, fail fast if required production settings are missing, and expose safe non-secret configuration indicators to internal diagnostics.</div></section>
 
----
-# Production Profile Configuration
-spring:
-  config:
-    activate:
-      on-profile: prod
-server:
-  port: 443
-  tomcat:
-    threads:
-      max: 200
-      min-spare: 20
-logging:
-  level:
-    com.myapp: INFO</code></pre>
-
-          <h3>2.2 Type-Safe <code>@ConfigurationProperties</code> with Record Validation</h3>
-          <p>
-            Avoid scattering individual <code>@Value("${prop}")</code> annotations throughout business logic. Modern Spring Boot binds configuration trees directly into validated, immutable <strong>Records</strong>:
-          </p>
-          <div class="code-header">
-            <span>Validated ConfigurationProperties Record</span>
-            <span>Java</span>
-          </div>
-          <pre><code>@ConfigurationProperties(prefix = "payment.gateway")
+    <section class="section anchor" id="properties"><h2>21. Properties</h2><p>Spring configuration can come from <code>application.properties</code>, YAML, environment variables, JVM system properties, command-line arguments, and other property sources. Higher-precedence sources can override lower-precedence values. Use external configuration for environment-specific values; never commit production secrets.</p><div class="codehead"><span>application.properties</span><span>Properties</span></div><pre class="code"><code>payment.gateway.base-url=https://sandbox.example.invalid
+payment.gateway.connect-timeout=2s
+payment.gateway.read-timeout=3s
+payment.gateway.max-attempts=2</code></pre><h3>Type-safe configuration with @ConfigurationProperties</h3><pre class="code"><code>@ConfigurationProperties(prefix = "payment.gateway")
 @Validated
-public record PaymentGatewayProperties(
-    @NotBlank(message = "API URL must be specified")
-    String apiUrl,
+public record PaymentProperties(
+    @NotNull URI baseUrl,
+    @NotNull Duration connectTimeout,
+    @NotNull Duration readTimeout,
+    @Min(1) @Max(3) int maxAttempts
+) {}</code></pre><p>Enable binding with <code>@ConfigurationPropertiesScan</code> or <code>@EnableConfigurationProperties(PaymentProperties.class)</code>. Use Bean Validation where applicable. Type-safe configuration improves discoverability and validation compared with scattering raw string lookups throughout services.</p></section>
 
-    @Min(value = 1000, message = "Timeout must be at least 1000ms")
-    int timeoutMs,
+    <section class="section anchor" id="environment"><h2>22. Environment</h2><p><code>Environment</code> exposes active/default profiles and the property-source abstraction. It is useful in infrastructure code for conditional decisions and diagnostics, but injecting it into every service just to read settings can hide dependencies. Prefer a focused <code>@ConfigurationProperties</code> object for related settings.</p><pre class="code"><code>@Component
+class StartupConfigurationCheck implements ApplicationRunner {
+    private final Environment environment;
 
-    @NotNull
-    Duration retryInterval,
-
-    List&lt;String&gt; supportedCurrencies
-) {}</code></pre>
-        </section>
-
-        <!-- SECTION 3: EMBEDDED SERVERS, ACTUATOR & LOGGING -->
-        <section>
-          <h2>3. Embedded Servers, Production Actuator & Structured Logging</h2>
-
-          <h3>3.1 Embedded Server Tuning</h3>
-          <p>
-            Spring Boot defaults to Apache Tomcat, but can be switched to Undertow or Jetty. In high-concurrency microservices, configure connection queues and thread limits:
-          </p>
-          <pre><code>server:
-  tomcat:
-    threads:
-      max: 200           # Worker thread ceiling
-      min-spare: 20      # Pre-warmed idle threads
-    max-connections: 8192 # Max simultaneous TCP sockets
-    accept-count: 100    # OS TCP listen queue length when all worker threads are busy
-    connection-timeout: 20000</code></pre>
-
-          <h3>3.2 Spring Boot Actuator: Security & Endpoints</h3>
-          <p>
-            Actuator provides production monitoring endpoints (<code>/health</code>, <code>/metrics</code>, <code>/beans</code>, <code>/env</code>, <code>/threaddump</code>).
-          </p>
-          <div class="callout callout-warning">
-            <div class="callout-title">⚠️ Actuator Production Security Rule</div>
-            <p>
-              Never expose sensitive endpoints publicly (<code>include: "*"</code>)! Exposing <code>/actuator/env</code> or <code>/actuator/heapdump</code> can leak database passwords and security tokens. Only expose <code>health</code> and <code>metrics</code> publicly, and secure other endpoints behind OAuth2/admin role checks.
-            </p>
-          </div>
-          <pre><code>management:
-  endpoints:
-    web:
-      exposure:
-        include: health, metrics, prometheus
-  endpoint:
-    health:
-      show-details: when_authorized
-      probes:
-        enabled: true # Enables Kubernetes readiness & liveness probes!</code></pre>
-
-          <h3>3.3 Structured JSON Logging with MDC (Mapped Diagnostic Context)</h3>
-          <p>
-            In distributed microservices, tracing requests across systems requires correlating logs via a unique Trace ID injected into SLF4J's <strong>Mapped Diagnostic Context (MDC)</strong>:
-          </p>
-          <div class="code-header">
-            <span>Trace ID Logging Filter using MDC</span>
-            <span>Java</span>
-          </div>
-          <pre><code>@Component
-public class CorrelationIdFilter extends OncePerRequestFilter {
-    public static final String TRACE_ID = "traceId";
+    StartupConfigurationCheck(Environment environment) {
+        this.environment = environment;
+    }
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
-            throws ServletException, IOException {
-        String traceId = request.getHeader("X-Correlation-Id");
-        if (traceId == null || traceId.isBlank()) {
-            traceId = UUID.randomUUID().toString();
-        }
-        MDC.put(TRACE_ID, traceId);
-        response.setHeader("X-Correlation-Id", traceId);
+    public void run(ApplicationArguments args) {
+        log.info("Active profiles: {}",
+            Arrays.toString(environment.getActiveProfiles()));
+
+        String region = environment.getProperty("app.region", "local");
+        validateSupportedRegion(region);
+    }
+}</code></pre><p>Never log all environment properties in production: they may include secrets. Log only explicitly safe values, and ensure missing mandatory configuration causes a clear startup failure.</p></section>
+
+    <section class="section anchor" id="aop"><h2>23. AOP — Aspect-Oriented Programming</h2><p>Aspect-Oriented Programming modularizes cross-cutting concerns that otherwise get repeated across many methods, such as timing, audit metadata, transaction boundaries, and authorization checks. Spring AOP is primarily proxy-based: calls made through a Spring proxy can trigger advice around the target method.</p><div class="diagram">Caller
+        |
+        v
+        Spring AOP proxy
+        |-- before / around advice
+        v
+        Target bean method
+        |
+        v
+        after / after-returning / after-throwing advice</div><p>Use AOP for behavior that genuinely applies across a set of join points. Avoid hiding core business rules in broad aspects where execution flow becomes difficult to understand.</p></section>
+
+    <section class="section anchor" id="aspect"><h2>24. Aspect</h2><p>An <strong>aspect</strong> groups pointcut definitions and advice. In Spring, an aspect is commonly a class annotated with <code>@Aspect</code> and registered as a bean, often via <code>@Component</code>. Add the appropriate Spring AOP dependency, such as <code>spring-boot-starter-aop</code>, when using Spring Boot.</p><pre class="code"><code>@Aspect
+@Component
+class ServiceTimingAspect {
+    private static final Logger log =
+        LoggerFactory.getLogger(ServiceTimingAspect.class);
+
+    @Around("execution(public * com.example.orders.service..*(..))")
+    Object timeServiceCall(ProceedingJoinPoint joinPoint) throws Throwable {
+        long start = System.nanoTime();
         try {
-            chain.doFilter(request, response);
+            return joinPoint.proceed();
         } finally {
-            MDC.remove(TRACE_ID); // Prevent thread pool context pollution!
+            long elapsedMs = (System.nanoTime() - start) / 1_000_000;
+            log.debug("{} completed in {} ms",
+                joinPoint.getSignature().toShortString(), elapsedMs);
         }
     }
-}</code></pre>
-        </section>
+}</code></pre><p>For high-volume systems, consider metrics instrumentation rather than logging every invocation. Never log raw method arguments indiscriminately; they may contain tokens, personal data, or payment details.</p></section>
 
-        <!-- SECTION 4: REST APIS, DTOS & VALIDATION -->
-        <section>
-          <h2>4. Production REST APIs, DTOs & Jakarta Bean Validation</h2>
+    <section class="section anchor" id="pointcut"><h2>25. Pointcut</h2><p>A <strong>pointcut</strong> selects which join points should be advised. Spring AOP supports method-execution pointcuts and annotation-based selection, among others. Narrow pointcuts are easier to reason about and safer to deploy than broad package-wide expressions.</p><pre class="code"><code>// Select public methods in the service package and its subpackages:
+@Pointcut("execution(public * com.example.orders.service..*(..))")
+void applicationServiceMethods() {}
 
-          <h3>4.1 REST API Design & HTTP Status Codes</h3>
-          <table>
-            <thead>
-              <tr>
-                <th>Operation</th>
-                <th>HTTP Method</th>
-                <th>Path Pattern</th>
-                <th>Expected Success Status</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>Create Resource</td>
-                <td><code>POST</code></td>
-                <td><code>/api/v1/orders</code></td>
-                <td><code>201 Created</code> (with <code>Location</code> header)</td>
-              </tr>
-              <tr>
-                <td>Read Resource</td>
-                <td><code>GET</code></td>
-                <td><code>/api/v1/orders/{id}</code></td>
-                <td><code>200 OK</code> (or <code>404 Not Found</code>)</td>
-              </tr>
-              <tr>
-                <td>Replace Resource</td>
-                <td><code>PUT</code></td>
-                <td><code>/api/v1/orders/{id}</code></td>
-                <td><code>200 OK</code> or <code>204 No Content</code></td>
-              </tr>
-              <tr>
-                <td>Partial Update</td>
-                <td><code>PATCH</code></td>
-                <td><code>/api/v1/orders/{id}</code></td>
-                <td><code>200 OK</code></td>
-              </tr>
-              <tr>
-                <td>Delete Resource</td>
-                <td><code>DELETE</code></td>
-                <td><code>/api/v1/orders/{id}</code></td>
-                <td><code>204 No Content</code></td>
-              </tr>
-            </tbody>
-          </table>
+// Select methods carrying a custom annotation:
+@Pointcut("@annotation(com.example.orders.aop.Audited)")
+void auditedMethods() {}</code></pre><p>Use explicit package boundaries or custom annotations such as <code>@Audited</code> for targeted cross-cutting behavior. Verify pointcuts with tests because an expression that matches too broadly can affect latency and behavior across the service.</p></section>
 
-          <h3>4.2 Validated Request DTO Pattern</h3>
-          <p>
-            Never expose JPA database entities directly to REST clients. Use immutable <strong>DTO Records</strong> with declarative Jakarta validation annotations:
-          </p>
-          <div class="code-header">
-            <span>OrderRequest DTO with Jakarta Validations</span>
-            <span>Java</span>
-          </div>
-          <pre><code>public record CreateOrderRequest(
-    @NotBlank(message = "Customer ID is required")
-    String customerId,
-
-    @NotEmpty(message = "Order must contain at least one item")
-    List&lt;@Valid OrderItemRequest&gt; items,
-
-    @NotNull(message = "Payment method is required")
-    PaymentMethodType paymentMethod
-) {}
-
-public record OrderItemRequest(
-    @NotBlank(message = "SKU must not be blank")
-    String sku,
-
-    @Min(value = 1, message = "Quantity must be at least 1")
-    int quantity,
-
-    @DecimalMin(value = "0.01", message = "Price must be greater than zero")
-    BigDecimal unitPrice
-) {}</code></pre>
-        </section>
-
-        <!-- SECTION 5: GLOBAL EXCEPTION HANDLING -->
-        <section>
-          <h2>5. Global Exception Handling & RFC 7807 ProblemDetail</h2>
-          <p>
-            Spring Boot 3 implements the <strong>RFC 7807 Problem Details for HTTP APIs</strong> specification using <code>ProblemDetail</code>:
-          </p>
-
-          <div class="code-header">
-            <span>Enterprise GlobalExceptionHandler with RFC 7807</span>
-            <span>Java</span>
-          </div>
-          <pre><code>@RestControllerAdvice
-public class GlobalExceptionHandler {
-
-    // 1. Handle Bean Validation Failures (HTTP 400)
-    @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ProblemDetail handleValidationException(MethodArgumentNotValidException ex) {
-        ProblemDetail problem = ProblemDetail.forStatusAndDetail(
-            HttpStatus.BAD_REQUEST, "Validation failed for one or more fields"
-        );
-        problem.setTitle("Constraint Violation");
-        
-        Map&lt;String, String&gt; errors = new HashMap&lt;&gt;();
-        ex.getBindingResult().getFieldErrors().forEach(error -&gt; 
-            errors.put(error.getField(), error.getDefaultMessage())
-        );
-        problem.setProperty("invalidFields", errors);
-        problem.setProperty("timestamp", Instant.now());
-        return problem;
+    <section class="section anchor" id="advice"><h2>26. Advice</h2><p>Advice is the action run at a selected join point. Common Spring AOP advice types are:</p><table><thead><tr><th>Advice</th><th>When it runs</th><th>Example use</th></tr></thead><tbody><tr><td><code>@Before</code></td><td>Before target method</td><td>Lightweight validation or contextual logging.</td></tr><tr><td><code>@AfterReturning</code></td><td>After normal return</td><td>Record successful operation metadata.</td></tr><tr><td><code>@AfterThrowing</code></td><td>When target throws</td><td>Record failure metrics; exception still propagates unless separately handled.</td></tr><tr><td><code>@After</code></td><td>After completion, success or failure</td><td>Cleanup that must run in either outcome.</td></tr><tr><td><code>@Around</code></td><td>Wraps target invocation</td><td>Timing, retries when appropriate, or controlled invocation.</td></tr></tbody></table><pre class="code"><code>@Aspect
+@Component
+class AuditAspect {
+    @AfterReturning(
+        pointcut = "@annotation(com.example.orders.aop.Audited)",
+        returning = "result"
+    )
+    void auditSuccess(JoinPoint jp, Object result) {
+        // Persist safe audit metadata; don't log sensitive result objects.
     }
 
-    // 2. Handle Custom Domain Exceptions (HTTP 404)
-    @ExceptionHandler(ResourceNotFoundException.class)
-    public ProblemDetail handleResourceNotFound(ResourceNotFoundException ex) {
-        ProblemDetail problem = ProblemDetail.forStatusAndDetail(HttpStatus.NOT_FOUND, ex.getMessage());
-        problem.setTitle("Resource Not Found");
-        problem.setProperty("timestamp", Instant.now());
-        return problem;
+    @AfterThrowing(
+        pointcut = "@annotation(com.example.orders.aop.Audited)",
+        throwing = "error"
+    )
+    void auditFailure(JoinPoint jp, Throwable error) {
+        // Record failure type and operation identity.
+    }
+}</code></pre><div class="callout warning"><strong>Around advice responsibility:</strong> call <code>proceed()</code> exactly as intended. Omitting it skips the target; calling it multiple times repeats the operation. Retrying non-idempotent payments or order creation from generic advice can create duplicate side effects.</div></section>
+
+    <section class="section anchor" id="proxy"><h2>27. Proxy</h2><p>A proxy is an object that intercepts calls and delegates to a target, optionally applying advice. Spring AOP commonly uses JDK dynamic proxies when proxying interfaces and CGLIB subclass proxies when class-based proxying is needed. Exact selection can depend on configuration and framework version.</p><table><thead><tr><th>Proxy type</th><th>Typical mechanism</th><th>Constraint</th></tr></thead><tbody><tr><td>JDK dynamic proxy</td><td>Implements one or more interfaces</td><td>Consumers generally interact through proxied interfaces.</td></tr><tr><td>CGLIB proxy</td><td>Subclass of target class</td><td>Cannot subclass final classes; final methods cannot be overridden for interception.</td></tr></tbody></table>
+        <h3>27.1 Self-invocation trap</h3><pre class="code"><code>@Service
+class BillingService {
+    public void bill() {
+        this.writeAudit(); // direct self-call bypasses proxy interception
     }
 
-    // 3. Catch-all Internal Server Errors (HTTP 500)
-    @ExceptionHandler(Exception.class)
-    public ProblemDetail handleGenericException(Exception ex) {
-        logger.error("Unhandled system error observed: ", ex);
-        ProblemDetail problem = ProblemDetail.forStatusAndDetail(
-            HttpStatus.INTERNAL_SERVER_ERROR, "An internal error occurred. Please quote incident reference."
-        );
-        problem.setTitle("Internal Server Error");
-        problem.setProperty("traceId", MDC.get("traceId"));
-        return problem;
+    @Transactional
+    public void writeAudit() {
+        // Expected transaction advice may not run on this call.
     }
-}</code></pre>
-        </section>
+}</code></pre><p>In proxy-based AOP, an external call enters through the proxy. A call through <code>this</code> inside the target normally bypasses that proxy, so annotations such as <code>@Transactional</code> may not apply to self-invocation. Move the advised operation to another bean or redesign the boundary rather than relying on a self-injected proxy workaround.</p>
+        <div class="callout production"><strong>Tough use case — missing transaction:</strong> an engineer adds <code>@Transactional</code> to an internal helper method, calls it from another method on the same object, and assumes the transaction starts. Production partial writes occur because proxy advice was bypassed. Confirm calls cross the Spring proxy and test rollback behavior against the actual transaction manager.</div>
+        <h3>27.2 AOP boundaries and limitations</h3><ul><li>Spring proxy AOP advises method executions invoked through the proxy; it is not full AspectJ weaving.</li><li>Private methods and self-invocation are common traps for proxy-based interception.</li><li>Proxying can affect concrete-type assumptions and injection expectations.</li><li>Keep aspects narrow, observable, and covered by integration tests.</li></ul></section>
 
-        <!-- SECTION 6: PAGINATION, SORTING & FILTERING -->
-        <section>
-          <h2>6. High-Performance Pagination, Sorting & Filtering</h2>
+    <section class="section anchor" id="enterprise"><h2>28. End-to-end enterprise use case</h2><p>Consider an order-processing service that calls a payment provider, writes to a database, and emits audit records. A robust Spring design separates the responsibilities:</p><div class="diagram">HTTP Controller
+        |
+        v
+        OrderService (@Service) -----> PaymentGateway interface
+        |                                 |
+        v                                 v
+        OrderRepository (@Repository)    configured SDK @Bean
+        |
+        v
+        Database
 
-          <h3>6.1 <code>Page&lt;T&gt;</code> vs. <code>Slice&lt;T&gt;</code></h3>
-          <p>
-            A major performance pitfall in Spring Data JPA:
-          </p>
-          <ul>
-            <li><strong><code>Page&lt;T&gt;</code>:</strong> Computes total pages and total elements. To do this, Hibernate issues two queries: the data query (<code>SELECT ... LIMIT 20</code>) PLUS an expensive <code>SELECT count(*) FROM orders</code>. On tables with 10 million rows, <code>count(*)</code> triggers full index/table scans!</li>
-            <li><strong><code>Slice&lt;T&gt;</code> (Preferred for Infinite Scroll / Mobile):</strong> Only checks if a <em>next</em> slice exists by querying <code>LIMIT 21</code> for a page size of 20. <strong>Zero count(*) queries!</strong> Saves massive database CPU.</li>
-          </ul>
+        ApplicationContext wires dependencies
+        Profiles/properties choose environment-specific endpoint
+        AOP records timing/audit metadata around selected service methods</div>
+        <ul><li><strong>IoC/DI:</strong> the service receives repository and gateway collaborators through its constructor.</li><li><strong>Beans/configuration:</strong> the SDK client is registered through <code>@Bean</code> and configured from validated properties.</li><li><strong>Profiles:</strong> dev uses a sandbox provider; prod uses the real provider, with startup validation.</li><li><strong>Scopes:</strong> stateless service beans remain singleton; request metadata is request-scoped only when needed and is not passed into background tasks.</li><li><strong>Lifecycle:</strong> clients initialize and close resources using supported lifecycle hooks.</li><li><strong>AOP:</strong> narrowly scoped timing/audit advice records safe metadata without hiding transaction or payment logic.</li></ul>
+        <div class="callout warning"><strong>Architecture warning:</strong> AOP logging is not a substitute for business audit guarantees. For financial events, persist audit/outbox records transactionally and deliver them reliably; an aspect that logs to a separate destination can fail independently of the business transaction.</div></section>
 
-          <div class="code-header">
-            <span>Controller Pagination & Dynamic Sorting</span>
-            <span>Java</span>
-          </div>
-          <pre><code>@GetMapping
-public ResponseEntity&lt;Slice&lt;OrderResponse&gt;&gt; getOrders(
-    @RequestParam(defaultValue = "0") int page,
-    @RequestParam(defaultValue = "20") int size,
-    @RequestParam(defaultValue = "createdAt,desc") String[] sort
-) {
-    Sort.Direction direction = sort[1].equalsIgnoreCase("asc") ? Sort.Direction.ASC : Sort.Direction.DESC;
-    Pageable pageable = PageRequest.of(page, size, Sort.by(direction, sort[0]));
-    
-    Slice&lt;OrderResponse&gt; orders = orderService.fetchOrderSlice(pageable);
-    return ResponseEntity.ok(orders);
-}</code></pre>
-        </section>
+    <section class="section anchor" id="interview"><h2>29. Interview questions and fast revision</h2>
+        <div class="qa"><strong>Q1. IoC vs DI?</strong><p>IoC is the broader principle of delegating control to a framework/container. DI is a technique that supplies dependencies from outside an object.</p></div>
+        <div class="qa"><strong>Q2. BeanFactory vs ApplicationContext?</strong><p>ApplicationContext extends BeanFactory and adds application-level capabilities such as events, message resolution, and resource integration.</p></div>
+        <div class="qa"><strong>Q3. What is a Spring bean?</strong><p>An object whose creation, wiring, and lifecycle are managed by the Spring container.</p></div>
+        <div class="qa"><strong>Q4. Why constructor injection?</strong><p>It makes required dependencies explicit, supports final fields, improves unit testing, and reveals dependency cycles early.</p></div>
+        <div class="qa"><strong>Q5. Are @Component, @Service, @Repository, and @Controller interchangeable?</strong><p>They are component stereotypes with different architectural meaning. @Repository also participates in persistence exception translation when the relevant infrastructure is active; @Controller is a web-layer stereotype.</p></div>
+        <div class="qa"><strong>Q6. Singleton scope means one object per JVM?</strong><p>No. It means one instance per bean definition per Spring container.</p></div>
+        <div class="qa"><strong>Q7. Injecting prototype into singleton: what happens?</strong><p>Usually one prototype is resolved when the singleton is created. Use ObjectProvider or another lookup mechanism for a new instance on each request.</p></div>
+        <div class="qa"><strong>Q8. Why does ThreadLocal/request scope cause problems in async tasks?</strong><p>Execution may continue after the request context ends or on a different thread. Pass required context explicitly or use supported propagation mechanisms.</p></div>
+        <div class="qa"><strong>Q9. @Configuration vs @Component with @Bean methods?</strong><p>Full @Configuration can be enhanced to intercept inter-bean method calls; a lite configuration class or proxyBeanMethods=false does not provide the same interception semantics.</p></div>
+        <div class="qa"><strong>Q10. @Bean vs @Component?</strong><p>@Component marks a class for scanning. @Bean registers the object returned by a factory method, useful for third-party types and explicit construction.</p></div>
+        <div class="qa"><strong>Q11. How are profiles different from properties?</strong><p>Properties provide configuration values; profiles activate selected bean definitions/configuration for an environment or mode.</p></div>
+        <div class="qa"><strong>Q12. What is a pointcut vs advice?</strong><p>A pointcut selects join points; advice defines the action to run at those join points.</p></div>
+        <div class="qa"><strong>Q13. What is an aspect?</strong><p>A module that groups cross-cutting behavior, typically pointcuts and advice.</p></div>
+        <div class="qa"><strong>Q14. Why might @Transactional not work on a method?</strong><p>Possible causes include self-invocation bypassing the proxy, visibility/proxy constraints, missing transaction infrastructure, or a mismatch between exception/rollback expectations and configuration.</p></div>
+        <div class="qa"><strong>Q15. What is the proxy doing?</strong><p>It intercepts calls crossing the proxy boundary so Spring can apply advice such as transactions, security, caching, or custom aspects.</p></div>
+        <div class="grid2"><div class="card"><h3>Design rules</h3><ul><li>Constructor-inject required dependencies.</li><li>Keep singleton services stateless.</li><li>Use configuration properties for related settings.</li><li>Use profiles for conditional configuration—not secrets.</li><li>Use providers for repeated prototype lookup.</li></ul></div><div class="card"><h3>Debugging rules</h3><ul><li>For missing beans, inspect scan roots and conditions.</li><li>For scope errors, inspect proxy/provider behavior.</li><li>For missing advice, inspect proxy crossing and pointcuts.</li><li>For leaks, inspect lifecycle cleanup and retained references.</li><li>For config bugs, verify active profiles and property precedence.</li></ul></div></div></section>
 
-        <!-- SECTION 7: API VERSIONING & IDEMPOTENCY -->
-        <section>
-          <h2>7. API Versioning & Distributed Idempotency</h2>
-
-          <h3>7.1 API Versioning Strategies</h3>
-          <ul>
-            <li><strong>URI Path Versioning (Most Popular):</strong> <code>/api/v1/orders</code> vs <code>/api/v2/orders</code>. Simple, clean caching, self-documenting.</li>
-            <li><strong>HTTP Header Versioning:</strong> <code>X-API-VERSION: 2</code>. Keeps URIs clean.</li>
-            <li><strong>Accept Header (Content Negotiation):</strong> <code>Accept: application/vnd.company.v2+json</code>. Adheres to strict REST HATEOAS standards.</li>
-          </ul>
-
-          <h3>7.2 Distributed Idempotency Pattern (Redis SET NX)</h3>
-          <p>
-            In distributed microservices, network timeouts cause clients to retry <code>POST</code> requests, which can trigger duplicate order creation and double-billing. An <strong>Idempotency Key</strong> guarantees safe retries:
-          </p>
-
-          <div class="code-header">
-            <span>Idempotent Order Creation via Redis SETNX</span>
-            <span>Java</span>
-          </div>
-          <pre><code>@PostMapping
-public ResponseEntity&lt;OrderResponse&gt; createOrder(
-    @RequestHeader("X-Idempotency-Key") String idempotencyKey,
-    @Valid @RequestBody CreateOrderRequest request
-) {
-    // 1. Atomic Redis SET key value NX EX 3600 (Set if Not Exists with 1-hour TTL)
-    Boolean isFirstCall = redisTemplate.opsForValue().setIfAbsent(
-        "idempotency:" + idempotencyKey, "PROCESSING", Duration.ofHours(1)
-    );
-
-    if (Boolean.FALSE.equals(isFirstCall)) {
-        // Duplicate request detected! Either return cached response or HTTP 409 Conflict
-        throw new DuplicateRequestException("Transaction with idempotency key is already processing");
-    }
-
-    try {
-        OrderResponse response = orderService.processOrder(request);
-        // Cache serialized response for identical subsequent calls:
-        redisTemplate.opsForValue().set("idempotency:response:" + idempotencyKey, response, Duration.ofHours(1));
-        return ResponseEntity.status(HttpStatus.CREATED).body(response);
-    } catch (Exception ex) {
-        redisTemplate.delete("idempotency:" + idempotencyKey); // Clear lock on failure
-        throw ex;
-    }
-}</code></pre>
-        </section>
-
-        <!-- SECTION 8: KUBERNETES HEALTH PROBES -->
-        <section>
-          <h2>8. Custom Health Checks & Kubernetes Probes</h2>
-          <p>
-            In cloud-native Kubernetes environments, Actuator separates health into two separate operational probes:
-          </p>
-          <ul>
-            <li><strong>Liveness Probe (<code>/actuator/health/liveness</code>):</strong> Tells K8s if the JVM is alive. If this fails (e.g. fatal deadlock), Kubernetes <strong>kills and restarts</strong> the container.</li>
-            <li><strong>Readiness Probe (<code>/actuator/health/readiness</code>):</strong> Tells K8s if the application is ready to accept HTTP traffic. If this fails (e.g. database connection pool warming up), Kubernetes <strong>stops routing traffic</strong> to the pod without killing it.</li>
-          </ul>
-
-          <div class="code-header">
-            <span>Custom HealthIndicator for External Payment Gateway</span>
-            <span>Java</span>
-          </div>
-          <pre><code>@Component
-public class PaymentGatewayHealthIndicator implements HealthIndicator {
-    private final PaymentClient paymentClient;
-
-    public PaymentGatewayHealthIndicator(PaymentClient paymentClient) {
-        this.paymentClient = paymentClient;
-    }
-
-    @Override
-    public Health health() {
-        try {
-            boolean isUp = paymentClient.ping();
-            if (isUp) {
-                return Health.up().withDetail("gateway", "Operational").build();
-            }
-            return Health.down().withDetail("gateway", "Latency Degraded").build();
-        } catch (Exception ex) {
-            return Health.down(ex).withDetail("gateway", "Unreachable").build();
-        }
-    }
-}</code></pre>
-        </section>
-
-        <!-- SECTION 9: REAL-TIME PRODUCTION ISSUES -->
-        <section>
-          <h2>9. Real-Time Production Issues & Post-Mortems</h2>
-
-          <!-- Incident 1 -->
-          <div class="callout callout-production">
-            <div class="callout-title">🚨 Incident 1: Sensitive Database Credentials Leaked via Actuator /env Endpoint</div>
-            <p><strong>Scenario:</strong> A security audit revealed that an e-commerce microservice exposed production PostgreSQL credentials, AWS access keys, and JWT signing secrets over the public internet at <code>https://api.company.com/actuator/env</code>.</p>
-          </div>
-
-          <div class="callout callout-warning">
-            <div class="callout-title">🔍 Root Cause Analysis (RCA)</div>
-            <p>
-              The application configured <code>management.endpoints.web.exposure.include=*</code> in <code>application.yml</code> for debugging purposes and forgot to restrict exposure in production. Spring Boot Actuator's default behavior exposed all configuration properties and system environment variables.
-            </p>
-          </div>
-
-          <div class="callout callout-solution">
-            <div class="callout-title">💡 Production Resolution</div>
-            <ul>
-              <li>Configured minimal public exposure: <code>management.endpoints.web.exposure.include=health,info,prometheus</code>.</li>
-              <li>Enabled property masking for sensitive patterns: <code>management.endpoint.env.keys-to-sanitize=password,secret,key,token</code>.</li>
-              <li>Routed Actuator to an internal management port not exposed to external ingresses: <code>management.server.port=8081</code>.</li>
-            </ul>
-          </div>
-
-          <!-- Incident 2 -->
-          <div class="callout callout-production">
-            <div class="callout-title">🚨 Incident 2: Database CPU Spikes to 100% via Page<T> count(*) Queries</div>
-            <p><strong>Scenario:</strong> As an orders table grew to 15 million records, the admin dashboard's order search endpoint p99 latency spiked from 40ms to 8,500ms, driving PostgreSQL CPU to 100%.</p>
-          </div>
-
-          <div class="callout callout-warning">
-            <div class="callout-title">🔍 Root Cause Analysis (RCA)</div>
-            <p>
-              The query method returned a <code>Page&lt;Order&gt;</code>:
-              <code>Page&lt;Order&gt; findByStatus(OrderStatus status, Pageable pageable);</code>.
-              Every request generated two queries: <code>SELECT ... LIMIT 20</code> (took 5ms) AND <code>SELECT count(*) FROM orders WHERE status = 'COMPLETED'</code>. The <code>count(*)</code> scanned 12 million index rows, locking database memory pages.
-            </p>
-          </div>
-
-          <div class="callout callout-solution">
-            <div class="callout-title">💡 Production Resolution</div>
-            <p>Switched the return type to <strong><code>Slice&lt;Order&gt;</code></strong>, which eliminates the <code>count(*)</code> query completely, reducing latency from 8,500ms back to 6ms!</p>
-          </div>
-        </section>
-
-        <!-- SECTION 10: SENIOR INTERVIEW Q&A -->
-        <section>
-          <h2>10. Senior / Staff Technical Interview Q&A</h2>
-
-          <div class="callout callout-interview">
-            <div class="callout-title">🎯 Q1: What is the exact difference between @Controller and @RestController?</div>
-            <p><strong>Answer:</strong> <code>@Controller</code> is the traditional Spring MVC annotation designed for returning HTML views (JSP, Thymeleaf). To return JSON from a <code>@Controller</code> method, you must explicitly annotate the method with <code>@ResponseBody</code>. <code>@RestController</code> is a convenience composite annotation combining <code>@Controller</code> and <code>@ResponseBody</code> at the class level; every method automatically serializes return values directly into the HTTP response body via configured <code>HttpMessageConverter</code> instances (such as Jackson).</p>
-          </div>
-
-          <div class="callout callout-interview">
-            <div class="callout-title">🎯 Q2: How does Spring Boot resolve properties when defined in multiple sources?</div>
-            <p><strong>Answer:</strong> Spring Boot uses a strict, deterministic property precedence order (highest to lowest):
-              <br>
-              1. <strong>Command Line Arguments</strong> (<code>--server.port=9090</code>)
-              <br>
-              2. <strong>JVM System Properties</strong> (<code>-Dserver.port=9090</code>)
-              <br>
-              3. <strong>OS Environment Variables</strong> (<code>SERVER_PORT=9090</code>)
-              <br>
-              4. <strong>Profile-specific configuration files outside packaged JAR</strong> (<code>file:./config/application-prod.yml</code>)
-              <br>
-              5. <strong>Profile-specific configuration files inside JAR</strong> (<code>classpath:application-prod.yml</code>)
-              <br>
-              6. <strong>Default <code>application.yml</code> inside packaged JAR</strong>.
-            </p>
-          </div>
-
-          <div class="callout callout-interview">
-            <div class="callout-title">🎯 Q3: Why is Keyset / Cursor Pagination superior to Offset Pagination for large datasets?</div>
-            <p><strong>Answer:</strong> Offset pagination (<code>OFFSET 1000000 LIMIT 20</code>) forces the database engine to scan and discard 1,000,000 index rows before returning 20 rows, degrading at $O(N)$ time. Keyset pagination (Cursor pagination) uses an indexed predicate: <code>WHERE id &lt; last_seen_id ORDER BY id DESC LIMIT 20</code>. The database performs an immediate $O(\log N)$ B-tree index seek to jump directly to the target record, maintaining constant-time sub-millisecond query performance regardless of how deep the user paginates.</p>
-          </div>
-        </section>
-
-      </main>
-    </div>
-  </div>
-
-  <footer>
-    <p>Interview A-Z Handbook &bull; Built for GitHub Pages &bull; Production Grade Interview Prep</p>
-  </footer>
-
-  <script src="../../assets/js/main.js"></script>
-</body>
-</html>
+    <section class="section anchor" id="tracker"><h2>30. Study progress tracker</h2><p class="muted">Mark each topic after you can explain the concept, write a code example, and describe one production failure mode.</p><div class="checklist" id="checklist">
+        <label><input type="checkbox"> IoC</label><label><input type="checkbox"> Dependency Injection</label><label><input type="checkbox"> Bean</label><label><input type="checkbox"> ApplicationContext</label><label><input type="checkbox"> BeanFactory</label><label><input type="checkbox"> Component Scanning</label><label><input type="checkbox"> Bean Lifecycle</label><label><input type="checkbox"> Bean Scope overview</label><label><input type="checkbox"> Singleton</label><label><input type="checkbox"> Prototype</label><label><input type="checkbox"> Request scope</label><label><input type="checkbox"> Session scope</label><label><input type="checkbox"> Constructor Injection</label><label><input type="checkbox"> Setter Injection</label><label><input type="checkbox"> Field Injection</label><label><input type="checkbox"> @Component</label><label><input type="checkbox"> @Service</label><label><input type="checkbox"> @Repository</label><label><input type="checkbox"> @Controller</label><label><input type="checkbox"> @Configuration</label><label><input type="checkbox"> @Bean</label><label><input type="checkbox"> Profiles</label><label><input type="checkbox"> Properties</label><label><input type="checkbox"> Environment</label><label><input type="checkbox"> AOP</label><label><input type="checkbox"> Aspect</label><label><input type="checkbox"> Pointcut</label><label><input type="checkbox"> Advice</label><label><input type="checkbox"> Proxy</label></div></section>
+    <footer class="footer">Interview A-Z Handbook · Spring Framework Core · Production-Oriented Interview Preparation</footer>
+</main></div>
+<script>
+    const sections=[...document.querySelectorAll('main section[id]')];
+    sections.forEach((s,i)=>{const a=document.createElement('a');a.href='#'+s.id;a.textContent=(i+1)+'. '+s.querySelector('h2').textContent.replace(/^\d+\.\s*/,'');document.getElementById('toc').appendChild(a)});
+    const boxes=[...document.querySelectorAll('#checklist input')];
+    function update(){const n=boxes.filter(b=>b.checked).length;document.getElementById('progressBar').style.width=(n/boxes.length*100)+'%';document.getElementById('progressText').textContent=n+' / '+boxes.length+' topics complete'}
+    boxes.forEach(b=>b.addEventListener('change',update));update();
+</script>
+</body></html>

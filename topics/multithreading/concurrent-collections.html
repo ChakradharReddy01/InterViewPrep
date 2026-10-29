@@ -3,246 +3,286 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Module 2: Concurrent Collections Deep Dive | Interview A-Z</title>
-  <link rel="stylesheet" href="../../assets/css/style.css">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <title>Module 2: Java Concurrent Collections Masterclass | Interview A-Z</title>
+  <style>
+    :root{--bg:#0b1120;--panel:#111b2e;--panel2:#162238;--text:#e5edf8;--muted:#a8b7cc;--line:#293a55;--blue:#38bdf8;--violet:#818cf8;--green:#34d399;--amber:#fbbf24;--red:#fb7185;--code:#080e19}
+    *{box-sizing:border-box}html{scroll-behavior:smooth;scroll-padding-top:90px}body{margin:0;background:var(--bg);color:var(--text);font:16px/1.72 Inter,system-ui,-apple-system,Segoe UI,sans-serif}a{color:var(--blue)}
+    .navbar{position:sticky;top:0;z-index:20;display:flex;justify-content:space-between;align-items:center;gap:1rem;padding:.85rem 1.5rem;background:rgba(8,14,25,.96);border-bottom:1px solid var(--line);backdrop-filter:blur(12px)}.brand{display:flex;align-items:center;gap:.7rem;font-weight:800}.brand-badge{font-size:.72rem;letter-spacing:.08em;background:linear-gradient(135deg,var(--blue),var(--violet));color:#08111e;padding:.2rem .5rem;border-radius:6px}.navlinks{display:flex;align-items:center;gap:1rem;flex-wrap:wrap}.navlinks a{font-size:.9rem;text-decoration:none;font-weight:650}.nav-btn{border:0;border-radius:7px;padding:.55rem .85rem;background:linear-gradient(135deg,var(--blue),var(--violet));color:#08111e;font-weight:800;cursor:pointer}
+    .layout{max-width:1550px;margin:auto;padding:1.5rem;display:grid;grid-template-columns:260px minmax(0,1fr);gap:1.5rem}.sidebar{position:sticky;top:88px;align-self:start;max-height:calc(100vh - 105px);overflow:auto;background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:1rem}.sidebar h3{margin:.2rem 0 .8rem;font-size:.95rem}.sidebar a{display:block;padding:.36rem .5rem;color:var(--muted);font-size:.86rem;text-decoration:none;border-radius:6px}.sidebar a:hover{background:var(--panel2);color:var(--blue)}main{min-width:0}.breadcrumb{font-size:.85rem;color:var(--muted);margin:.2rem 0 1rem}.hero{padding:1.7rem;background:linear-gradient(135deg,#132641,#171b38);border:1px solid #304463;border-radius:18px;margin-bottom:1.3rem}.hero h1{font-size:clamp(2rem,4vw,3rem);line-height:1.12;margin:.6rem 0}.hero p{color:#c5d3e7;max-width:950px}.chips{display:flex;flex-wrap:wrap;gap:.5rem}.chip{border:1px solid #395170;border-radius:999px;padding:.2rem .65rem;font-size:.78rem;color:#c5d8f1}.section{background:var(--panel);border:1px solid var(--line);border-radius:15px;padding:1.35rem;margin:1rem 0}.section h2{font-size:1.55rem;margin:.1rem 0 1rem}.section h3{font-size:1.12rem;margin:1.25rem 0 .4rem;color:#c5e7ff}.section p,.section li{color:#d1dced}.muted{color:var(--muted)!important}.grid2,.grid3{display:grid;gap:1rem}.grid2{grid-template-columns:repeat(2,minmax(0,1fr))}.grid3{grid-template-columns:repeat(3,minmax(0,1fr))}.card{padding:1rem;background:var(--panel2);border:1px solid var(--line);border-radius:11px}.card h3{margin-top:0}.callout{margin:1rem 0;padding:1rem 1.1rem;border-left:4px solid var(--blue);background:#102338;border-radius:0 10px 10px 0}.warning{border-color:var(--amber);background:#2a2415}.production{border-color:var(--red);background:#2a1824}.solution{border-color:var(--green);background:#102820}.diagram{overflow:auto;background:#080e19;border:1px solid var(--line);border-radius:10px;padding:1rem;margin:1rem 0;color:#b8e7ff;font:.9rem/1.55 ui-monospace,SFMono-Regular,Consolas,monospace;white-space:pre}.codehead{display:flex;justify-content:space-between;color:var(--muted);font-size:.8rem;padding:.55rem .8rem;background:#0d1626;border:1px solid var(--line);border-bottom:0;border-radius:9px 9px 0 0}.code{margin:0 0 1rem;overflow:auto;background:var(--code);border:1px solid var(--line);border-radius:0 0 9px 9px;padding:1rem;color:#dbeafe;font:.88rem/1.65 ui-monospace,SFMono-Regular,Consolas,monospace;white-space:pre}code{font-family:ui-monospace,SFMono-Regular,Consolas,monospace;color:#b8e7ff;background:#0a1322;padding:.1rem .3rem;border-radius:4px}pre code{background:transparent;padding:0;color:inherit}table{width:100%;border-collapse:collapse;margin:1rem 0;font-size:.92rem}th,td{padding:.75rem;text-align:left;vertical-align:top;border:1px solid var(--line)}th{background:#182943;color:#c5e7ff}td{color:#d1dced}tr:nth-child(even) td{background:#0e192b}.checklist label{display:flex;gap:.65rem;align-items:flex-start;padding:.45rem 0;color:#d1dced}.checklist input{margin-top:.45rem;accent-color:var(--blue)}.progress-wrap{height:8px;background:#26364e;border-radius:99px;overflow:hidden}.progress-bar{height:100%;width:0;background:linear-gradient(90deg,var(--blue),var(--violet));transition:width .2s}.small{font-size:.88rem}.footer{text-align:center;color:var(--muted);padding:2rem 1rem}.qa{padding:.9rem 1rem;margin:.8rem 0;background:#0d192b;border:1px solid var(--line);border-radius:9px}.qa strong{color:#c5e7ff}.qa p{margin:.45rem 0 0}.anchor{scroll-margin-top:90px}
+    @media(max-width:1000px){.layout{grid-template-columns:1fr;padding:1rem}.sidebar{position:relative;top:auto;max-height:none}.navlinks{gap:.55rem}.grid3{grid-template-columns:1fr 1fr}}@media(max-width:650px){.navbar{padding:.7rem .8rem;align-items:flex-start}.brand{font-size:.9rem}.navlinks a:not(.home-link){display:none}.navlinks{justify-content:flex-end}.layout{padding:.65rem}.section{padding:1rem}.grid2,.grid3{grid-template-columns:1fr}.hero{padding:1.1rem}table{display:block;overflow-x:auto}}@media print{body{background:#fff;color:#111;font-size:11pt}.navbar,.sidebar,.no-print{display:none!important}.layout{display:block;padding:0;max-width:none}.hero,.section,.card,.qa{background:#fff!important;color:#111!important;border:1px solid #aaa;break-inside:avoid}.hero p,.section p,.section li,.muted,td{color:#222!important}.section h3,.section h2,.hero h1{color:#111!important}.code,.diagram{background:#f4f4f4!important;color:#111!important;white-space:pre-wrap;overflow-wrap:anywhere}.codehead{background:#eee;color:#111}.callout{background:#f5f5f5!important}.footer{color:#333}}
+  </style>
 </head>
 <body>
-
-  <!-- Top Navigation -->
-    <!-- Top Navigation -->
-    <nav class="navbar">
-    <div class="brand">
-      <a href="../../index.html" class="brand-link" style="display: flex; align-items: center; gap: 0.75rem; text-decoration: none; color: inherit;">
-        <span class="brand-badge" style="background: linear-gradient(135deg, #38bdf8, #818cf8); color: #0f172a; padding: 0.15rem 0.55rem; border-radius: 6px; font-size: 0.75rem; font-weight: 800; letter-spacing: 0.05em; text-transform: uppercase;">Interview A-Z</span>
-        <span style="font-weight: 700; font-size: 1.15rem; color: #fff;">Engineering Handbook</span>
-      </a>
-    </div>
-    <div class="nav-links navlinks" style="display: flex; gap: 1.25rem; align-items: center;">
-      <a href="../../index.html" class="nav-link" style="text-decoration: none; font-weight: 600; font-size: 0.95rem;">🏠 Home</a>
-      <a href="../../index.html#topics" class="nav-link" style="text-decoration: none; font-weight: 600; font-size: 0.95rem;">📚 All Modules</a>
-      <a href="https://github.com/ChakradharReddy01/InterViewPrep" target="_blank" class="nav-link" style="text-decoration: none; font-weight: 600; font-size: 0.95rem;">GitHub</a>
-      <button onclick="document.querySelectorAll('details').forEach(d=>d.open=true);window.print();" class="nav-btn-pdf" title="Save page as PDF" style="display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.35rem 0.85rem; font-size: 0.85rem; font-weight: 700; background: linear-gradient(135deg, #38bdf8, #818cf8); color: #0f172a; border: none; border-radius: 6px; cursor: pointer; transition: transform 0.15s ease, box-shadow 0.15s ease; box-shadow: 0 2px 8px rgba(56,189,248,0.25);">
-        <span>📄</span> Save to PDF
-      </button>
-    </div>
-  </nav>
-
-  <div class="container">
-    <div class="article-layout">
-      <!-- Sticky Sidebar Table of Contents -->
-      <aside class="sidebar-toc">
-        <h3>On This Page</h3>
-        <ul class="toc-links" id="dynamic-toc">
-          <!-- Dynamically populated via main.js -->
-        </ul>
-      </aside>
-
-      <!-- Main Article Content -->
-      <main class="article-content">
-        <!-- Breadcrumb -->
-        <nav class="breadcrumb">
-          <a href="../../index.html">Home</a>
-          <span>/</span>
-          <span>Module 2: Multithreading</span>
-          <span>/</span>
-          <span style="color: #fff;">Concurrent Collections</span>
-        </nav>
-
-        <!-- Article Header -->
-        <header class="article-header">
-          <h1>Module 2: Concurrent Collections & Lock-Free Data Structures</h1>
-          <div class="article-meta">
-            <span class="badge badge-multithread">Concurrent Collections</span>
-            <span class="badge badge-advanced">Lock-Free CAS</span>
-            <span class="badge badge-prod">High-Throughput Queues</span>
-            <span>⏱️ 45 min deep dive</span>
-            <span>Target Roles: SDE-2, SDE-3, Distributed Systems Engineer</span>
-          </div>
-        </header>
-
-        <!-- SECTION 1: CONCURRENTHASHMAP -->
-        <section>
-          <h2>1. ConcurrentHashMap: The High-Throughput Standard</h2>
-
-          <h3>1.1 Architecture & Lock-Free Reads</h3>
-          <p>
-            <code>ConcurrentHashMap</code> achieves multi-core scalability without coarse synchronized blocks:
-          </p>
-          <ul>
-            <li><strong>Lock-Free Reads (<code>get()</code>):</strong> Uses volatile field references (<code>volatile Node&lt;K,V&gt; next;</code> and <code>volatile V val;</code>). A reader never acquires a lock, guaranteeing non-blocking reads even during concurrent writes.</li>
-            <li><strong>Fine-Grained Writes (<code>put()</code>):</strong>
-              <ol>
-                <li>If the bucket is empty, it uses atomic <strong>CAS</strong> (<code>compareAndSetObject</code>) to insert the head node with zero locking.</li>
-                <li>If the bucket already contains nodes, it acquires a <code>synchronized</code> lock <strong>only on the first node (bin head)</strong> of that specific bucket. Other buckets remain completely unobstructed!</li>
-                <li>If a bucket length reaches 8, it converts to a Red-Black <strong>TreeBin</strong> to protect against Hash-DoS attacks.</li>
-              </ol>
-            </li>
-          </ul>
-
-          <div class="code-header">
-            <span>Atomic Compound Operations in ConcurrentHashMap</span>
-            <span>Java</span>
-          </div>
-          <pre><code>ConcurrentHashMap&lt;String, AtomicLong&gt; counters = new ConcurrentHashMap&lt;&gt;();
-
-// computeIfAbsent: Atomic check-and-insert guaranteed by bin-head monitor lock
-counters.computeIfAbsent("API_USERS", k -&gt; new AtomicLong(0)).incrementAndGet();
-
-// merge: Atomic accumulation without race conditions
-ConcurrentHashMap&lt;String, Integer&gt; inventory = new ConcurrentHashMap&lt;&gt;();
-inventory.merge("ITEM_101", 5, Integer::sum);</code></pre>
-        </section>
-
-        <!-- SECTION 2: COPYONWRITEARRAYLIST -->
-        <section>
-          <h2>2. CopyOnWriteArrayList: Read-Mostly Snapshot Semantics</h2>
-
-          <h3>2.1 How CopyOnWriteArrayList Works</h3>
-          <p>
-            Maintains an internal volatile array pointer: <code>private transient volatile Object[] array;</code>.
-          </p>
-          <ul>
-            <li><strong>Lock-Free Reads ($O(1)$):</strong> Reads access the current snapshot array directly without locks or synchronization. Perfect for high-frequency reads (e.g. event listeners, observer patterns, configuration caches).</li>
-            <li><strong>Expensive Writes ($O(N)$):</strong> Every single modification (<code>add</code>, <code>set</code>, <code>remove</code>) acquires a ReentrantLock, creates a <strong>brand new copy</strong> of the underlying array using <code>Arrays.copyOf()</code>, mutates the clone, and resets the volatile pointer.</li>
-            <li><strong>Snapshot Iterators:</strong> The iterator takes a snapshot of the array at the moment of instantiation. It <strong>never throws <code>ConcurrentModificationException</code></strong> and ignores modifications made after iteration begins.</li>
-          </ul>
-
-          <div class="callout callout-warning">
-            <div class="callout-title">⚠️ The Write-Heavy Anti-Pattern</div>
-            <p>
-              Never use <code>CopyOnWriteArrayList</code> in write-heavy services! Inserting 10,000 items creates 10,000 array copies on the heap, triggering catastrophic GC allocation storms and freezing application threads.
-            </p>
-          </div>
-        </section>
-
-        <!-- SECTION 3: BLOCKING QUEUES -->
-        <section>
-          <h2>3. BlockingQueues: ArrayBlockingQueue vs. LinkedBlockingQueue</h2>
-
-          <h3>3.1 ArrayBlockingQueue vs. LinkedBlockingQueue Deep Contrast</h3>
-          <table>
-            <thead>
-              <tr>
-                <th>Feature</th>
-                <th><code>ArrayBlockingQueue</code></th>
-                <th><code>LinkedBlockingQueue</code></th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td><strong>Backing Structure</strong></td>
-                <td>Fixed circular array (Ring buffer)</td>
-                <td>Singly-linked chain of <code>Node</code> objects</td>
-              </tr>
-              <tr>
-                <td><strong>Capacity</strong></td>
-                <td>Strictly bounded at initialization</td>
-                <td>Optionally bounded (default <code>Integer.MAX_VALUE</code>)</td>
-              </tr>
-              <tr>
-                <td><strong>Locking Architecture</strong></td>
-                <td><strong>Single Lock</strong> (<code>ReentrantLock</code> shared by both producers and consumers)</td>
-                <td><strong>Two Independent Locks</strong> (<code>putLock</code> for producers and <code>takeLock</code> for consumers)</td>
-              </tr>
-              <tr>
-                <td><strong>Throughput</strong></td>
-                <td>Lower under high producer-consumer concurrency due to lock contention</td>
-                <td>Significantly higher because producers and consumers do not contend for the same lock</td>
-              </tr>
-              <tr>
-                <td><strong>GC Allocation</strong></td>
-                <td>Zero object allocation per item (pre-allocated array)</td>
-                <td>Allocates a <code>Node</code> wrapper object for every enqueued item</td>
-              </tr>
-            </tbody>
-          </table>
-
-          <div class="code-header">
-            <span>Two-Lock Architecture in LinkedBlockingQueue</span>
-            <span>Java Internals</span>
-          </div>
-          <pre><code>// Under the hood in java.util.concurrent.LinkedBlockingQueue:
-private final ReentrantLock takeLock = new ReentrantLock(); // Consumers lock here
-private final Condition notEmpty = takeLock.newCondition();
-
-private final ReentrantLock putLock = new ReentrantLock();  // Producers lock here
-private final Condition notFull = putLock.newCondition();
-
-private final AtomicInteger count = new AtomicInteger();    // Atomic cross-lock size counter</code></pre>
-
-          <h3>3.2 ConcurrentLinkedQueue (Lock-Free FIFO)</h3>
-          <p>
-            An unbounded, thread-safe FIFO queue based on the <strong>Michael & Scott lock-free queue algorithm</strong>. Uses pure atomic <code>CAS</code> on head and tail node pointers without ever blocking or parking threads.
-          </p>
-        </section>
-
-        <!-- SECTION 4: REAL-TIME PRODUCTION ISSUES -->
-        <section>
-          <h2>4. Real-Time Production Issues & Post-Mortems</h2>
-
-          <!-- Incident 1 -->
-          <div class="callout callout-production">
-            <div class="callout-title">🚨 Incident 1: 15-Second Stop-The-World GC Storm via CopyOnWriteArrayList</div>
-            <p><strong>Scenario:</strong> A real-time IoT gateway buffering sensor telemetry saw JVM Old Gen surge to 100%, causing consecutive 15-second GC pauses that caused network connection timeouts.</p>
-          </div>
-
-          <div class="callout callout-warning">
-            <div class="callout-title">🔍 Root Cause Analysis (RCA)</div>
-            <p>
-              Developers used <code>CopyOnWriteArrayList</code> as an in-memory buffer receiving 12,000 sensor readings per second. With 50,000 readings already stored, each incoming <code>list.add(reading)</code> allocated a fresh 50,001-element array on the heap. In 1 second, the service allocated over 5GB of short-lived arrays, overwhelming the Young Generation and flooding Old Gen.
-            </p>
-          </div>
-
-          <div class="callout callout-solution">
-            <div class="callout-title">💡 Production Resolution</div>
-            <p>Replaced with a bounded <code>ArrayBlockingQueue&lt;SensorReading&gt;</code> with zero node-allocation overhead, and drained elements in batches using <code>drainTo()</code>.</p>
-          </div>
-
-          <!-- Incident 2 -->
-          <div class="callout callout-production">
-            <div class="callout-title">🚨 Incident 2: High Producer-Consumer Lock Thrashing on ArrayBlockingQueue</div>
-            <p><strong>Scenario:</strong> A high-frequency order placement pipeline hosted on a 32-core server capped at only 15,000 orders/sec. CPU profiling showed 75% of CPU time spent in <code>ReentrantLock.lock()</code>.</p>
-          </div>
-
-          <div class="callout callout-warning">
-            <div class="callout-title">🔍 Root Cause Analysis (RCA)</div>
-            <p>
-              The messaging bridge used <code>ArrayBlockingQueue</code>. Because <code>ArrayBlockingQueue</code> shares a <strong>single lock</strong> for both <code>put()</code> and <code>take()</code>, 16 producer threads and 16 consumer threads constantly blocked each other on the same monitor.
-            </p>
-          </div>
-
-          <div class="callout callout-solution">
-            <div class="callout-title">💡 Production Resolution</div>
-            <p>Switched to <code>LinkedBlockingQueue(50000)</code> with separate <code>putLock</code> and <code>takeLock</code>, doubling throughput to 42,000 orders/sec.</p>
-          </div>
-        </section>
-
-        <!-- SECTION 5: SENIOR INTERVIEW Q&A -->
-        <section>
-          <h2>5. Senior / Staff Technical Interview Q&A</h2>
-
-          <div class="callout callout-interview">
-            <div class="callout-title">🎯 Q1: Why does ConcurrentHashMap size() not simply lock the table to count elements?</div>
-            <p><strong>Answer:</strong> Locking the table would destroy read and write concurrency. Instead, <code>ConcurrentHashMap</code> uses the striping technique of <code>LongAdder</code>: it maintains a <code>baseCount</code> and an array of <code>CounterCell</code> objects. When threads update the map, they update different counter cells via CAS. Calling <code>size()</code> sums <code>baseCount</code> plus all <code>CounterCell</code> values in a lock-free pass.</p>
-          </div>
-
-          <div class="callout callout-interview">
-            <div class="callout-title">🎯 Q2: Can an iterator of CopyOnWriteArrayList reflect elements added after the iterator was created?</div>
-            <p><strong>Answer:</strong> <strong>No.</strong> The iterator maintains a reference to the exact array instance that was active at the moment <code>iterator()</code> was called. When subsequent writes occur, the list creates a new array and points its internal reference to it, while the iterator continues traversing the immutable old array snapshot.</p>
-          </div>
-        </section>
-
-      </main>
-    </div>
+<nav class="navbar">
+  <div class="brand"><span class="brand-badge">INTERVIEW A-Z</span><span>Engineering Handbook</span></div>
+  <div class="navlinks">
+    <a class="home-link" href="../../index.html">🏠 Home Directory</a>
+    <a href="../../index.html#topics">📚 All Modules</a>
+    <a href="https://github.com/ChakradharReddy01/InterViewPrep" target="_blank" rel="noopener">GitHub</a>
+    <button class="nav-btn" onclick="window.print()">📄 Save to PDF</button>
   </div>
+</nav>
+<div class="layout">
+  <aside class="sidebar"><h3>On This Page</h3><div id="toc"></div><hr style="border-color:var(--line);margin:1rem 0"><div class="small muted">Study progress</div><div class="progress-wrap"><div id="progressBar" class="progress-bar"></div></div><div id="progressText" class="small muted">0 / 8 sections complete</div></aside>
+  <main>
+    <div class="breadcrumb"><a href="../../index.html">Home</a> / Module 2: Multithreading / <span style="color:#fff">Concurrent Collections</span></div>
+    <header class="hero"><div class="chips"><span class="chip">Core Java Concurrency</span><span class="chip">Thread Safety</span><span class="chip">CAS & Blocking</span><span class="chip">Interview Deep Dive</span></div><h1>Concurrent Collections Masterclass</h1><p>Understand which concurrent data structure to choose, how its concurrency strategy works, what consistency guarantees it provides, and what can go wrong in production. Includes Java examples, architecture diagrams, performance trade-offs, and interview questions.</p><p class="muted small">Suggested study time: 45–60 minutes · Java 17 compatible · Focus on choosing the right collection for the access pattern.</p></header>
 
-  <footer>
-    <p>Interview A-Z Handbook &bull; Built for GitHub Pages &bull; Production Grade Interview Prep</p>
-  </footer>
+    <section class="section anchor" id="overview"><h2>1. Why concurrent collections exist</h2>
+      <p>Ordinary collections such as <code>HashMap</code>, <code>ArrayList</code>, and <code>LinkedList</code> are not designed to make concurrent mutation safe by themselves. If multiple threads read and modify them without a suitable coordination strategy, the application can observe lost updates, inconsistent state, exceptions, or corrupted assumptions about the data.</p>
+      <div class="diagram">Multiple producer / request threads
+        |       |       |
+        v       v       v
+        +-------------------------+
+        | Concurrent data structure|
+        | locks / CAS / snapshots  |
+        +-------------------------+
+        |       |       |
+        v       v       v
+        safe coordination according to
+        the collection's documented contract</div>
+      <p>“Thread-safe” does not mean every multi-step business operation is automatically atomic. A collection can make individual methods safe while a sequence of separate calls remains racy.</p>
+      <div class="codehead"><span>Unsafe check-then-act on an ordinary map</span><span>Java</span></div><pre class="code"><code>Map&lt;String, Integer&gt; counts = new HashMap&lt;&gt;();
 
-  <script src="../../assets/js/main.js"></script>
+// If multiple threads run this concurrently, both operations race.
+if (!counts.containsKey("login")) {
+    counts.put("login", 1);
+}</code></pre>
+      <div class="codehead"><span>Atomic operation using ConcurrentHashMap</span><span>Java</span></div><pre class="code"><code>ConcurrentHashMap&lt;String, Integer&gt; counts = new ConcurrentHashMap&lt;&gt;();
+counts.putIfAbsent("login", 1);
+
+// For an atomic counter update:
+counts.merge("login", 1, Integer::sum);</code></pre>
+      <div class="callout"><strong>Decision rule:</strong> start with the access pattern. Is it a map, list, or queue? Are reads far more frequent than writes? Must consumers wait for work? Is the queue bounded? Do you need atomic compound operations or just thread-safe individual calls?</div>
+    </section>
+
+    <section class="section anchor" id="chm"><h2>2. ConcurrentHashMap</h2>
+      <p><code>ConcurrentHashMap&lt;K,V&gt;</code> is a thread-safe map designed for concurrent access. It usually scales much better than synchronizing every operation on one shared map lock. It does not permit <code>null</code> keys or values, which avoids ambiguity between “no mapping” and a mapping whose value is null.</p>
+      <h3>2.1 How it works conceptually</h3>
+      <div class="diagram">hash(key) -> table bucket
+        |
+        +---------+----------+
+        |                    |
+        empty bin            occupied bin
+        |                    |
+        CAS insert       coordinate updates
+        at bin level
+        |
+        concurrent reads generally avoid
+        locking the whole map</div>
+      <p>In modern Java implementations, reads generally use volatile/atomic visibility and do not acquire a global map lock. Updates use CAS where possible and coordinate at the relevant bin when needed. Under heavy collisions, a bin may be treeified to reduce lookup degradation. Exact implementation details are JDK-version-specific; do not assume the old Java 7 segmented-lock architecture applies to Java 8+.</p>
+      <h3>2.2 Safe atomic updates</h3>
+      <div class="codehead"><span>Per-key counters</span><span>Java</span></div><pre class="code"><code>ConcurrentHashMap&lt;String, LongAdder&gt; hits = new ConcurrentHashMap&lt;&gt;();
+
+void recordHit(String endpoint) {
+    hits.computeIfAbsent(endpoint, key -&gt; new LongAdder())
+        .increment();
+}
+
+long hitCount(String endpoint) {
+    LongAdder counter = hits.get(endpoint);
+    return counter == null ? 0L : counter.sum();
+}</code></pre>
+      <p><code>computeIfAbsent</code> safely establishes a mapping for the key; <code>LongAdder</code> is often preferable to <code>AtomicLong</code> for highly contended statistics counters. Its <code>sum()</code> is not a globally atomic snapshot during concurrent updates, so use it for statistics rather than a strict transactional balance.</p>
+      <h3>2.3 Useful methods and their guarantees</h3>
+      <table><thead><tr><th>Method</th><th>Use</th><th>Important detail</th></tr></thead><tbody>
+      <tr><td><code>putIfAbsent(k,v)</code></td><td>Initialize only if missing.</td><td>The map operation is atomic for that key.</td></tr>
+      <tr><td><code>computeIfAbsent(k, fn)</code></td><td>Calculate and install a value if absent.</td><td>Keep the mapping function short and avoid recursively modifying the same map.</td></tr>
+      <tr><td><code>compute(k, fn)</code></td><td>Atomically compute a mapping for a key.</td><td>Returning null removes the mapping or leaves it absent.</td></tr>
+      <tr><td><code>merge(k, v, fn)</code></td><td>Combine a new value with the current mapping.</td><td>Useful for per-key accumulation.</td></tr>
+      <tr><td><code>put(k,v)</code></td><td>Insert or replace a mapping.</td><td>Thread-safe single operation; not a multi-key transaction.</td></tr>
+      </tbody></table>
+      <h3>2.4 Iteration and size</h3>
+      <p>Iterators are <strong>weakly consistent</strong>: they do not throw <code>ConcurrentModificationException</code> simply because another thread updates the map, and they may reflect some concurrent changes but do not promise a frozen point-in-time snapshot. Aggregate methods such as <code>size()</code> are useful for monitoring and control flow, but during concurrent mutation their values can change immediately and should not be used as a strict synchronization condition.</p>
+      <div class="callout warning"><strong>Common bug:</strong> <code>if (map.get(key) == null) map.put(key, value)</code> is a check-then-act race. Use <code>putIfAbsent</code> or an appropriate <code>compute</code> operation. Also remember that atomic map methods do not make mutation of a mutable object stored as the value automatically thread-safe.</div>
+      <h3>2.5 Real-world use cases</h3><ul><li>In-memory metadata and configuration lookups with concurrent updates.</li><li>Per-key metrics and counters, often with <code>LongAdder</code>.</li><li>Deduplication markers and idempotency caches, provided expiration and durability are handled separately.</li></ul>
+    </section>
+
+    <section class="section anchor" id="cow"><h2>3. CopyOnWriteArrayList</h2>
+      <p><code>CopyOnWriteArrayList</code> is designed for workloads where iteration and reads are frequent but mutations are relatively rare. On a write, it creates a fresh backing array with the modification applied and publishes that new array. Existing readers can continue using the old array safely.</p>
+      <div class="diagram">Current array: [listener A, listener B]
+        |
+        reader iterator keeps snapshot reference
+        |
+        writer adds listener C
+        v
+        New array:     [listener A, listener B, listener C]
+
+        Existing iterator still sees A, B.
+        A newly created iterator sees A, B, C.</div>
+      <h3>3.1 Complexity and behavior</h3>
+      <table><thead><tr><th>Operation</th><th>Typical cost</th><th>Behavior</th></tr></thead><tbody>
+      <tr><td><code>get(index)</code></td><td>O(1)</td><td>Reads the current array without locking.</td></tr>
+      <tr><td>Iteration</td><td>O(n)</td><td>Uses a snapshot captured when the iterator was created.</td></tr>
+      <tr><td><code>add/remove/set</code></td><td>O(n) copying plus lock cost</td><td>Publishes a new array after mutation.</td></tr>
+      </tbody></table>
+      <p>Snapshot iterators do not throw <code>ConcurrentModificationException</code> due to concurrent modifications, but they do not see later changes. Iterator mutation methods such as <code>remove()</code> are unsupported.</p>
+      <div class="codehead"><span>Event listener registry</span><span>Java</span></div><pre class="code"><code>final class EventBus {
+    private final CopyOnWriteArrayList&lt;Consumer&lt;String&gt;&gt; listeners =
+            new CopyOnWriteArrayList&lt;&gt;();
+
+    void subscribe(Consumer&lt;String&gt; listener) {
+        listeners.add(listener);
+    }
+
+    void publish(String event) {
+        for (Consumer&lt;String&gt; listener : listeners) {
+            listener.accept(event);
+        }
+    }
+}</code></pre>
+      <p>This works well when subscriptions change occasionally and events are published often. Consider how listener exceptions should be isolated: one failing listener should not accidentally prevent all later listeners from receiving the event unless that is the intended contract.</p>
+      <div class="callout production"><strong>Production failure: allocation storm.</strong> A telemetry service stores tens of thousands of frequently arriving events in a <code>CopyOnWriteArrayList</code>. Every addition copies the entire array, producing huge allocation and garbage-collection pressure. Use a queue or purpose-built buffer for write-heavy ingestion; reserve copy-on-write collections for small, read-mostly registries.</div>
+      <h3>3.2 When to choose it</h3><ul><li>Event listeners or observer registrations.</li><li>Small routing tables or configuration lists with infrequent updates.</li><li>Cases where stable snapshot iteration is more valuable than cheap writes.</li></ul>
+    </section>
+
+    <section class="section anchor" id="blocking"><h2>4. BlockingQueue: producer-consumer coordination</h2>
+      <p><code>BlockingQueue&lt;E&gt;</code> defines queue operations that can wait when necessary. A producer can wait for capacity when the queue is full; a consumer can wait for an element when it is empty. This supports producer-consumer systems without manually writing a wait/notify protocol.</p>
+      <div class="diagram">Producer threads                         Consumer threads
+        |                                         ^
+        v                                         |
+        put(item) --> [ BlockingQueue ] --> take()
+        |        |
+        empty: take waits
+        full: put waits (bounded queues)</div>
+      <h3>4.1 The four operation styles</h3>
+      <table><thead><tr><th>Operation style</th><th>Insert</th><th>Remove</th><th>Meaning</th></tr></thead><tbody>
+      <tr><td>Throws on failure</td><td><code>add(e)</code></td><td><code>remove()</code></td><td>Throws when full/empty.</td></tr>
+      <tr><td>Special value</td><td><code>offer(e)</code></td><td><code>poll()</code></td><td>Returns false/null immediately if it cannot proceed.</td></tr>
+      <tr><td>Waits</td><td><code>put(e)</code></td><td><code>take()</code></td><td>Waits until space/item is available; interruptible.</td></tr>
+      <tr><td>Timed wait</td><td><code>offer(e, time, unit)</code></td><td><code>poll(time, unit)</code></td><td>Waits up to a limit, then returns false/null.</td></tr>
+      </tbody></table>
+      <p>Blocking operations are interruptible. Code should handle <code>InterruptedException</code> appropriately, commonly by restoring the interrupt flag when it cannot propagate the exception.</p>
+      <div class="codehead"><span>Bounded producer-consumer pattern</span><span>Java</span></div><pre class="code"><code>BlockingQueue&lt;String&gt; queue = new ArrayBlockingQueue&lt;&gt;(500);
+
+// Producer: waits for capacity instead of allocating unlimited pending work.
+void publish(String message) throws InterruptedException {
+    queue.put(message);
+}
+
+// Consumer: waits until work becomes available.
+void consumeLoop() throws InterruptedException {
+    while (!Thread.currentThread().isInterrupted()) {
+        String message = queue.take();
+        process(message);
+    }
+}</code></pre>
+      <h3>4.2 Backpressure and boundedness</h3>
+      <p>A bounded queue caps the number of queued elements. When producers outpace consumers, they must wait, time out, reject, or apply another domain-specific policy. This is a form of backpressure. An unbounded queue can absorb a burst but may accumulate work until memory is exhausted if the rate mismatch persists.</p>
+      <div class="callout warning"><strong>Poison pill caveat:</strong> a sentinel object is sometimes used to stop consumers, but it must be coordinated with the number of consumers and queue capacity. Do not use null as a sentinel: blocking queues generally prohibit null elements.</div>
+    </section>
+
+    <section class="section anchor" id="arrayqueue"><h2>5. ArrayBlockingQueue</h2>
+      <p><code>ArrayBlockingQueue</code> is a bounded FIFO queue backed by a fixed-size circular array. Its capacity is chosen at construction and does not grow. It is useful when predictable queue capacity and memory bounds matter.</p>
+      <div class="diagram">Fixed circular buffer, capacity = 5
+        head -> [A] [B] [C] [ ] [ ] <- tail
+        take() advances head
+        put() writes at tail
+        When full: put waits / offer fails or times out.</div>
+      <div class="codehead"><span>Bounded queue with explicit admission behavior</span><span>Java</span></div><pre class="code"><code>ArrayBlockingQueue&lt;Task&gt; queue = new ArrayBlockingQueue&lt;&gt;(1000);
+
+boolean accepted = queue.offer(task);
+if (!accepted) {
+    // Decide explicitly: reject request, retry later, or persist elsewhere.
+    metrics.incrementQueueFull();
+}</code></pre>
+      <p>By default, producer and consumer operations coordinate through a shared lock, which can become a contention point under high concurrency. The constructor has a fairness option: <code>new ArrayBlockingQueue&lt;&gt;(capacity, true)</code> favors waiting threads in FIFO order, typically at some throughput cost. Fairness does not mean tasks themselves are processed in every desired business order when multiple consumers run.</p>
+      <h3>Strengths and trade-offs</h3><ul><li><strong>Strength:</strong> strict capacity and no per-element linked-node allocation.</li><li><strong>Trade-off:</strong> one shared lock can create contention between producers and consumers.</li><li><strong>Choose it when:</strong> you need a predictable bounded buffer and simple FIFO semantics.</li></ul>
+    </section>
+
+    <section class="section anchor" id="linkedqueue"><h2>6. LinkedBlockingQueue</h2>
+      <p><code>LinkedBlockingQueue</code> is a FIFO queue backed by linked nodes. It can be bounded using a capacity argument or effectively unbounded when created with the no-argument constructor (capacity defaults to <code>Integer.MAX_VALUE</code>).</p>
+      <div class="diagram">Producer side                   Consumer side
+        putLock + notFull               takeLock + notEmpty
+        |                                |
+        v                                v
+        [head] -> [node] -> [node] -> [tail]
+        shared count coordinates capacity / emptiness</div>
+      <p>Its implementation separates producer-side and consumer-side locking, with an atomic count used to coordinate the queue state. This can permit more producer/consumer overlap than a single-lock design in some workloads, but it allocates a node per enqueued item and performance depends on contention and workload.</p>
+      <div class="codehead"><span>Bound it explicitly</span><span>Java</span></div><pre class="code"><code>// Prefer an explicit capacity when backlog must be limited.
+BlockingQueue&lt;Job&gt; jobs = new LinkedBlockingQueue&lt;&gt;(2000);
+
+if (!jobs.offer(job)) {
+    // Queue is full: apply the application's overload policy.
+    handleOverload(job);
+}</code></pre>
+      <div class="callout production"><strong>Production failure: unbounded backlog.</strong> A service uses <code>new LinkedBlockingQueue&lt;&gt;()</code> while its downstream database slows down. Producers keep adding jobs; heap usage and task age rise until the service becomes unhealthy. Set a capacity based on acceptable waiting time and memory, and define what happens when it fills.</div>
+      <h3>ArrayBlockingQueue vs LinkedBlockingQueue</h3>
+      <table><thead><tr><th>Dimension</th><th>ArrayBlockingQueue</th><th>LinkedBlockingQueue</th></tr></thead><tbody>
+      <tr><td>Storage</td><td>Fixed circular array</td><td>Linked nodes</td></tr>
+      <tr><td>Capacity</td><td>Always bounded</td><td>Bounded if configured; otherwise effectively unbounded</td></tr>
+      <tr><td>Per-element allocation</td><td>No new queue node per element</td><td>Allocates node objects</td></tr>
+      <tr><td>Locking</td><td>Shared lock for producers and consumers</td><td>Separate put/take locks coordinated by count</td></tr>
+      <tr><td>Typical choice</td><td>Simple, predictable bounded buffer</td><td>Potentially useful when producer/consumer concurrency benefits from split locks</td></tr>
+      </tbody></table>
+      <p>Neither is always faster. Benchmark using realistic producer counts, consumer counts, element sizes, capacity, and JVM settings.</p>
+    </section>
+
+    <section class="section anchor" id="clq"><h2>7. ConcurrentLinkedQueue</h2>
+      <p><code>ConcurrentLinkedQueue</code> is an unbounded, thread-safe, non-blocking FIFO queue. It is designed for concurrent enqueue/dequeue without blocking producers and consumers on a queue lock. Modern implementations use atomic compare-and-set operations to coordinate head/tail and node links.</p>
+      <div class="diagram">Producer A ----\
+        Producer B -----+--> CAS-based concurrent FIFO --> poll()
+        Producer C ----/               |
+        no capacity limit
+        no waiting for item/space</div>
+      <h3>7.1 Non-blocking does not mean free</h3>
+      <p>When a thread cannot complete a CAS because another thread changed the structure, it retries. This avoids blocking on a lock but still consumes CPU under contention. “Lock-free” describes progress properties of the algorithm; it does not mean every operation finishes in a fixed number of steps or that contention disappears.</p>
+      <div class="codehead"><span>Non-blocking poll loop</span><span>Java</span></div><pre class="code"><code>ConcurrentLinkedQueue&lt;String&gt; queue = new ConcurrentLinkedQueue&lt;&gt;();
+
+queue.offer("job-1");
+queue.offer("job-2");
+
+String item;
+while ((item = queue.poll()) != null) {
+    process(item);
+}</code></pre>
+      <p><code>poll()</code> returns immediately with null if the queue is empty. It does not wait for work. Use a <code>BlockingQueue</code> when consumers should sleep until an item arrives.</p>
+      <h3>7.2 Important trade-offs</h3><ul><li>Unbounded: it does not provide a built-in capacity limit or producer backpressure.</li><li>Non-blocking: useful when callers should not wait for queue operations.</li><li>Memory: queued nodes remain reachable until removed and reclaimed.</li><li>Size: obtaining <code>size()</code> requires traversal and may be inaccurate by the time it is used under concurrent changes; avoid using it as a capacity guard.</li></ul>
+      <div class="callout"><strong>Choose ConcurrentLinkedQueue when</strong> you need concurrent FIFO enqueue/dequeue and non-blocking empty behavior. Choose a BlockingQueue when waiting and/or bounded capacity is part of the desired producer-consumer contract.</div>
+    </section>
+
+    <section class="section anchor" id="comparison"><h2>8. Selection guide, production issues, and interview questions</h2>
+      <table><thead><tr><th>Requirement</th><th>Good starting choice</th><th>Why / caution</th></tr></thead><tbody>
+      <tr><td>Concurrent key-value map</td><td><code>ConcurrentHashMap</code></td><td>Scalable concurrent map operations; use atomic compound methods for per-key updates.</td></tr>
+      <tr><td>Read-mostly list / listener registry</td><td><code>CopyOnWriteArrayList</code></td><td>Snapshot iteration; writes copy the array, so avoid write-heavy workloads.</td></tr>
+      <tr><td>Producer-consumer with waiting</td><td><code>BlockingQueue</code> implementation</td><td>Consumers can wait for work; bounded variants can apply backpressure.</td></tr>
+      <tr><td>Strict fixed queue capacity</td><td><code>ArrayBlockingQueue</code></td><td>Predictable capacity; shared-lock contention may matter.</td></tr>
+      <tr><td>FIFO queue with optional bound</td><td><code>LinkedBlockingQueue(capacity)</code></td><td>Separate producer/consumer locks; node allocation; always consider explicit capacity.</td></tr>
+      <tr><td>Non-blocking concurrent FIFO</td><td><code>ConcurrentLinkedQueue</code></td><td>Does not wait for work or impose a capacity limit.</td></tr>
+      </tbody></table>
+      <div class="qa"><strong>Q1. Why is ConcurrentHashMap preferred over Collections.synchronizedMap?</strong><p>It is designed for concurrent access with finer-grained coordination and non-global-lock reads in typical modern implementations. A synchronized wrapper serializes access through one monitor and generally requires external synchronization for safe compound iteration.</p></div>
+      <div class="qa"><strong>Q2. Is ConcurrentHashMap fully lock-free?</strong><p>No. Reads generally avoid locking, and some updates use CAS, but updates to occupied bins may use synchronization. It is a concurrent scalable map, not a guarantee that every operation is lock-free.</p></div>
+      <div class="qa"><strong>Q3. Why does ConcurrentHashMap reject null keys and values?</strong><p>It avoids ambiguity between an absent mapping and a mapping whose value is null, which is especially important when retrieval happens concurrently.</p></div>
+      <div class="qa"><strong>Q4. What is a snapshot iterator?</strong><p>CopyOnWriteArrayList iterators traverse the array version captured at iterator creation. They do not see subsequent writes and do not throw ConcurrentModificationException because of those writes.</p></div>
+      <div class="qa"><strong>Q5. Why not use CopyOnWriteArrayList for an event buffer?</strong><p>Each mutation copies the backing array, so frequent writes to a large list create O(n) copying and substantial allocation/GC pressure.</p></div>
+      <div class="qa"><strong>Q6. Difference between put, offer, and add on a BlockingQueue?</strong><p>Put waits for capacity; offer returns false immediately when it cannot insert; add throws an exception when insertion is not possible. Timed offer waits up to a specified duration.</p></div>
+      <div class="qa"><strong>Q7. ArrayBlockingQueue vs LinkedBlockingQueue?</strong><p>ArrayBlockingQueue uses a fixed circular array and a shared lock. LinkedBlockingQueue uses linked nodes, can be explicitly bounded, and separates producer and consumer locks. Actual throughput depends on workload.</p></div>
+      <div class="qa"><strong>Q8. Is LinkedBlockingQueue always bounded?</strong><p>No. Its no-argument constructor uses an effective capacity of Integer.MAX_VALUE. Specify a capacity when a backlog limit is required.</p></div>
+      <div class="qa"><strong>Q9. BlockingQueue vs ConcurrentLinkedQueue?</strong><p>BlockingQueue supports waiting/timed operations and may impose capacity. ConcurrentLinkedQueue is non-blocking and unbounded; poll returns null immediately when empty.</p></div>
+      <div class="qa"><strong>Q10. Can thread-safe collections make a business workflow atomic?</strong><p>Not automatically. Thread safety of individual calls does not make a multi-call check-then-act sequence atomic. Use atomic collection methods or a wider synchronization/transaction strategy.</p></div>
+      <div class="qa"><strong>Q11. How do you prevent an unbounded queue from exhausting memory?</strong><p>Choose a bounded queue or a bounded admission policy, monitor queue depth and age, and define backpressure, rejection, persistence, or retry behavior.</p></div>
+      <div class="qa"><strong>Q12. Does lock-free mean there is no contention?</strong><p>No. CAS retries can increase under contention, and lock-free algorithms can still consume CPU and have variable per-thread completion time.</p></div>
+      <h3>Thumb rules</h3><div class="grid2"><div class="card"><h3>Do</h3><ul><li>Use atomic map methods for compound per-key updates.</li><li>Choose copy-on-write only for read-mostly collections.</li><li>Bound queues when memory and latency must be controlled.</li><li>Monitor queue depth, rejection, task age, and consumer throughput.</li></ul></div><div class="card"><h3>Avoid</h3><ul><li>Assuming thread-safe means every multi-step workflow is atomic.</li><li>Using a queue's <code>size()</code> as a concurrency guard.</li><li>Using an unbounded queue to hide sustained overload.</li><li>Choosing a collection based only on a benchmark from a different workload.</li></ul></div></div>
+    </section>
+
+    <section class="section anchor" id="tracker"><h2>9. Study progress tracker</h2><p class="muted">Tick each item when you can explain the concept and write a small example from memory.</p><div class="checklist" id="checklist">
+      <label><input type="checkbox"> I can explain why concurrent collections exist and their guarantees.</label>
+      <label><input type="checkbox"> I understand ConcurrentHashMap atomic methods and weakly consistent iteration.</label>
+      <label><input type="checkbox"> I can explain CopyOnWriteArrayList snapshots and write costs.</label>
+      <label><input type="checkbox"> I understand BlockingQueue put, offer, take, poll, and timed operations.</label>
+      <label><input type="checkbox"> I can compare ArrayBlockingQueue and LinkedBlockingQueue.</label>
+      <label><input type="checkbox"> I can explain ConcurrentLinkedQueue's non-blocking behavior and limitations.</label>
+      <label><input type="checkbox"> I can choose the correct collection for a production use case.</label>
+      <label><input type="checkbox"> I can answer the interview questions without reading the answers.</label>
+    </div></section>
+    <footer class="footer">Interview A-Z Handbook · Java Backend Interview Preparation · Built for GitHub Pages</footer>
+  </main></div>
+<script>
+  const sections=[...document.querySelectorAll('main section[id]')];
+  sections.forEach((s,i)=>{const a=document.createElement('a');a.href='#'+s.id;a.textContent=(i+1)+'. '+s.querySelector('h2').textContent.replace(/^\\d+\\.\\s*/,'');document.getElementById('toc').appendChild(a)});
+  const boxes=[...document.querySelectorAll('#checklist input')];
+  function update(){const n=boxes.filter(b=>b.checked).length;document.getElementById('progressBar').style.width=(n/boxes.length*100)+'%';document.getElementById('progressText').textContent=n+' / '+boxes.length+' topics complete'}
+  boxes.forEach(b=>b.addEventListener('change',update));update();
+</script>
 </body>
 </html>

@@ -1,293 +1,409 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Module 2: Executor Framework & ThreadPoolExecutor Deep Dive | Interview A-Z</title>
-  <link rel="stylesheet" href="../../assets/css/style.css">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Module 2: Java Executor Framework Masterclass | Interview A-Z</title>
+    <style>
+        :root{--bg:#0b1120;--panel:#111b2e;--panel2:#162238;--text:#e5edf8;--muted:#a8b7cc;--line:#293a55;--blue:#38bdf8;--violet:#818cf8;--green:#34d399;--amber:#fbbf24;--red:#fb7185;--code:#080e19}
+        *{box-sizing:border-box}html{scroll-behavior:smooth;scroll-padding-top:90px}body{margin:0;background:var(--bg);color:var(--text);font:16px/1.72 Inter,system-ui,-apple-system,Segoe UI,sans-serif}
+        a{color:var(--blue)}.navbar{position:sticky;top:0;z-index:20;display:flex;justify-content:space-between;align-items:center;gap:1rem;padding:.85rem 1.5rem;background:rgba(8,14,25,.96);border-bottom:1px solid var(--line);backdrop-filter:blur(12px)}.brand{display:flex;align-items:center;gap:.7rem;font-weight:800}.brand-badge{font-size:.72rem;letter-spacing:.08em;background:linear-gradient(135deg,var(--blue),var(--violet));color:#08111e;padding:.2rem .5rem;border-radius:6px}.navlinks{display:flex;align-items:center;gap:1rem;flex-wrap:wrap}.navlinks a{font-size:.9rem;text-decoration:none;font-weight:650}.nav-btn{border:0;border-radius:7px;padding:.55rem .85rem;background:linear-gradient(135deg,var(--blue),var(--violet));color:#08111e;font-weight:800;cursor:pointer}
+        .layout{max-width:1550px;margin:auto;padding:1.5rem;display:grid;grid-template-columns:260px minmax(0,1fr);gap:1.5rem}.sidebar{position:sticky;top:88px;align-self:start;max-height:calc(100vh - 105px);overflow:auto;background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:1rem}.sidebar h3{margin:.2rem 0 .8rem;font-size:.95rem}.sidebar a{display:block;padding:.36rem .5rem;color:var(--muted);font-size:.86rem;text-decoration:none;border-radius:6px}.sidebar a:hover{background:var(--panel2);color:var(--blue)}main{min-width:0}.breadcrumb{font-size:.85rem;color:var(--muted);margin:.2rem 0 1rem}.hero{padding:1.7rem;background:linear-gradient(135deg,#132641,#171b38);border:1px solid #304463;border-radius:18px;margin-bottom:1.3rem}.hero h1{font-size:clamp(2rem,4vw,3rem);line-height:1.12;margin:.6rem 0}.hero p{color:#c5d3e7;max-width:950px}.chips{display:flex;flex-wrap:wrap;gap:.5rem}.chip{border:1px solid #395170;border-radius:999px;padding:.2rem .65rem;font-size:.78rem;color:#c5d8f1}.section{background:var(--panel);border:1px solid var(--line);border-radius:15px;padding:1.35rem;margin:1rem 0}.section h2{font-size:1.55rem;margin:.1rem 0 1rem}.section h3{font-size:1.12rem;margin:1.25rem 0 .4rem;color:#c5e7ff}.section p,.section li{color:#d1dced}.muted{color:var(--muted)!important}.grid2,.grid3{display:grid;gap:1rem}.grid2{grid-template-columns:repeat(2,minmax(0,1fr))}.grid3{grid-template-columns:repeat(3,minmax(0,1fr))}.card{padding:1rem;background:var(--panel2);border:1px solid var(--line);border-radius:11px}.card h3{margin-top:0}.callout{margin:1rem 0;padding:1rem 1.1rem;border-left:4px solid var(--blue);background:#102338;border-radius:0 10px 10px 0}.warning{border-color:var(--amber);background:#2a2415}.production{border-color:var(--red);background:#2a1824}.solution{border-color:var(--green);background:#102820}.diagram{overflow:auto;background:#080e19;border:1px solid var(--line);border-radius:10px;padding:1rem;margin:1rem 0;color:#b8e7ff;font:.9rem/1.55 ui-monospace,SFMono-Regular,Consolas,monospace;white-space:pre}.codehead{display:flex;justify-content:space-between;color:var(--muted);font-size:.8rem;padding:.55rem .8rem;background:#0d1626;border:1px solid var(--line);border-bottom:0;border-radius:9px 9px 0 0}.code{margin:0 0 1rem;overflow:auto;background:var(--code);border:1px solid var(--line);border-radius:0 0 9px 9px;padding:1rem;color:#dbeafe;font: .88rem/1.65 ui-monospace,SFMono-Regular,Consolas,monospace;white-space:pre}.inline-code,code{font-family:ui-monospace,SFMono-Regular,Consolas,monospace;color:#b8e7ff;background:#0a1322;padding:.1rem .3rem;border-radius:4px}pre code{background:transparent;padding:0;color:inherit}table{width:100%;border-collapse:collapse;margin:1rem 0;font-size:.92rem}th,td{padding:.75rem;text-align:left;vertical-align:top;border:1px solid var(--line)}th{background:#182943;color:#c5e7ff}td{color:#d1dced}tr:nth-child(even) td{background:#0e192b}.pill{display:inline-block;border-radius:5px;padding:.12rem .45rem;font-size:.75rem;font-weight:800}.good{background:#123a30;color:#8af0c8}.bad{background:#401e2b;color:#ffb4c4}.checklist label{display:flex;gap:.65rem;align-items:flex-start;padding:.45rem 0;color:#d1dced}.checklist input{margin-top:.45rem;accent-color:var(--blue)}.progress-wrap{height:8px;background:#26364e;border-radius:99px;overflow:hidden}.progress-bar{height:100%;width:0;background:linear-gradient(90deg,var(--blue),var(--violet));transition:width .2s}.small{font-size:.88rem}.footer{text-align:center;color:var(--muted);padding:2rem 1rem}.qa{padding:.9rem 1rem;margin:.8rem 0;background:#0d192b;border:1px solid var(--line);border-radius:9px}.qa strong{color:#c5e7ff}.qa p{margin:.45rem 0 0}.anchor{scroll-margin-top:90px}
+        @media(max-width:1000px){.layout{grid-template-columns:1fr;padding:1rem}.sidebar{position:relative;top:auto;max-height:none}.navlinks{gap:.55rem}.grid3{grid-template-columns:1fr 1fr}}@media(max-width:650px){.navbar{padding:.7rem .8rem;align-items:flex-start}.brand{font-size:.9rem}.navlinks a:not(.home-link){display:none}.navlinks{justify-content:flex-end}.layout{padding:.65rem}.section{padding:1rem}.grid2,.grid3{grid-template-columns:1fr}.hero{padding:1.1rem}table{display:block;overflow-x:auto}}@media print{body{background:#fff;color:#111;font-size:11pt}.navbar,.sidebar,.no-print{display:none!important}.layout{display:block;padding:0;max-width:none}.hero,.section,.card,.qa{background:#fff!important;color:#111!important;border:1px solid #aaa;break-inside:avoid}.hero p,.section p,.section li,.muted,td{color:#222!important}.section h3,.section h2,.hero h1{color:#111!important}.code,.diagram{background:#f4f4f4!important;color:#111!important;white-space:pre-wrap;overflow-wrap:anywhere}.codehead{background:#eee;color:#111}.callout{background:#f5f5f5!important}.footer{color:#333}}
+    </style>
 </head>
 <body>
-
-  <!-- Top Navigation -->
-    <!-- Top Navigation -->
-    <nav class="navbar">
-    <div class="brand">
-      <a href="../../index.html" class="brand-link" style="display: flex; align-items: center; gap: 0.75rem; text-decoration: none; color: inherit;">
-        <span class="brand-badge" style="background: linear-gradient(135deg, #38bdf8, #818cf8); color: #0f172a; padding: 0.15rem 0.55rem; border-radius: 6px; font-size: 0.75rem; font-weight: 800; letter-spacing: 0.05em; text-transform: uppercase;">Interview A-Z</span>
-        <span style="font-weight: 700; font-size: 1.15rem; color: #fff;">Engineering Handbook</span>
-      </a>
+<nav class="navbar">
+    <div class="brand"><span class="brand-badge">INTERVIEW A-Z</span><span>Engineering Handbook</span></div>
+    <div class="navlinks">
+        <a class="home-link" href="../../index.html">🏠 Home Directory</a>
+        <a href="../../index.html#topics">📚 All Modules</a>
+        <a href="https://github.com/ChakradharReddy01/InterViewPrep" target="_blank" rel="noopener">GitHub</a>
+        <button class="nav-btn" onclick="document.querySelectorAll('details').forEach(d=>d.open=true);window.print()">📄 Save to PDF</button>
     </div>
-    <div class="nav-links navlinks" style="display: flex; gap: 1.25rem; align-items: center;">
-      <a href="../../index.html" class="nav-link" style="text-decoration: none; font-weight: 600; font-size: 0.95rem;">🏠 Home</a>
-      <a href="../../index.html#topics" class="nav-link" style="text-decoration: none; font-weight: 600; font-size: 0.95rem;">📚 All Modules</a>
-      <a href="https://github.com/ChakradharReddy01/InterViewPrep" target="_blank" class="nav-link" style="text-decoration: none; font-weight: 600; font-size: 0.95rem;">GitHub</a>
-      <button onclick="document.querySelectorAll('details').forEach(d=>d.open=true);window.print();" class="nav-btn-pdf" title="Save page as PDF" style="display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.35rem 0.85rem; font-size: 0.85rem; font-weight: 700; background: linear-gradient(135deg, #38bdf8, #818cf8); color: #0f172a; border: none; border-radius: 6px; cursor: pointer; transition: transform 0.15s ease, box-shadow 0.15s ease; box-shadow: 0 2px 8px rgba(56,189,248,0.25);">
-        <span>📄</span> Save to PDF
-      </button>
-    </div>
-  </nav>
-
-  <div class="container">
-    <div class="article-layout">
-      <!-- Sticky Sidebar Table of Contents -->
-      <aside class="sidebar-toc">
+</nav>
+<div class="layout">
+    <aside class="sidebar">
         <h3>On This Page</h3>
-        <ul class="toc-links" id="dynamic-toc">
-          <!-- Dynamically populated via main.js -->
-        </ul>
-      </aside>
-
-      <!-- Main Article Content -->
-      <main class="article-content">
-        <!-- Breadcrumb -->
-        <nav class="breadcrumb">
-          <a href="../../index.html">Home</a>
-          <span>/</span>
-          <span>Module 2: Multithreading</span>
-          <span>/</span>
-          <span style="color: #fff;">Executor Framework</span>
-        </nav>
-
-        <!-- Article Header -->
-        <header class="article-header">
-          <h1>Module 2: Executor Framework, ThreadPoolExecutor & Sizing Mechanics</h1>
-          <div class="article-meta">
-            <span class="badge badge-multithread">Executor Framework</span>
-            <span class="badge badge-advanced">ThreadPoolExecutor</span>
-            <span class="badge badge-prod">Production Sizing & OOM</span>
-            <span>⏱️ 50 min deep dive</span>
-            <span>Target Roles: SDE-2, SDE-3, Senior Platform Engineer</span>
-          </div>
+        <div id="toc"></div>
+        <hr style="border-color:var(--line);margin:1rem 0">
+        <div class="small muted">Study progress</div><div class="progress-wrap"><div id="progressBar" class="progress-bar"></div></div><div id="progressText" class="small muted">0 / 10 sections complete</div>
+    </aside>
+    <main>
+        <div class="breadcrumb"><a href="../../index.html">Home</a> / Module 2: Multithreading / <span style="color:#fff">Executor Framework</span></div>
+        <header class="hero">
+            <div class="chips"><span class="chip">Core Java Concurrency</span><span class="chip">ThreadPoolExecutor</span><span class="chip">Production Readiness</span><span class="chip">Interview Deep Dive</span></div>
+            <h1>Executor Framework & Thread Pool Masterclass</h1>
+            <p>A practical, end-to-end guide to submitting work, managing worker threads, sizing pools, selecting queues, handling overload, and avoiding production failures. Learn the mental model first, then connect it to Java APIs and interview scenarios.</p>
+            <p class="muted small">Suggested time: 50–70 minutes · Java 17 compatible examples · Includes runnable patterns, production post-mortems, comparison tables, and interview Q&A.</p>
         </header>
 
-        <!-- SECTION 1: EXECUTOR HIERARCHY -->
-        <section>
-          <h2>1. Executor Hierarchy & Core Interfaces</h2>
-          
-          <pre><code>                     java.util.concurrent.Executor (interface: execute(Runnable))
-                                   |
-                  java.util.concurrent.ExecutorService (interface: submit, shutdown, invokeAll)
-                                   |
-              +--------------------+--------------------+
-              |                                         |
-java.util.concurrent.AbstractExecutorService     java.util.concurrent.ScheduledExecutorService
-              |                                         |
-java.util.concurrent.ThreadPoolExecutor         java.util.concurrent.ScheduledThreadPoolExecutor</code></pre>
+        <section class="section anchor" id="mental-model">
+            <h2>1. The mental model: why the Executor Framework exists</h2>
+            <p>Creating a new thread for every task is easy to write but hard to operate. Threads consume stack memory and operating-system resources; creating them repeatedly costs time; and unbounded thread creation can exhaust the process. An executor separates <strong>what work should run</strong> from <strong>how, when, and on which thread it runs</strong>.</p>
+            <div class="diagram">Application / request handler
+                |
+                | submit(task)
+                v
+                ExecutorService
+                |
+                v
+                ThreadPoolExecutor
+                |      |       |
+                worker worker  worker       <-- reusable threads
+                \      |      /
+                Work queue             <-- absorbs a bounded burst
+                |
+                Rejection policy          <-- decides what happens at saturation</div>
+            <div class="grid3">
+                <div class="card"><h3>Task</h3><p class="small">A unit of work, commonly a <code>Runnable</code> or <code>Callable&lt;V&gt;</code>.</p></div>
+                <div class="card"><h3>Executor</h3><p class="small">Accepts a task and takes responsibility for arranging its execution.</p></div>
+                <div class="card"><h3>Worker pool</h3><p class="small">A limited set of reusable threads that process submitted tasks.</p></div>
+            </div>
+            <div class="callout"><strong>Important distinction:</strong> a thread pool limits concurrent execution; a queue stores work that has not started. A large queue does not make a slow downstream dependency faster—it only delays the moment overload becomes visible.</div>
+            <h3>Example: asynchronous audit logging</h3>
+            <p>An order API can submit a non-critical audit record to a dedicated executor rather than creating a thread for each order. The design still needs a policy for overload: should the request slow down, should the audit event be persisted elsewhere, or is dropping the event acceptable? That is a business decision, not just a thread-pool setting.</p>
+        </section>
 
-          <h3>1.1 <code>Executor</code> vs. <code>ExecutorService</code></h3>
-          <ul>
-            <li><strong><code>Executor</code>:</strong> Base interface defining a single command execution method: <code>void execute(Runnable command)</code>. Decouples task submission from thread mechanics.</li>
-            <li><strong><code>ExecutorService</code>:</strong> Comprehensive lifecycle manager supporting <code>Callable</code> submission (<code>submit()</code> returning a <code>Future</code>), batch execution (<code>invokeAll()</code>, <code>invokeAny()</code>), and graceful termination (<code>shutdown()</code>, <code>shutdownNow()</code>, <code>awaitTermination()</code>).</li>
-          </ul>
+        <section class="section anchor" id="executor">
+            <h2>2. Executor and ExecutorService</h2>
+            <h3>2.1 Executor: the smallest contract</h3>
+            <p><code>Executor</code> exposes one method: <code>execute(Runnable command)</code>. It intentionally does not promise whether the command runs in a new thread, a pooled thread, or even synchronously in the caller. It decouples task submission from execution mechanics.</p>
+            <div class="codehead"><span>Minimal usage</span><span>Java</span></div><pre class="code"><code>Executor executor = command -> new Thread(command).start();
+executor.execute(() -> System.out.println("Work on " +
+        Thread.currentThread().getName()));</code></pre>
+            <p>This lambda is useful for demonstrating the contract, but it is not a production thread-management strategy: every submission creates a thread.</p>
+            <h3>2.2 ExecutorService: submission, results, and lifecycle</h3>
+            <p><code>ExecutorService</code> extends <code>Executor</code> and adds task submission that can return a <code>Future</code>, bulk operations, and shutdown management.</p>
+            <div class="codehead"><span>Runnable vs Callable</span><span>Java</span></div><pre class="code"><code>ExecutorService pool = Executors.newFixedThreadPool(4);
 
-          <h3>1.2 Graceful Shutdown Protocol</h3>
-          <p>Production applications must gracefully drain thread pools during container termination (SIGTERM):</p>
-          <pre><code>public void shutdownGracefully(ExecutorService pool) {
-    pool.shutdown(); // 1. Disable new task submissions
+try {
+    Future&lt;?&gt; logFuture = pool.submit(() -> System.out.println("Audit saved"));
+
+    Future&lt;Integer&gt; total = pool.submit(() -> {
+        // Callable can return a value and throw checked exceptions.
+        return 20 + 22;
+    });
+
+    total.get();       // blocks until result is ready; may throw ExecutionException
+    System.out.println(total.get()); // 42
+} catch (InterruptedException e) {
+    Thread.currentThread().interrupt();
+} catch (ExecutionException e) {
+    // Inspect e.getCause() for the task's original failure.
+    throw new RuntimeException("Background task failed", e.getCause());
+} finally {
+    pool.shutdown();
+}</code></pre>
+            <table><thead><tr><th>Method</th><th>Purpose</th><th>Key detail</th></tr></thead><tbody>
+            <tr><td><code>execute(Runnable)</code></td><td>Submit a task without a result handle.</td><td>With a normal ThreadPoolExecutor, an exception escaping a task may reach the worker's uncaught-exception handling path.</td></tr>
+            <tr><td><code>submit(...)</code></td><td>Submit Runnable or Callable and return a Future.</td><td>Failures are captured by the Future; call <code>get()</code> to observe them.</td></tr>
+            <tr><td><code>invokeAll(tasks)</code></td><td>Run a collection of tasks and return Futures.</td><td>The untimed form waits for all tasks to complete.</td></tr>
+            <tr><td><code>invokeAny(tasks)</code></td><td>Return the result of one successfully completed task.</td><td>Other unfinished tasks are cancelled when a result is returned.</td></tr>
+            <tr><td><code>shutdown()</code></td><td>Stop accepting new tasks.</td><td>Previously submitted tasks are allowed to complete.</td></tr>
+            <tr><td><code>shutdownNow()</code></td><td>Best-effort interruption of active tasks and return tasks that never commenced.</td><td>Interruption is cooperative; tasks that ignore it may keep running.</td></tr>
+            <tr><td><code>awaitTermination(...)</code></td><td>Wait for termination for a bounded time.</td><td>It does not initiate shutdown by itself.</td></tr>
+            </tbody></table>
+            <h3>2.3 Graceful shutdown: production pattern</h3>
+            <div class="codehead"><span>Graceful shutdown helper</span><span>Java</span></div><pre class="code"><code>static void shutdownGracefully(ExecutorService pool) {
+    pool.shutdown(); // Reject new work; let accepted work finish.
     try {
-        // 2. Wait up to 30 seconds for existing running tasks to finish
         if (!pool.awaitTermination(30, TimeUnit.SECONDS)) {
-            pool.shutdownNow(); // 3. Cancel executing tasks via Thread.interrupt()
-            // 4. Wait again for tasks to acknowledge interrupt
+            pool.shutdownNow(); // Requests interruption.
             if (!pool.awaitTermination(10, TimeUnit.SECONDS)) {
-                logger.error("Thread pool did not terminate cleanly");
+                System.err.println("Pool did not terminate cleanly");
             }
         }
-    } catch (InterruptedException ie) {
+    } catch (InterruptedException e) {
         pool.shutdownNow();
-        Thread.currentThread().interrupt(); // Restore interrupt flag
+        Thread.currentThread().interrupt(); // Preserve cancellation signal.
     }
 }</code></pre>
+            <div class="callout warning"><strong>Interview pitfall:</strong> <code>shutdownNow()</code> does not forcibly kill Java code. It generally interrupts worker threads. Tasks should check interruption, use interruptible blocking operations, and clean up resources.</div>
         </section>
 
-        <!-- SECTION 2: THREADPOOLEXECUTOR ANATOMY -->
-        <section>
-          <h2>2. ThreadPoolExecutor Anatomy & 7 Core Parameters</h2>
-          <p>
-            In production enterprise code, <strong>never use the factory methods in <code>Executors</code></strong> (like <code>newFixedThreadPool</code>). You must construct <code>ThreadPoolExecutor</code> directly with explicit parameters:
-          </p>
-
-          <div class="code-header">
-            <span>Production-Grade ThreadPoolExecutor Configuration</span>
-            <span>Java</span>
-          </div>
-          <pre><code>ThreadPoolExecutor executor = new ThreadPoolExecutor(
-    corePoolSize,                     // 1. Minimum core worker threads
-    maximumPoolSize,                  // 2. Maximum worker threads under peak load
-    keepAliveTime, TimeUnit.SECONDS,  // 3. Idle timeout before terminating excess threads
-    new ArrayBlockingQueue&lt;&gt;(1000),   // 4. Bounded Work Queue (Mandatory!)
-    new NamedThreadFactory("orders"), // 5. Custom thread factory for clear logs
-    new ThreadPoolExecutor.CallerRunsPolicy() // 6. Rejection policy (Backpressure)
+        <section class="section anchor" id="threadpoolexecutor">
+            <h2>3. ThreadPoolExecutor: the engine underneath common pools</h2>
+            <p><code>ThreadPoolExecutor</code> is the configurable implementation behind many standard thread-pool patterns. Its constructor makes the capacity and overload strategy explicit.</p>
+            <div class="codehead"><span>Explicit bounded pool configuration</span><span>Java</span></div><pre class="code"><code>ThreadPoolExecutor orderPool = new ThreadPoolExecutor(
+    8,                                  // corePoolSize
+    16,                                 // maximumPoolSize
+    60L, TimeUnit.SECONDS,              // keepAliveTime for excess idle workers
+    new ArrayBlockingQueue&lt;&gt;(500),       // bounded queue
+    runnable -> {
+        Thread t = new Thread(runnable);
+        t.setName("order-worker-" + t.threadId());
+        t.setUncaughtExceptionHandler((thread, error) ->
+            System.err.println("Uncaught in " + thread.getName() + ": " + error));
+        return t;
+    },
+    new ThreadPoolExecutor.AbortPolicy() // explicit overload behavior
 );</code></pre>
-
-          <h3>2.1 Task Submission & Execution Order Mechanics</h3>
-          <p>
-            A common interview trap is misunderstanding the sequence in which <code>ThreadPoolExecutor</code> scales threads:
-          </p>
-          <ol>
-            <li><strong>Core Threads First:</strong> If current threads &lt; <code>corePoolSize</code>, a new worker thread is spawned immediately to handle the task, even if other core threads are idle.</li>
-            <li><strong>Queueing Second:</strong> If current threads == <code>corePoolSize</code>, the task is offered to the <code>workQueue</code>.</li>
-            <li><strong>Max Threads Third:</strong> If the <code>workQueue</code> is <strong>completely full</strong> and current threads &lt; <code>maximumPoolSize</code>, a new worker thread is spawned to run the task.</li>
-            <li><strong>Rejection Handler Fourth:</strong> If current threads == <code>maximumPoolSize</code> AND the <code>workQueue</code> is completely full, the <strong>RejectedExecutionHandler</strong> is invoked!</li>
-          </ol>
+            <p>In Java 17, <code>Thread.threadId()</code> is available. For Java 8 compatibility, use <code>getId()</code>. In real services, prefer a well-tested named ThreadFactory and include daemon status and uncaught-exception behavior intentionally.</p>
+            <h3>3.1 The seven constructor arguments</h3>
+            <table><thead><tr><th>Argument</th><th>Meaning</th><th>Design question</th></tr></thead><tbody>
+            <tr><td><code>corePoolSize</code></td><td>Baseline worker count. Workers are normally retained when idle.</td><td>How much steady-state concurrency should exist?</td></tr>
+            <tr><td><code>maximumPoolSize</code></td><td>Upper worker limit when the queue cannot accept more work.</td><td>How much extra concurrency can the machine and dependency tolerate?</td></tr>
+            <tr><td><code>keepAliveTime</code></td><td>Idle time before excess workers are removed.</td><td>How quickly should burst-created threads shrink?</td></tr>
+            <tr><td><code>unit</code></td><td>Time unit for keep-alive.</td><td>Milliseconds, seconds, etc.?</td></tr>
+            <tr><td><code>workQueue</code></td><td>Stores tasks waiting for a worker.</td><td>Bounded, direct handoff, or priority-based?</td></tr>
+            <tr><td><code>threadFactory</code></td><td>Creates workers.</td><td>Are names, daemon behavior, and diagnostics appropriate?</td></tr>
+            <tr><td><code>RejectedExecutionHandler</code></td><td>Defines behavior when saturated or shut down.</td><td>Fail, slow producer, or discard—and is that safe?</td></tr>
+            </tbody></table>
+            <h3>3.2 The crucial submission sequence</h3>
+            <div class="diagram">1. If running workers < corePoolSize:
+                create worker to run this task
+                2. Else try to enqueue task
+                3. If enqueue fails and workers < maximumPoolSize:
+                create another worker for this task
+                4. If enqueue fails and max workers already exist:
+                invoke rejection handler</div>
+            <p>That ordering surprises many candidates: a pool typically queues work after reaching its core size, rather than immediately growing toward the maximum. With an unbounded queue, enqueueing almost always succeeds, so <code>maximumPoolSize</code> usually has no practical effect.</p>
+            <h3>3.3 Other useful controls</h3>
+            <ul>
+                <li><code>allowCoreThreadTimeOut(true)</code> allows core workers to time out when idle, provided keep-alive is positive.</li>
+                <li><code>prestartAllCoreThreads()</code> starts core workers before the first task, useful when startup latency matters.</li>
+                <li><code>getActiveCount()</code>, <code>getPoolSize()</code>, <code>getQueue().size()</code>, and completed-task counts can support diagnostics, but are approximate snapshots—not synchronization mechanisms.</li>
+                <li><code>beforeExecute</code>, <code>afterExecute</code>, and <code>terminated</code> can be overridden for instrumentation and lifecycle hooks. Avoid allowing instrumentation failures to break task processing.</li>
+            </ul>
         </section>
 
-        <!-- SECTION 3: SIZING FORMULA & FACTORY PITFALLS -->
-        <section>
-          <h2>3. Thread Pool Sizing Formulas & Factory Pitfalls</h2>
-
-          <h3>3.1 Sizing Formula: CPU-Bound vs. I/O-Bound Tasks</h3>
-          <p>
-            Tuning thread pool size depends entirely on the nature of the workload:
-          </p>
-          <ul>
-            <li><strong>CPU-Bound Workloads (Cryptographic hashing, JSON parsing, algorithms):</strong>
-              <pre><code>N_threads = N_cpu + 1</code></pre>
-              Where $N_{cpu} = \text{Runtime.getRuntime().availableProcessors()}$. Adding more threads beyond CPU cores causes excessive context switching and degrades throughput. The $+1$ thread handles occasional page faults.
-            </li>
-            <li><strong>I/O-Bound Workloads (Database queries, microservice REST calls, Redis lookups):</strong>
-              <p>Threads spend most of their time blocked waiting for network I/O. Use <strong>Little's Law</strong> or the Wait-to-Compute ratio formula:</p>
-              <pre><code>N_threads = N_cpu * (1 + Wait_Time / Compute_Time)</code></pre>
-              <em>Example:</em> If a database query takes 90ms of I/O wait and 10ms of CPU compute ($W/C = 9$), on an 8-core CPU:
-              $$N_{threads} = 8 \times (1 + 9) = 80 \text{ threads}$$
-            </li>
-          </ul>
-
-          <h3>3.2 The Dangerous Factory Methods in <code>Executors</code></h3>
-          <table>
-            <thead>
-              <tr>
-                <th>Factory Method</th>
-                <th>Underlying Queue / Size</th>
-                <th>Production Hazard / Fatal Flaw</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td><code>newFixedThreadPool(N)</code></td>
-                <td>Unbounded <code>LinkedBlockingQueue</code> (capacity $2^{31}-1$)</td>
-                <td><strong>OutOfMemoryError: Java heap space</strong>. If downstream stalls, millions of tasks queue up indefinitely in memory.</td>
-              </tr>
-              <tr>
-                <td><code>newCachedThreadPool()</code></td>
-                <td>Direct handoff <code>SynchronousQueue</code>, max threads = <code>Integer.MAX_VALUE</code></td>
-                <td><strong>OutOfMemoryError: unable to create new native thread</strong>. Under traffic bursts, it spawns thousands of OS threads, crashing the container.</td>
-              </tr>
-              <tr>
-                <td><code>newSingleThreadExecutor()</code></td>
-                <td>Unbounded <code>LinkedBlockingQueue</code></td>
-                <td>Same OOM risk as <code>FixedThreadPool</code> if tasks arrive faster than 1 thread can process.</td>
-              </tr>
-            </tbody>
-          </table>
+        <section class="section anchor" id="factory-pools">
+            <h2>4. Fixed, cached, and single-thread executors</h2>
+            <p>The <code>Executors</code> factory methods are convenient for learning and simple applications. In services under unpredictable load, understand their queue and thread limits before using them. A common production approach is constructing a <code>ThreadPoolExecutor</code> directly with a bounded queue and explicit rejection behavior.</p>
+            <table><thead><tr><th>Factory</th><th>Typical implementation behavior</th><th>Good fit</th><th>Main risk</th></tr></thead><tbody>
+            <tr><td><code>newFixedThreadPool(n)</code></td><td>Core=max=n; shared unbounded LinkedBlockingQueue.</td><td>Simple bounded-concurrency batch work with controlled input.</td><td>Queue can grow until heap pressure or OOM if producers outpace workers.</td></tr>
+            <tr><td><code>newCachedThreadPool()</code></td><td>Core 0, max effectively very large, SynchronousQueue, idle timeout around 60 seconds.</td><td>Short-lived bursts of independent tasks when concurrency is naturally limited elsewhere.</td><td>Can create very many threads under sustained overload, exhausting native thread resources.</td></tr>
+            <tr><td><code>newSingleThreadExecutor()</code></td><td>One worker and an unbounded queue; sequential task execution.</td><td>Serial background processing where ordering is required.</td><td>Queue growth if tasks arrive faster than the single worker can process them.</td></tr>
+            </tbody></table>
+            <h3>4.1 Fixed thread pool</h3>
+            <div class="diagram">submit task A ─┐
+                submit task B ─┼──> unbounded queue ──> worker 1
+                submit task C ─┤                    └─> worker 2
+                submit task D ─┘
+                Concurrency is limited; queued work is not.</div>
+            <p>“Fixed” means the number of worker threads is fixed, not that memory use is fixed. If a database becomes slow and submissions continue, pending tasks accumulate. A bounded queue is what imposes a queue capacity limit.</p>
+            <h3>4.2 Cached thread pool</h3>
+            <p>A cached pool uses direct handoff: a task is handed to an available worker, or a new thread may be created. Since its maximum thread count is extremely high, it is risky when the workload has no independent concurrency bound. It can be reasonable for carefully controlled short tasks, but not as a blanket default for high-volume request handling.</p>
+            <h3>4.3 Single-thread executor</h3>
+            <p>It guarantees that submitted tasks execute sequentially, with at most one active task at a time. The executor returned by <code>newSingleThreadExecutor()</code> also prevents callers from reconfiguring the underlying pool to add workers. Sequential execution is useful for stateful background workflows, but a slow or stuck task blocks everything behind it.</p>
+            <div class="callout solution"><strong>Practical rule:</strong> choose a pool based on the work and its failure policy—not based only on a convenient factory name. For production services, make queue capacity, maximum concurrency, thread naming, and rejection behavior deliberate.</div>
         </section>
 
-        <!-- SECTION 4: QUEUE POLICIES & REJECTION HANDLERS -->
-        <section>
-          <h2>4. Work Queue Policies & Rejection Handlers</h2>
+        <section class="section anchor" id="scheduled">
+            <h2>5. ScheduledExecutorService</h2>
+            <p><code>ScheduledExecutorService</code> schedules a task after a delay or repeatedly. The common implementation is <code>ScheduledThreadPoolExecutor</code>. It is suitable for lightweight in-process scheduled work, not a durable distributed scheduler: process restarts, multiple application replicas, and missed runs need separate design consideration.</p>
+            <div class="codehead"><span>One-shot and recurring work</span><span>Java</span></div><pre class="code"><code>ScheduledExecutorService scheduler =
+        Executors.newScheduledThreadPool(2);
 
-          <h3>4.1 Work Queue Types</h3>
-          <ul>
-            <li><strong>Bounded Queue (<code>ArrayBlockingQueue</code>):</strong> Protects system memory by imposing a hard cap on queued tasks. Mandatory for resilient production microservices.</li>
-            <li><strong>Direct Handoff (<code>SynchronousQueue</code>):</strong> Holds zero elements. Every task must be handed off directly to an available thread; if no thread is available, it immediately spawns a new thread or triggers rejection.</li>
-            <li><strong>Priority Queue (<code>PriorityBlockingQueue</code>):</strong> Tasks are ordered according to natural priority or a custom comparator.</li>
-          </ul>
+scheduler.schedule(() -> refreshCache(), 5, TimeUnit.SECONDS);
 
-          <h3>4.2 The 4 Built-In Rejection Policies</h3>
-          <ul>
-            <li><strong><code>AbortPolicy</code> (Default):</strong> Throws a runtime <code>RejectedExecutionException</code>. Good for failing fast when combined with metrics alarms.</li>
-            <li><strong><code>CallerRunsPolicy</code> (Natural Backpressure):</strong> The task is executed by the <strong>calling thread</strong> itself (e.g. the Tomcat HTTP worker thread). This dramatically slows down incoming requests, giving the pool time to recover.</li>
-            <li><strong><code>DiscardPolicy</code>:</strong> Silently drops the rejected task with zero notification (dangerous in business operations; only acceptable for non-critical metrics).</li>
-            <li><strong><code>DiscardOldestPolicy</code>:</strong> Drops the oldest unhandled task from the head of the queue and retries task submission.</li>
-          </ul>
+ScheduledFuture&lt;?&gt; periodic = scheduler.scheduleWithFixedDelay(
+        () -> {
+            try {
+                reconcileAccounts();
+            } catch (RuntimeException e) {
+                // Log and decide whether the task should continue.
+                System.err.println("Reconciliation failed: " + e.getMessage());
+            }
+        },
+        0, 60, TimeUnit.SECONDS
+);
+
+// When no longer needed:
+periodic.cancel(false);
+scheduler.shutdown();</code></pre>
+            <table><thead><tr><th>Method</th><th>Timing model</th><th>Use when</th></tr></thead><tbody>
+            <tr><td><code>schedule(task, delay, unit)</code></td><td>Run once after a delay.</td><td>Delayed cleanup or a one-time follow-up.</td></tr>
+            <tr><td><code>scheduleAtFixedRate(task, initialDelay, period, unit)</code></td><td>Target start times follow a fixed rate.</td><td>Periodic cadence matters and each execution is expected to finish on time.</td></tr>
+            <tr><td><code>scheduleWithFixedDelay(task, initialDelay, delay, unit)</code></td><td>Wait the specified delay after one execution finishes before the next begins.</td><td>Want a quiet interval between runs, regardless of duration.</td></tr>
+            </tbody></table>
+            <p>Periodic executions of the same scheduled task do not overlap in the standard scheduled executor. If one fixed-rate execution takes longer than the period, subsequent executions may start late and then run as soon as possible; they do not execute concurrently with one another.</p>
+            <div class="callout production"><strong>Silent recurring-job failure:</strong> if a periodic execution throws an uncaught exception, later executions of that periodic task are suppressed. The scheduler itself may remain alive, making the job appear to have mysteriously stopped. Catch expected operational exceptions at the task boundary, log them with context, and alert on missed runs. Do not catch <code>Throwable</code> indiscriminately as a default; fatal VM errors should not be treated like ordinary business failures.</div>
+            <h3>Fixed rate vs fixed delay timeline</h3>
+            <div class="diagram">Task duration = 8s; configured period/delay = 5s
+
+                Fixed rate target:   start 0s ─ run 8s ─ next starts as soon as possible
+                Fixed delay:         start 0s ─ run 8s ─ wait 5s ─ next starts at 13s</div>
         </section>
 
-        <!-- SECTION 5: REAL-TIME PRODUCTION ISSUES -->
-        <section>
-          <h2>5. Real-Time Production Issues & Post-Mortems</h2>
+        <section class="section anchor" id="sizing">
+            <h2>6. Thread-pool sizing: CPU, I/O, latency, and capacity</h2>
+            <p>There is no universally correct thread count. Size a pool using workload measurements, downstream limits, memory budget, and latency objectives. The familiar formulas are starting estimates, not guarantees.</p>
+            <h3>6.1 CPU-bound tasks</h3>
+            <p>Examples: compression, cryptographic hashing, image transforms, heavy parsing, and in-memory calculations. These tasks spend most of their time executing on CPU. A common starting point is roughly the number of available processors, sometimes plus one, followed by load testing. Too many runnable threads can increase context switching and reduce throughput.</p>
+            <div class="codehead"><span>Read the runtime's processor estimate</span><span>Java</span></div><pre class="code"><code>int cpuCount = Runtime.getRuntime().availableProcessors();
+System.out.println("Available processors: " + cpuCount);</code></pre>
+            <h3>6.2 I/O-bound tasks</h3>
+            <p>Examples: database queries, HTTP calls, object-storage requests. Threads spend a portion of their lifetime waiting for I/O, so a pool can sometimes have more threads than CPU cores. A classic estimate is:</p>
+            <div class="callout"><strong>Starting estimate:</strong> <code>threads ≈ CPU cores × (1 + wait time / compute time)</code><br>For 8 cores, 90 ms waiting and 10 ms computing gives <code>8 × (1 + 9) = 80</code> as a rough estimate—not a recommendation to blindly configure 80 threads.</div>
+            <p>The estimate ignores queueing, tail latency, memory, connection pools, rate limits, and contention. If a database connection pool only permits 20 concurrent connections, creating 100 database worker threads may simply cause 80 of them to wait for connections.</p>
+            <h3>6.3 Start from the bottleneck and limits</h3>
+            <ul>
+                <li>Measure service time, CPU utilization, queue wait time, active workers, rejection count, and p95/p99 latency.</li>
+                <li>Set concurrency no higher than the downstream dependency can safely handle. Consider a dedicated pool per dependency or workload class.</li>
+                <li>Bound the queue by acceptable waiting time and memory, not by an arbitrary enormous number.</li>
+                <li>Load-test with realistic payloads and slow-dependency scenarios, not only happy-path requests.</li>
+                <li>Revisit settings when request mix, CPU quota, container limits, database capacity, or traffic patterns change.</li>
+            </ul>
+            <h3>6.4 Queue capacity and latency</h3>
+            <p>Queueing can hide overload. If a task takes 100 ms on average and 10 workers each complete about 10 tasks/second, total idealized service capacity is about 100 tasks/second. If arrivals persistently exceed that rate, any finite queue eventually fills. A larger queue delays rejection but can create very high wait times and stale work.</p>
+            <div class="callout warning"><strong>Do not size a queue to “system RAM.”</strong> Each queued task may retain request payloads, closures, tracing context, and object graphs. The safe capacity depends on retained bytes per task, heap headroom, service rate, and the maximum waiting time your application can tolerate.</div>
+        </section>
 
-          <!-- Incident 1 -->
-          <div class="callout callout-production">
-            <div class="callout-title">🚨 Incident 1: 8GB Heap OOM via newFixedThreadPool Unbounded Queue</div>
-            <p><strong>Scenario:</strong> During a Kafka partition rebalance, an email notification service's memory climbed steadily until Kubernetes killed the pod with exit code 137 (OOMKilled). Heap dumps revealed over 3,500,000 pending <code>EmailTask</code> instances.</p>
-          </div>
+        <section class="section anchor" id="queues">
+            <h2>7. Work queue policies</h2>
+            <table><thead><tr><th>Queue</th><th>Behavior</th><th>Advantages</th><th>Risks / cautions</th></tr></thead><tbody>
+            <tr><td><code>ArrayBlockingQueue</code></td><td>Fixed-capacity FIFO array queue.</td><td>Predictable upper bound on queued task count.</td><td>Capacity must be chosen; tasks can still retain large payloads.</td></tr>
+            <tr><td><code>LinkedBlockingQueue</code></td><td>Linked FIFO queue; can be bounded or effectively unbounded depending on constructor.</td><td>Flexible; high capacity available.</td><td>The no-argument constructor is effectively unbounded and may grow until heap exhaustion.</td></tr>
+            <tr><td><code>SynchronousQueue</code></td><td>No storage capacity; producers hand tasks directly to consumers.</td><td>Avoids queue buildup and encourages handoff/new worker creation.</td><td>Can drive thread growth with a cached-style pool; otherwise saturation may reject quickly.</td></tr>
+            <tr><td><code>PriorityBlockingQueue</code></td><td>Orders tasks by priority comparator/natural ordering.</td><td>Useful when task priority is meaningful.</td><td>Unbounded by default; low-priority work can starve; tasks must be comparable or comparator-backed.</td></tr>
+            </tbody></table>
+            <h3>Why queue choice changes scaling</h3>
+            <div class="diagram">Bounded queue:
+                core workers busy -> queue fills -> pool can grow toward max -> reject at full capacity
 
-          <div class="callout callout-warning">
-            <div class="callout-title">🔍 Root Cause Analysis (RCA)</div>
-            <p>
-              The application initialized its worker pool via:
-              <code>Executors.newFixedThreadPool(50)</code>.
-              Internally, this creates a <code>LinkedBlockingQueue</code> with a capacity of <code>Integer.MAX_VALUE</code> (unbounded). When the downstream SMTP gateway experienced a 10-minute outage, tasks kept arriving from Kafka at 5,000/sec. Because the queue never filled up, the pool never rejected any tasks, buffering millions of requests until the 8GB heap was completely exhausted.
-            </p>
-          </div>
+                Unbounded queue:
+                core workers busy -> queue accepts more -> pool normally does not grow past core -> queue may grow until memory pressure
 
-          <div class="callout callout-solution">
-            <div class="callout-title">💡 Production Resolution</div>
-            <p>Replaced with a bounded queue and <code>CallerRunsPolicy</code> backpressure:</p>
-            <pre><code>ThreadPoolExecutor executor = new ThreadPoolExecutor(
-    50, 100, 60L, TimeUnit.SECONDS,
-    new ArrayBlockingQueue&lt;&gt;(5000), // Bounded buffer
-    new NamedThreadFactory("email-worker"),
-    new ThreadPoolExecutor.CallerRunsPolicy() // Slows down Kafka consumer on saturation
+                SynchronousQueue:
+                no waiting room -> hand off to idle worker or grow/reject, depending on pool configuration</div>
+            <p>Queue size and worker count form one capacity system. Increasing both does not automatically improve throughput; it can increase memory usage and the amount of work waiting during an outage.</p>
+        </section>
+
+        <section class="section anchor" id="rejection">
+            <h2>8. Rejection policies and backpressure</h2>
+            <p>A rejection handler is called when the executor cannot accept a task—commonly because it is saturated, or because it has been shut down. Choose the policy based on the meaning of the task and the caller's ability to slow down.</p>
+            <table><thead><tr><th>Policy</th><th>Behavior</th><th>Appropriate use / warning</th></tr></thead><tbody>
+            <tr><td><code>AbortPolicy</code></td><td>Throws <code>RejectedExecutionException</code>.</td><td>Explicit fail-fast behavior. Catch at the boundary and translate into a controlled response or retry strategy.</td></tr>
+            <tr><td><code>CallerRunsPolicy</code></td><td>Runs the task on the thread calling <code>execute</code>, unless the executor is shut down.</td><td>Can slow the producer and provide natural backpressure. Dangerous if caller is an event-loop or latency-critical request thread.</td></tr>
+            <tr><td><code>DiscardPolicy</code></td><td>Silently discards the rejected task.</td><td>Only for intentionally lossy work, such as some best-effort telemetry. Never use casually for payments, orders, or required notifications.</td></tr>
+            <tr><td><code>DiscardOldestPolicy</code></td><td>Removes the queue head and retries submission, if executor is not shut down.</td><td>Can lose the oldest pending task and may be unfair. Use only when newer work intentionally supersedes old work.</td></tr>
+            </tbody></table>
+            <h3>8.1 Explicit failure handling</h3>
+            <div class="codehead"><span>Handling saturation at the submission boundary</span><span>Java</span></div><pre class="code"><code>try {
+    orderPool.execute(() -> processOrder(orderId));
+} catch (RejectedExecutionException rejected) {
+    // Example policy: return a retryable response, persist to a durable queue,
+    // or use a domain-specific fallback. Do not silently pretend it succeeded.
+    recordRejectedOrder(orderId, rejected);
+    throw new ServiceBusyException("Order processing is temporarily busy", rejected);
+}</code></pre>
+            <p>The fallback shown is illustrative: for a real order flow, the system must define whether the order has already been persisted, whether retry is safe, and how idempotency prevents duplicates.</p>
+            <div class="callout warning"><strong>CallerRuns is not always safe.</strong> If a web request thread executes a long-running task, request latency rises. If a task submits another task to the same saturated pool and waits for it, caller-run behavior can create unexpected execution paths. Use it only after understanding the calling thread and task dependencies.</div>
+        </section>
+
+        <section class="section anchor" id="production">
+            <h2>9. Production incidents and how to prevent them</h2>
+            <div class="callout production"><strong>Incident A — heap growth from a fixed pool</strong><p>A notification consumer receives 5,000 messages per second while its SMTP provider is unavailable. A 50-worker fixed pool continues accepting tasks into its unbounded queue. Pending task objects grow into the millions, heap pressure rises, and the container is OOM-killed.</p></div>
+            <h3>Root cause</h3><p>Worker concurrency was bounded, but pending work was not. The queue hid a sustained arrival/service-rate mismatch.</p>
+            <div class="callout solution"><strong>Resolution</strong><p>Use a bounded queue, explicit rejection/backpressure behavior, and upstream flow control. For example, pause or slow message consumption when local capacity is exhausted, or rely on a durable broker that supports acknowledgements and controlled redelivery.</p></div>
+            <div class="codehead"><span>Illustrative bounded worker pool</span><span>Java</span></div><pre class="code"><code>ThreadPoolExecutor emailPool = new ThreadPoolExecutor(
+    20, 40,
+    30, TimeUnit.SECONDS,
+    new ArrayBlockingQueue&lt;&gt;(1000),
+    namedThreadFactory("email-worker"),
+    new ThreadPoolExecutor.AbortPolicy()
 );</code></pre>
-          </div>
-
-          <!-- Incident 2 -->
-          <div class="callout callout-production">
-            <div class="callout-title">🚨 Incident 2: ScheduledExecutorService Silent Death via Unhandled Exception</div>
-            <p><strong>Scenario:</strong> A scheduled background reconciliation job running every 60 seconds (<code>scheduleAtFixedRate</code>) mysteriously stopped running forever after day 3. No errors appeared in the logs, and the service showed 0% CPU.</p>
-          </div>
-
-          <div class="callout callout-warning">
-            <div class="callout-title">🔍 Root Cause Analysis (RCA)</div>
-            <p>
-              In <code>ScheduledExecutorService</code>, if a periodic task execution throws an unhandled <code>RuntimeException</code> or <code>Error</code>, <strong>the executor permanently cancels all future executions of that task</strong> without terminating the thread pool or logging a fatal exception!
-            </p>
-          </div>
-
-          <div class="callout callout-solution">
-            <div class="callout-title">💡 Production Resolution</div>
-            <p>Always wrap periodic scheduled tasks in a top-level <code>try-catch (Throwable t)</code> block:</p>
-            <pre><code>scheduler.scheduleAtFixedRate(() -&gt; {
-    try {
-        reconcileAccounts();
-    } catch (Throwable t) {
-        logger.error("Periodic reconciliation failed critically: ", t);
-    }
-}, 0, 60, TimeUnit.SECONDS);</code></pre>
-          </div>
+            <p>Numbers are placeholders. Tune using measured task duration, message retention, provider limits, heap budget, and retry semantics. A bounded queue limits the number of queued tasks, but does not by itself guarantee durable delivery.</p>
+            <div class="callout production"><strong>Incident B — cached pool exhausts native threads</strong><p>A traffic burst produces thousands of concurrent blocking calls. A cached thread pool creates more workers because tasks cannot be handed to idle threads. The process hits operating-system/container thread limits and fails with an error such as <code>OutOfMemoryError: unable to create native thread</code>.</p></div>
+            <p><strong>Prevention:</strong> cap concurrency; use bounded queues and explicit rejection; apply timeouts to downstream calls; limit request admission; and monitor active threads and thread-creation failures.</p>
+            <div class="callout production"><strong>Incident C — scheduled reconciliation stops after an exception</strong><p>A recurring job throws an unchecked exception during one run. The scheduled executor suppresses later executions of that periodic task, while the rest of the application stays up.</p></div>
+            <p><strong>Prevention:</strong> handle expected failures at the task boundary, log stack traces and run identifiers, expose last-success timestamps, and alert when the job has not completed within its expected interval. Avoid broad <code>catch (Throwable)</code> unless a carefully justified last-resort boundary rethrows fatal errors.</p>
+            <div class="callout production"><strong>Incident D — thread-pool starvation deadlock</strong><p>Every worker in a small pool runs a parent task. Each parent submits a child task to the same pool and blocks on <code>Future.get()</code>. No worker remains to run the children, so all parents wait indefinitely.</p></div>
+            <div class="diagram">worker 1: parent A -> waits for child A
+                worker 2: parent B -> waits for child B
+                queue:    child A, child B
+                Available workers: 0
+                Result: starvation deadlock</div>
+            <p><strong>Prevention:</strong> avoid blocking on tasks submitted to the same constrained pool; compose work asynchronously; separate workloads with different blocking behavior; or ensure capacity and dependencies cannot form a wait cycle. Merely increasing the pool size can hide, rather than fix, the design flaw.</p>
         </section>
 
-        <!-- SECTION 6: SENIOR INTERVIEW Q&A -->
-        <section>
-          <h2>6. Senior / Staff Technical Interview Q&A</h2>
-
-          <div class="callout callout-interview">
-            <div class="callout-title">🎯 Q1: Why does ThreadPoolExecutor queue tasks BEFORE scaling from corePoolSize to maximumPoolSize?</div>
-            <p><strong>Answer:</strong> Thread creation and destruction are expensive OS operations. The design philosophy of <code>ThreadPoolExecutor</code> is that <code>corePoolSize</code> represents the steady-state processing capacity. If a burst of traffic arrives, it is far more memory- and CPU-efficient to buffer tasks temporarily in a queue than to spin up new OS threads. <code>maximumPoolSize</code> is intended solely as an emergency relief valve when the queue has completely saturated.</p>
-          </div>
-
-          <div class="callout callout-interview">
-            <div class="callout-title">🎯 Q2: What is the difference between scheduleAtFixedRate and scheduleWithFixedDelay?</div>
-            <p><strong>Answer:</strong> 
-              - <strong><code>scheduleAtFixedRate(task, initial, period)</code>:</strong> Schedules executions at fixed clock intervals relative to the <em>start</em> of the first execution ($T_0, T_0 + \text{period}, T_0 + 2\times\text{period}$). If a task takes longer than the period, the next execution starts immediately, resulting in consecutive overlapping or batched runs.
-              <br>
-              - <strong><code>scheduleWithFixedDelay(task, initial, delay)</code>:</strong> Guarantees a fixed delay between the <em>completion</em> of one task execution and the <em>start</em> of the next. Prevents concurrent executions regardless of task run duration.
-            </p>
-          </div>
+        <section class="section anchor" id="monitoring">
+            <h2>10. Monitoring, debugging, and operational checklist</h2>
+            <p>Thread pools should be observable as capacity controls, not invisible infrastructure. At minimum, expose metrics for each important executor and correlate them with request latency and downstream health.</p>
+            <table><thead><tr><th>Signal</th><th>What it tells you</th><th>Interpretation clue</th></tr></thead><tbody>
+            <tr><td>Active worker count</td><td>How many workers are currently executing tasks.</td><td>Persistently near max may mean saturation; compare with queue and CPU metrics.</td></tr>
+            <tr><td>Queue depth</td><td>How much work is waiting.</td><td>Continuously rising depth means arrivals exceed service capacity over that interval.</td></tr>
+            <tr><td>Task wait time</td><td>Time from submission to execution start.</td><td>Rising wait time often reveals overload before requests time out.</td></tr>
+            <tr><td>Task execution duration</td><td>How long work takes after starting.</td><td>Spikes can point to a slow dependency or increased task complexity.</td></tr>
+            <tr><td>Rejected task count</td><td>How often admission failed.</td><td>Should be visible and alertable; rejection may be an intentional protective signal.</td></tr>
+            <tr><td>Completed task count</td><td>Approximate work completed by the pool.</td><td>Use rate over time, not only the cumulative total.</td></tr>
+            <tr><td>Thread count and CPU</td><td>Resource consumption.</td><td>High threads with low CPU may mean blocking; high CPU may mean compute saturation.</td></tr>
+            </tbody></table>
+            <h3>Operational checklist</h3>
+            <ul>
+                <li>Give each pool a descriptive name, for example <code>payment-io</code>, <code>image-transform</code>, or <code>report-scheduler</code>.</li>
+                <li>Use bounded queues unless unbounded buffering is an explicit, justified choice.</li>
+                <li>Set timeouts on network/database operations and define cancellation behavior.</li>
+                <li>Do not block on <code>Future.get()</code> without a timeout when the caller has a latency budget.</li>
+                <li>Propagate tracing/MDC context deliberately; worker threads are reused and thread-local context can become stale if not cleaned up.</li>
+                <li>Use separate pools for tasks with different resource profiles so slow I/O does not starve CPU work.</li>
+                <li>Ensure shutdown happens during application lifecycle termination.</li>
+                <li>Test saturation, downstream outage, rejected tasks, task exceptions, and graceful shutdown.</li>
+            </ul>
         </section>
 
-      </main>
-    </div>
-  </div>
+        <section class="section anchor" id="comparison">
+            <h2>11. Decision guide and thumb rules</h2>
+            <table><thead><tr><th>Need</th><th>Starting point</th><th>Think carefully about</th></tr></thead><tbody>
+            <tr><td>Simple sequential background tasks</td><td>Single-thread executor or a dedicated single-worker ThreadPoolExecutor</td><td>Queue bounds, stuck task behavior, ordering semantics.</td></tr>
+            <tr><td>Controlled parallel batch work</td><td>Fixed-size ThreadPoolExecutor with bounded queue</td><td>What happens when input arrives faster than processing?</td></tr>
+            <tr><td>Blocking I/O work</td><td>Dedicated, capped pool sized against downstream capacity</td><td>Connection limits, timeouts, request budgets, saturation.</td></tr>
+            <tr><td>Periodic lightweight job</td><td>ScheduledExecutorService</td><td>Exception handling, duplicate execution across replicas, missed runs.</td></tr>
+            <tr><td>Priority-sensitive work</td><td>Priority queue with bounded admission strategy or separate pools by priority</td><td>Starvation and whether priority ordering is actually required.</td></tr>
+            <tr><td>High-volume durable work</td><td>Message broker plus bounded local concurrency</td><td>Acknowledgement, retries, idempotency, backpressure, and durability.</td></tr>
+            </tbody></table>
+            <div class="grid2">
+                <div class="card"><h3>Remember</h3><ul><li>Pool size limits concurrent workers.</li><li>Queue capacity limits waiting tasks.</li><li>Rejection policy defines overload behavior.</li><li>Shutdown controls lifecycle.</li></ul></div>
+                <div class="card"><h3>Avoid</h3><ul><li>Using a huge queue to hide overload.</li><li>Using an unbounded cached pool for arbitrary blocking work.</li><li>Ignoring exceptions hidden inside Futures.</li><li>Assuming interruption forcibly stops a task.</li></ul></div>
+            </div>
+        </section>
 
-  <footer>
-    <p>Interview A-Z Handbook &bull; Built for GitHub Pages &bull; Production Grade Interview Prep</p>
-  </footer>
+        <section class="section anchor" id="interview">
+            <h2>12. Interview questions and strong answer outlines</h2>
+            <div class="qa"><strong>Q1. Why use Executor instead of creating threads directly?</strong><p>It separates task submission from execution strategy and enables thread reuse, controlled concurrency, queueing, lifecycle management, observability, and explicit overload handling.</p></div>
+            <div class="qa"><strong>Q2. What is the difference between Executor and ExecutorService?</strong><p><code>Executor</code> defines <code>execute(Runnable)</code>. <code>ExecutorService</code> adds submit methods and Futures, bulk operations, and lifecycle methods such as shutdown and awaitTermination.</p></div>
+            <div class="qa"><strong>Q3. Explain ThreadPoolExecutor task submission order.</strong><p>Create workers up to core size; then try the queue; if queueing fails, grow up to maximum size; if both queue and maximum workers are exhausted, invoke the rejection handler.</p></div>
+            <div class="qa"><strong>Q4. Why can maximumPoolSize appear to be ignored?</strong><p>With an unbounded queue, tasks can continue queueing after core workers are busy, so the executor generally has no reason to grow beyond corePoolSize.</p></div>
+            <div class="qa"><strong>Q5. What is the danger of newFixedThreadPool?</strong><p>Its queue is unbounded. If arrivals persistently exceed task completion, pending work and retained objects can grow until heap exhaustion. Worker count is fixed, but queued work is not.</p></div>
+            <div class="qa"><strong>Q6. Why is newCachedThreadPool risky?</strong><p>It can create a very large number of threads when tasks cannot be handed to idle workers. Under a burst of blocking tasks, native thread and memory limits can be exhausted.</p></div>
+            <div class="qa"><strong>Q7. How would you size a pool for I/O-bound work?</strong><p>Start from measured wait-to-compute ratio, then validate against downstream connection/rate limits, CPU quota, memory, queue wait, latency objectives, and load tests. The formula is only a starting estimate.</p></div>
+            <div class="qa"><strong>Q8. Compare AbortPolicy and CallerRunsPolicy.</strong><p>AbortPolicy throws RejectedExecutionException so the caller can handle failure explicitly. CallerRunsPolicy executes the task on the submitting thread when the executor is saturated and not shut down, slowing the producer but potentially increasing caller latency.</p></div>
+            <div class="qa"><strong>Q9. Does shutdownNow kill tasks immediately?</strong><p>No. It requests interruption and returns tasks that never commenced. Tasks must cooperate with interruption; cleanup and termination are not guaranteed instantly.</p></div>
+            <div class="qa"><strong>Q10. Fixed rate vs fixed delay?</strong><p>Fixed rate targets start times based on the configured period. Fixed delay waits the specified interval after the previous execution completes. Periodic executions of the same task do not overlap in the standard scheduled executor.</p></div>
+            <div class="qa"><strong>Q11. Why might a scheduled job stop running without the application stopping?</strong><p>An uncaught exception from a periodic execution suppresses future executions of that periodic task. Log and handle expected failures, monitor last-success time, and alert on missed runs.</p></div>
+            <div class="qa"><strong>Q12. What is thread-pool starvation deadlock?</strong><p>All workers block waiting for child tasks that are queued in the same pool. No worker remains to execute the children. Avoid blocking dependency cycles and compose work or isolate pools appropriately.</p></div>
+            <div class="qa"><strong>Q13. Why not make the queue extremely large?</strong><p>A large queue retains memory and increases wait time. It can turn overload into stale requests and heap pressure rather than resolving the underlying throughput mismatch.</p></div>
+            <div class="qa"><strong>Q14. What would you monitor?</strong><p>Active and total threads, queue depth, queue wait time, execution duration, completed task rate, rejection count, CPU, memory, downstream latency, and the request-level p95/p99 latency.</p></div>
+        </section>
 
-  <script src="../../assets/js/main.js"></script>
+        <section class="section anchor" id="tracker">
+            <h2>13. Progress tracker</h2>
+            <p class="muted">Mark each area complete as you study. Progress is kept in this page while it remains open; it is not sent to a server.</p>
+            <div class="checklist" id="checklist">
+                <label><input type="checkbox"> I can explain why Executor decouples task submission from thread management.</label>
+                <label><input type="checkbox"> I understand Executor vs ExecutorService, Future, and graceful shutdown.</label>
+                <label><input type="checkbox"> I can explain all ThreadPoolExecutor constructor parameters.</label>
+                <label><input type="checkbox"> I can reproduce the core → queue → max → rejection submission sequence.</label>
+                <label><input type="checkbox"> I know the risks of fixed, cached, and single-thread executors.</label>
+                <label><input type="checkbox"> I can explain scheduleAtFixedRate vs scheduleWithFixedDelay and periodic exceptions.</label>
+                <label><input type="checkbox"> I can estimate pool size and explain why formulas require load testing.</label>
+                <label><input type="checkbox"> I can choose between ArrayBlockingQueue, LinkedBlockingQueue, SynchronousQueue, and PriorityBlockingQueue.</label>
+                <label><input type="checkbox"> I can explain all four rejection policies and their business implications.</label>
+                <label><input type="checkbox"> I can diagnose queue growth, native-thread exhaustion, and starvation deadlock.</label>
+            </div>
+        </section>
+        <footer class="footer">Interview A-Z Handbook · Java Backend Interview Preparation · Built for GitHub Pages</footer>
+    </main>
+</div>
+<script>
+    const headings=[...document.querySelectorAll('main section[id]')];
+    const toc=document.getElementById('toc');
+    headings.forEach((s,i)=>{const a=document.createElement('a');a.href='#'+s.id;a.textContent=(i+1)+'. '+s.querySelector('h2').textContent.replace(/^\\d+\\.\\s*/,'');toc.appendChild(a)});
+    const boxes=[...document.querySelectorAll('#checklist input')];
+    function updateProgress(){const done=boxes.filter(b=>b.checked).length;document.getElementById('progressBar').style.width=(done/boxes.length*100)+'%';document.getElementById('progressText').textContent=done+' / '+boxes.length+' topics complete'}
+    boxes.forEach(b=>b.addEventListener('change',updateProgress));updateProgress();
+</script>
 </body>
 </html>

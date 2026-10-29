@@ -1,399 +1,389 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Module 2: Synchronization, Atomic Variables & Memory Concurrency | Interview A-Z</title>
-  <link rel="stylesheet" href="../../assets/css/style.css">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Module 2: Java Synchronization Masterclass | Interview A-Z</title>
+    <style>
+        :root{--bg:#0b1120;--panel:#111b2e;--panel2:#162238;--text:#e5edf8;--muted:#a8b7cc;--line:#293a55;--blue:#38bdf8;--violet:#818cf8;--green:#34d399;--amber:#fbbf24;--red:#fb7185;--code:#080e19}
+        *{box-sizing:border-box}html{scroll-behavior:smooth;scroll-padding-top:90px}body{margin:0;background:var(--bg);color:var(--text);font:16px/1.72 Inter,system-ui,-apple-system,Segoe UI,sans-serif}
+        a{color:var(--blue)}.navbar{position:sticky;top:0;z-index:20;display:flex;justify-content:space-between;align-items:center;gap:1rem;padding:.85rem 1.5rem;background:rgba(8,14,25,.94);border-bottom:1px solid var(--line);backdrop-filter:blur(12px)}.brand{display:flex;align-items:center;gap:.7rem;font-weight:800}.brand-badge{font-size:.72rem;letter-spacing:.08em;background:linear-gradient(135deg,var(--blue),var(--violet));color:#08111e;padding:.2rem .5rem;border-radius:6px}.navlinks{display:flex;align-items:center;gap:1rem;flex-wrap:wrap}.navlinks a{font-size:.9rem;text-decoration:none;font-weight:650}.nav-btn{border:0;border-radius:7px;padding:.55rem .85rem;background:linear-gradient(135deg,var(--blue),var(--violet));color:#08111e;font-weight:800;cursor:pointer}
+        .layout{max-width:1500px;margin:auto;padding:1.5rem;display:grid;grid-template-columns:250px minmax(0,1fr);gap:1.5rem}.sidebar{position:sticky;top:88px;align-self:start;max-height:calc(100vh - 105px);overflow:auto;background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:1rem}.sidebar h3{margin:.2rem 0 .8rem;font-size:.95rem}.sidebar a{display:block;padding:.36rem .5rem;color:var(--muted);font-size:.86rem;text-decoration:none;border-radius:6px}.sidebar a:hover{background:var(--panel2);color:var(--blue)}main{min-width:0}.breadcrumb{font-size:.85rem;color:var(--muted);margin:.2rem 0 1rem}.hero{padding:1.7rem;background:linear-gradient(135deg,#132641,#171b38);border:1px solid #304463;border-radius:18px;margin-bottom:1.3rem}.hero h1{font-size:clamp(2rem,4vw,3rem);line-height:1.12;margin:.6rem 0}.hero p{color:#c5d3e7;max-width:850px}.chips{display:flex;flex-wrap:wrap;gap:.5rem}.chip{border:1px solid #395170;border-radius:999px;padding:.2rem .65rem;font-size:.78rem;color:#c5d8f1}.section{background:var(--panel);border:1px solid var(--line);border-radius:15px;padding:1.35rem;margin:1rem 0}.section h2{font-size:1.55rem;margin:.1rem 0 1rem}.section h3{font-size:1.12rem;margin:1.25rem 0 .4rem;color:#c5e7ff}.section p,.section li{color:#d1dced}.muted{color:var(--muted)!important}.grid2,.grid3{display:grid;gap:1rem}.grid2{grid-template-columns:repeat(2,minmax(0,1fr))}.grid3{grid-template-columns:repeat(3,minmax(0,1fr))}.card{padding:1rem;background:var(--panel2);border:1px solid var(--line);border-radius:11px}.card h3{margin-top:0}.callout{margin:1rem 0;padding:1rem 1.1rem;border-left:4px solid var(--blue);background:#102338;border-radius:0 10px 10px 0}.warning{border-color:var(--amber);background:#2a2415}.production{border-color:var(--red);background:#2a1824}.solution{border-color:var(--green);background:#102820}.callout strong{color:#fff}.diagram{overflow:auto;background:#080e19;border:1px solid var(--line);border-radius:10px;padding:1rem;margin:1rem 0;color:#b8e7ff;font: .9rem/1.55 ui-monospace,SFMono-Regular,Consolas,monospace;white-space:pre}.codehead{display:flex;justify-content:space-between;color:var(--muted);font-size:.8rem;margin-top:1rem}.code{overflow:auto;background:var(--code);border:1px solid var(--line);border-radius:9px;padding:1rem;color:#d6e4f5;font: .88rem/1.65 ui-monospace,SFMono-Regular,Consolas,monospace;white-space:pre}.tablewrap{overflow-x:auto}table{border-collapse:collapse;width:100%;font-size:.91rem}th,td{text-align:left;vertical-align:top;border:1px solid var(--line);padding:.7rem}th{background:#1b2a41;color:#d9edff}td{color:#d1dced}.pill{display:inline-block;border-radius:5px;background:#20344e;color:#bce7ff;padding:.1rem .4rem;font-size:.78rem}.checklist label{display:flex;gap:.65rem;align-items:flex-start;padding:.5rem 0;border-bottom:1px solid var(--line);color:#d1dced}.checklist input{margin-top:.4rem;accent-color:var(--blue)}details{background:var(--panel2);border:1px solid var(--line);border-radius:9px;padding:.8rem 1rem;margin:.7rem 0}summary{cursor:pointer;font-weight:750;color:#d7eaff}footer{text-align:center;color:var(--muted);padding:2rem;border-top:1px solid var(--line)}.progressbar{height:8px;background:#26344a;border-radius:999px;overflow:hidden}.progressfill{height:100%;width:0;background:linear-gradient(90deg,var(--blue),var(--violet));transition:width .2s}.small{font-size:.86rem}
+        @media(max-width:950px){.layout{grid-template-columns:1fr;padding:1rem}.sidebar{position:relative;top:0;max-height:none}.sidebar nav{columns:2}.grid3{grid-template-columns:1fr}.grid2{grid-template-columns:1fr}.navbar{padding:.75rem 1rem}.navlinks{gap:.55rem}}
+        @media print{body{background:#fff;color:#111;font-size:11pt}.navbar,.sidebar,.nav-btn,.progress-ui{display:none!important}.layout{display:block;padding:0;max-width:none}.hero,.section,.card,.callout{background:#fff!important;color:#111!important;border:1px solid #bbb;break-inside:avoid}.section p,.section li,.muted,.hero p,td{color:#222!important}.diagram,.code{background:#f5f5f5;color:#111;white-space:pre-wrap;overflow-wrap:anywhere}.section h2,.section h3,summary{color:#111}.hero{background:#f4f7fb!important}.chip{color:#222;border-color:#aaa}a{color:#111}details{break-inside:avoid}}
+    </style>
 </head>
 <body>
-
-  <!-- Top Navigation -->
-    <!-- Top Navigation -->
-    <nav class="navbar">
-    <div class="brand">
-      <a href="../../index.html" class="brand-link" style="display: flex; align-items: center; gap: 0.75rem; text-decoration: none; color: inherit;">
-        <span class="brand-badge" style="background: linear-gradient(135deg, #38bdf8, #818cf8); color: #0f172a; padding: 0.15rem 0.55rem; border-radius: 6px; font-size: 0.75rem; font-weight: 800; letter-spacing: 0.05em; text-transform: uppercase;">Interview A-Z</span>
-        <span style="font-weight: 700; font-size: 1.15rem; color: #fff;">Engineering Handbook</span>
-      </a>
-    </div>
-    <div class="nav-links navlinks" style="display: flex; gap: 1.25rem; align-items: center;">
-      <a href="../../index.html" class="nav-link" style="text-decoration: none; font-weight: 600; font-size: 0.95rem;">🏠 Home</a>
-      <a href="../../index.html#topics" class="nav-link" style="text-decoration: none; font-weight: 600; font-size: 0.95rem;">📚 All Modules</a>
-      <a href="https://github.com/ChakradharReddy01/InterViewPrep" target="_blank" class="nav-link" style="text-decoration: none; font-weight: 600; font-size: 0.95rem;">GitHub</a>
-      <button onclick="document.querySelectorAll('details').forEach(d=>d.open=true);window.print();" class="nav-btn-pdf" title="Save page as PDF" style="display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.35rem 0.85rem; font-size: 0.85rem; font-weight: 700; background: linear-gradient(135deg, #38bdf8, #818cf8); color: #0f172a; border: none; border-radius: 6px; cursor: pointer; transition: transform 0.15s ease, box-shadow 0.15s ease; box-shadow: 0 2px 8px rgba(56,189,248,0.25);">
-        <span>📄</span> Save to PDF
-      </button>
-    </div>
-  </nav>
-
-  <div class="container">
-    <div class="article-layout">
-      <!-- Sticky Sidebar Table of Contents -->
-      <aside class="sidebar-toc">
-        <h3>On This Page</h3>
-        <ul class="toc-links" id="dynamic-toc">
-          <!-- Dynamically populated via main.js -->
-        </ul>
-      </aside>
-
-      <!-- Main Article Content -->
-      <main class="article-content">
-        <!-- Breadcrumb -->
-        <nav class="breadcrumb">
-          <a href="../../index.html">Home</a>
-          <span>/</span>
-          <span>Module 2: Multithreading</span>
-          <span>/</span>
-          <span style="color: #fff;">Synchronization & Locks</span>
-        </nav>
-
-        <!-- Article Header -->
-        <header class="article-header">
-          <h1>Module 2: Synchronization, Monitors, Volatile & Hardware CAS</h1>
-          <div class="article-meta">
-            <span class="badge badge-multithread">Multithreading</span>
-            <span class="badge badge-advanced">Hardware & JMM</span>
-            <span class="badge badge-prod">Lock-Free Concurrency</span>
-            <span>⏱️ 50 min deep dive</span>
-            <span>Target Roles: SDE-2, SDE-3, Concurrency / Performance Specialist</span>
-          </div>
+<nav class="navbar">
+    <div class="brand"><span class="brand-badge">INTERVIEW A–Z</span><span>Engineering Handbook</span></div>
+    <div class="navlinks"><a href="../../index.html" class="nav-link">Home</a><a href="../../index.html#topics">All Modules</a><a href="https://github.com/ChakradharReddy01/InterViewPrep" target="_blank" rel="noreferrer">GitHub</a><button class="nav-btn" onclick="document.querySelectorAll('details').forEach(d=>d.open=true);window.print()">Print / Save PDF</button></div>
+</nav>
+<div class="layout">
+    <aside class="sidebar"><h3>On This Page</h3><nav>
+        <a href="#overview">Start here</a><a href="#race">1. Race conditions</a><a href="#critical">2. Critical section</a><a href="#sync">3. synchronized</a><a href="#locks">4. Intrinsic lock</a><a href="#monitor">5. Monitor</a><a href="#volatile">6. volatile</a><a href="#atomic">7. Atomic variables</a><a href="#cas">8. CAS</a><a href="#production">9. Production incidents</a><a href="#thumb">10. Thumb rules</a><a href="#interview">11. Interview Q&amp;A</a><a href="#tracker">12. Progress tracker</a>
+    </nav></aside>
+    <main>
+        <div class="breadcrumb"><a href="../../index.html">Home</a> / Module 2: Multithreading / Synchronization</div>
+        <header class="hero" id="overview">
+            <div class="chips"><span class="chip">Java Concurrency</span><span class="chip">JVM & Memory Model</span><span class="chip">Production Readiness</span><span class="chip">Interview Prep</span></div>
+            <h1>Synchronization, Intrinsic Locks, volatile, Atomic Variables & CAS</h1>
+            <p>Learn how multiple threads safely update shared data, why apparently simple code fails under load, and how to choose the right concurrency tool. Explanations start with everyday analogies, then build toward Java implementation details and interview-ready answers.</p>
+            <div class="grid3">
+                <div class="card"><strong>Core question</strong><p class="small">What if two threads touch the same mutable data at the same time?</p></div>
+                <div class="card"><strong>Goal</strong><p class="small">Correct results, visibility, predictable behavior, and acceptable performance.</p></div>
+                <div class="card"><strong>Golden idea</strong><p class="small">Protect the whole operation that must behave as one logical action—not just one line.</p></div>
+            </div>
         </header>
 
-        <!-- SECTION 1: RACE CONDITIONS & CRITICAL SECTIONS -->
-        <section>
-          <h2>1. Race Conditions & Critical Sections</h2>
+        <section class="section" id="race">
+            <h2>1. Race Condition</h2>
+            <p><strong>Kid-friendly idea:</strong> Two people see one last cookie. Both check that it exists, both decide they can take it, and both act. The final result violates the rule “only one cookie can be taken.” A race condition happens when a program's correctness depends on the unpredictable timing of threads.</p>
+            <h3>Why <code>count++</code> is not one indivisible action</h3>
+            <p>Incrementing a shared integer is a read → calculate → write sequence. Two threads can read the same old value and overwrite each other's update. This is called a <em>lost update</em>.</p>
+            <div class="diagram">Initial count = 10
 
-          <h3>1.1 What is a Race Condition?</h3>
-          <p>
-            A <strong>Race Condition</strong> occurs when the correctness of a program depends on the relative timing, interleaving, or execution order of multiple concurrent threads accessing shared mutable state.
-          </p>
-          <ul>
-            <li><strong>Read-Modify-Write:</strong> When an operation consists of multiple non-atomic steps (e.g., <code>count++</code>: 1. read <code>count</code>, 2. add 1, 3. write back). If two threads execute step 1 simultaneously with <code>count = 5</code>, both compute 6, resulting in a <strong>lost update</strong>.</li>
-            <li><strong>Check-Then-Act:</strong> When a thread observes a condition (e.g., <code>if (balance &gt;= amount)</code>) and acts on it (e.g., <code>balance -= amount</code>). If another thread mutates <code>balance</code> between the check and the act, invalid state or negative balances result.</li>
-          </ul>
+                Thread A                         Thread B
+                --------                         --------
+                read count -> 10
+                read count -> 10
+                calculate 10 + 1 -> 11
+                calculate 10 + 1 -> 11
+                write count = 11
+                write count = 11
 
-          <h3>1.2 Critical Section & Mutual Exclusion</h3>
-          <p>
-            A <strong>Critical Section</strong> is a segment of code that accesses shared mutable resources and must not be executed concurrently by more than one thread. To maintain thread safety, the system must guarantee three properties:
-          </p>
-          <ol>
-            <li><strong>Mutual Exclusion:</strong> Only one thread can execute in the critical section at any given instant.</li>
-            <li><strong>Progress:</strong> If no thread is executing in the critical section and some threads wish to enter, only those threads can participate in deciding who enters next.</li>
-            <li><strong>Bounded Waiting:</strong> There must be a limit on the number of times other threads can enter the critical section after a thread has requested entry (preventing thread starvation).</li>
-          </ol>
+                Expected: 12                    Actual: 11  (one update lost)</div>
+            <div class="codehead"><span>Broken example</span><span>Java</span></div>
+            <pre class="code">class UnsafeCounter {
+    private int count = 0;
+
+    void increment() {
+        count++; // not atomic; multiple threads can lose updates
+    }
+
+    int getCount() {
+        return count;
+    }
+}</pre>
+            <p>Even if each line looks simple, the operation as a whole is not thread-safe. The same pattern appears in inventory counts, wallet balances, seat reservations, and request counters.</p>
+            <h3>Check-then-act race</h3>
+            <pre class="code">if (stock >= quantity) {   // check
+    stock -= quantity;     // act
+}</pre>
+            <p>Two orders can both observe stock = 1 and both sell the last item. Protect the check and the update together, or make the database perform a conditional atomic update.</p>
+            <div class="callout warning"><strong>Interview phrase:</strong> “A race condition is a correctness bug caused by unsafely interleaved concurrent operations on shared state. I first identify the shared mutable state, then identify the non-atomic invariant, and finally protect that invariant with a lock, an atomic operation, or a database transaction/constraint as appropriate.”</div>
         </section>
 
-        <!-- SECTION 2: SYNCHRONIZED, MONITORS & INTRINSIC LOCKS -->
-        <section>
-          <h2>2. Synchronized Methods, Blocks & Monitor Mechanics</h2>
+        <section class="section" id="critical">
+            <h2>2. Critical Section</h2>
+            <p>A <strong>critical section</strong> is the smallest logical region that reads or changes shared state and must obey a concurrency rule. A lock protects entry to that region.</p>
+            <div class="grid2">
+                <div class="card"><h3>Good critical section</h3><p>Check available inventory and decrement it under one synchronization boundary.</p><pre class="code">synchronized (inventoryLock) {
+    if (stock >= quantity) {
+        stock -= quantity;
+    }
+}</pre></div>
+                <div class="card"><h3>Dangerous critical section</h3><p>Locking only the decrement leaves the check exposed to races.</p><pre class="code">if (stock >= quantity) {
+    synchronized (inventoryLock) {
+        stock -= quantity;
+    }
+}</pre></div>
+            </div>
+            <h3>Three classic correctness goals</h3>
+            <ul><li><strong>Mutual exclusion:</strong> no two threads execute the protected critical section at the same time for the same lock.</li><li><strong>Progress:</strong> if the lock is free and threads are trying to enter, the system should be able to let one proceed.</li><li><strong>Bounded waiting:</strong> ideally, a waiting thread should not be postponed forever. Java intrinsic monitors do not promise strict fairness, so starvation is still possible in some workloads.</li></ul>
+            <div class="callout solution"><strong>Thumb rule:</strong> Lock the complete invariant (the check + decision + update), but keep the critical section short. Avoid network calls, database calls, sleeps, or expensive work while holding a lock unless there is a very deliberate reason.</div>
+        </section>
 
-          <h3>2.1 Synchronized Method vs. Synchronized Block</h3>
-          <ul>
-            <li><strong>Synchronized Instance Method:</strong> Locks the entire method body using the object's instance monitor (<code>this</code>).
-              <pre><code>public synchronized void updateBalance(long amount) {
-    this.balance += amount;
-}</code></pre>
-            </li>
-            <li><strong>Synchronized Static Method:</strong> Locks the <code>java.lang.Class</code> object in Metaspace/Heap (<code>Account.class</code>). It does <em>not</em> block non-static synchronized methods on instances of the same class!</li>
-            <li><strong>Synchronized Block (Fine-Grained):</strong> Restricts locking strictly to the critical lines of code and allows locking on private dedicated lock objects, reducing contention and preventing external callers from deadlocking on <code>this</code>:
-              <pre><code>private final Object lock = new Object(); // Private final lock prevents external hijacking
+        <section class="section" id="sync">
+            <h2>3. <code>synchronized</code> Method vs. Block</h2>
+            <p><code>synchronized</code> provides <strong>mutual exclusion</strong> and a <strong>happens-before visibility guarantee</strong>. When one thread exits a synchronized region and another later acquires the same monitor, writes made before unlock become visible to the acquiring thread.</p>
+            <div class="grid2">
+                <div class="card"><h3>Instance synchronized method</h3><pre class="code">public synchronized void deposit(long amount) {
+    balance += amount;
+}</pre><p>Locks <code>this</code>. Two calls on the same object serialize; calls on two different account objects can run concurrently.</p></div>
+                <div class="card"><h3>Synchronized block</h3><pre class="code">private final Object lock = new Object();
 
-public void processTransaction(Transaction tx) {
-    validate(tx); // Unsynchronized validation outside critical section!
-    
+public void deposit(long amount) {
+    validate(amount); // outside lock
     synchronized (lock) {
-        this.balance += tx.amount(); // Strictly bounded critical section
+        balance += amount;
     }
-    
-    sendNotification(tx); // Unsynchronized I/O outside critical section
-}</code></pre>
-            </li>
-          </ul>
-
-          <h3>2.2 Intrinsic Locks & Reentrancy</h3>
-          <p>
-            Every object in Java has an <strong>Intrinsic Lock</strong> stored in its 64-bit <strong>Mark Word</strong> header.
-          </p>
-          <p>
-            <strong>Reentrancy Guarantee:</strong> Java intrinsic locks are completely <em>reentrant</em>. If a thread that already holds a lock attempts to acquire it again (e.g., a synchronized method recursively calling another synchronized method on the same object), the JVM allows it immediately without deadlocking itself. Internally, the JVM associates an <strong>acquisition counter</strong> with the lock:
-          </p>
-          <ul>
-            <li>When the thread acquires the lock, the counter increments to <code>1</code> and records the thread ID.</li>
-            <li>Each reentrant entry increments the counter (<code>2</code>, <code>3</code>...).</li>
-            <li>Each exit decrements the counter. The lock is only released to other threads when the counter reaches <code>0</code>.</li>
-          </ul>
-
-          <h3>2.3 Monitor Mechanics: Entry Set vs. Wait Set</h3>
-          <p>
-            The JVM implements object synchronization using <strong>Monitors</strong> based on the Mesa monitor architecture:
-          </p>
-          <pre><code>                             +----------------------------+
-                             |   ENTRY SET (Blocked)      |
-                             | Threads waiting to acquire |
-                             | lock on synchronized block |
-                             +-------------+--------------+
-                                           |
-                              acquires lock|
-                                           v
-                             +----------------------------+
-                             |       OWNER THREAD         |
-                             |  Active in Critical Section|
-                             +-------------+--------------+
-                                           |
-                               Object.wait() releases lock
-                                           v
-                             +----------------------------+
-                             |    WAIT SET (Waiting)      |
-                             | Threads waiting for        |
-                             | notify() / notifyAll()     |
-                             +----------------------------+</code></pre>
-
-          <ul>
-            <li><strong>Entry Set:</strong> When Thread A holds the monitor, other threads trying to enter are placed into the <strong>Entry Set</strong> and transitioned to the <code>BLOCKED</code> state.</li>
-            <li><strong>Wait Set:</strong> When the owner thread calls <code>wait()</code>, it voluntarily releases the monitor and moves to the <strong>Wait Set</strong> in the <code>WAITING</code> state.</li>
-            <li><strong><code>notify()</code> vs. <code>notifyAll()</code>:</strong> 
-              <code>notify()</code> moves a <em>single arbitrary thread</em> from the Wait Set to the Entry Set. If that thread cannot proceed, the system deadlocks. 
-              <strong>Always use <code>notifyAll()</code> in enterprise code</strong> to wake all waiting threads, allowing them to re-check their condition loops.
-            </li>
-          </ul>
+}</pre><p>Locks the chosen object and lets you narrow the protected region. A private final lock avoids exposing the lock to unrelated code.</p></div>
+            </div>
+            <h3>Static synchronized method</h3>
+            <pre class="code">public static synchronized void refreshGlobalConfig() {
+    // guarded by MyService.class monitor
+}</pre>
+            <p>A static synchronized method locks the <code>Class</code> object, e.g. <code>MyService.class</code>, not an instance's <code>this</code>. It therefore does not automatically exclude an instance synchronized method.</p>
+            <h3>Important behavior</h3>
+            <ul><li>Locks are reentrant: a thread holding a monitor can acquire that same monitor again.</li><li>If a synchronized method throws an exception, the monitor is still released as the method exits.</li><li><code>synchronized</code> is not a distributed lock. It coordinates threads inside one JVM only.</li><li>Calling <code>Thread.sleep()</code> inside a synchronized block does not release the monitor.</li></ul>
+            <div class="callout warning"><strong>Common bug:</strong> Synchronizing on a public object, a string literal, or an object other code can also lock may create accidental contention or deadlocks. Prefer a private final lock when a dedicated lock is needed.</div>
         </section>
 
-        <!-- SECTION 3: VOLATILE & HARDWARE JMM -->
-        <section>
-          <h2>3. The <code>volatile</code> Keyword & Hardware Memory Semantics</h2>
+        <section class="section" id="locks">
+            <h2>4. Intrinsic Lock</h2>
+            <p>Every Java object can be used as a monitor lock. This built-in locking mechanism is called an <strong>intrinsic lock</strong> (or monitor lock). A synchronized instance method uses the current object's lock; a synchronized block uses the exact object in parentheses.</p>
+            <div class="diagram">Object accountA                  Object accountB
+                +------------------+             +------------------+
+                | monitor A        |             | monitor B        |
+                | balance = 100    |             | balance = 500    |
+                +------------------+             +------------------+
+                Thread 1 locks A                  Thread 2 locks B
+                |                                 |
+                +---- can run concurrently -------+
 
-          <h3>3.1 CPU Caches & The MESI Protocol</h3>
-          <p>
-            Modern multi-core processors maintain private L1/L2 caches per core. When Thread 1 on Core 0 writes <code>flag = true</code>, the update initially lives inside Core 0's write buffer and L1 cache. Unless a hardware memory barrier is emitted, Core 1 executing Thread 2 may continue reading <code>flag = false</code> indefinitely from its own stale L1 cache!
-          </p>
-
-          <h3>3.2 Memory Barriers & The Happens-Before Relationship</h3>
-          <p>
-            Declaring a variable <code>volatile</code> instructs the JVM and compiler to enforce strict memory ordering:
-          </p>
-          <ul>
-            <li><strong>Visibility:</strong> Every write to a volatile variable is immediately flushed to shared L3 cache / RAM. Every read from a volatile variable is loaded directly from coherent main memory, bypassing stale registers.</li>
-            <li><strong>Instruction Reordering Prevention:</strong> The JVM emits hardware memory barriers (such as <code>mfence</code> or <code>lock</code> prefixed instructions on x86) around volatile variables:
-              <ul>
-                <li><code>StoreStore</code> barrier before volatile write (ensures previous normal writes are visible first).</li>
-                <li><code>StoreLoad</code> barrier after volatile write (ensures the write is visible before subsequent reads).</li>
-                <li><code>LoadLoad</code> and <code>LoadStore</code> barriers after volatile reads.</li>
-              </ul>
-            </li>
-            <li><strong>Happens-Before Rule:</strong> A write to a volatile variable <em>happens-before</em> every subsequent read of that same volatile variable.</li>
-          </ul>
-
-          <div class="callout callout-warning">
-            <div class="callout-title">⚠️ Why volatile DOES NOT Guarantee Atomicity</div>
-            <p>
-              <code>volatile</code> guarantees visibility and ordering, but <strong>zero mutual exclusion or atomicity</strong>. Compound operations like <code>count++</code> or <code>flag = !flag</code> consist of 3 distinct bytecode instructions. Two threads can execute the read simultaneously, resulting in lost updates even if <code>count</code> is volatile!
-            </p>
-          </div>
-        </section>
-
-        <!-- SECTION 4: ATOMIC VARIABLES & HARDWARE CAS -->
-        <section>
-          <h2>4. Atomic Variables & Hardware Compare-And-Swap (CAS)</h2>
-
-          <h3>4.1 The Compare-And-Swap (CAS) Hardware Primitive</h3>
-          <p>
-            CAS is a CPU instruction (<code>CMPXCHG</code> on x86) that performs an atomic read-modify-write in a single processor cycle:
-          </p>
-          <pre><code>boolean compareAndSwap(int expectedValue, int newValue) {
-    // Executed atomically at the hardware CPU bus/cache level:
-    if (this.currentValue == expectedValue) {
-        this.currentValue = newValue;
-        return true;  // CAS Succeeded!
+                Two threads locking the SAME object must coordinate.</div>
+            <h3>Reentrancy example</h3>
+            <pre class="code">class ReportService {
+    public synchronized void generate() {
+        writeHeader(); // same thread can re-enter this object's monitor
     }
-    return false;     // CAS Failed, value was changed by another thread!
-}</code></pre>
 
-          <h3>4.2 Atomic Variables (<code>java.util.concurrent.atomic</code>)</h3>
-          <p>
-            Classes like <code>AtomicInteger</code>, <code>AtomicLong</code>, and <code>AtomicReference</code> implement lock-free concurrency using CAS and volatile memory pointers:
-          </p>
-          <div class="code-header">
-            <span>Lock-Free Optimistic Loop (AtomicInteger.incrementAndGet)</span>
-            <span>Java</span>
-          </div>
-          <pre><code>// Under the hood in java.lang.invoke.VarHandle / Unsafe:
-public final int getAndAddInt(Object o, long offset, int delta) {
-    int v;
-    do {
-        v = getIntVolatile(o, offset); // 1. Read current volatile value
-    } while (!weakCompareAndSetInt(o, offset, v, v + delta)); // 2. Optimistic CAS retry loop!
-    return v;
-}</code></pre>
-
-          <h3>4.3 The ABA Problem & <code>AtomicStampedReference</code></h3>
-          <p>
-            In a lock-free algorithm, Thread 1 reads value $A$. Before Thread 1 performs its CAS, Thread 2 changes the value from $A \rightarrow B$, and then changes it back from $B \rightarrow A$.
-          </p>
-          <p>
-            Thread 1's CAS compares current value $A$ with expected value $A$, assumes nothing changed, and succeeds! While harmless for simple integers, in lock-free linked data structures (like concurrent stacks or free lists), this causes severe <strong>node reuse and memory pointer corruption</strong>.
-          </p>
-          <div class="code-header">
-            <span>Solving ABA with Version Stamps</span>
-            <span>Java</span>
-          </div>
-          <pre><code>// Stores object reference AND an integer version stamp
-AtomicStampedReference&lt;Node&gt; atomicRef = new AtomicStampedReference&lt;&gt;(initialNode, 0);
-
-int currentStamp = atomicRef.getStamp();
-Node currentNode = atomicRef.getReference();
-
-// CAS verifies BOTH reference AND version stamp match:
-boolean success = atomicRef.compareAndSet(
-    currentNode, newNode, currentStamp, currentStamp + 1
-);</code></pre>
-
-          <h3>4.4 <code>AtomicLong</code> vs. <code>LongAdder</code> Under Extreme Concurrency</h3>
-          <p>
-            When 200 threads simultaneously invoke <code>atomicLong.incrementAndGet()</code> under high throughput (e.g. 100,000 req/sec), all 200 threads continuously fail their CAS loops, hammering the same memory address and causing <strong>CPU cache-line bouncing</strong>.
-          </p>
-          <p>
-            Java 8 introduced <strong><code>LongAdder</code></strong> (extending <code>Striped64</code>):
-          </p>
-          <ul>
-            <li>Maintains an array of cells (<code>Cell[]</code>) striped across CPU cores.</li>
-            <li>When contention is detected, different threads update different cells independently without blocking each other.</li>
-            <li>Calling <code>sum()</code> accumulates the cells together, providing orders of magnitude higher write throughput than <code>AtomicLong</code>!</li>
-          </ul>
+    private synchronized void writeHeader() {
+        System.out.println("Header");
+    }
+}</pre>
+            <p>Reentrancy prevents a thread from deadlocking itself when a synchronized method calls another synchronized method using the same monitor. It does not prevent deadlocks involving two different locks.</p>
+            <h3>Deadlock example</h3>
+            <pre class="code">// Thread A: holds lock1, waits for lock2
+// Thread B: holds lock2, waits for lock1</pre>
+            <p>Mitigate deadlocks by acquiring multiple locks in a consistent global order, minimizing nested locks, and using time-bounded lock acquisition with explicit recovery when appropriate.</p>
         </section>
 
-        <!-- SECTION 5: REAL-TIME PRODUCTION ISSUES -->
-        <section>
-          <h2>5. Real-Time Production Issues & Post-Mortems</h2>
+        <section class="section" id="monitor">
+            <h2>5. Monitor: Entry Set, Wait Set, wait / notify</h2>
+            <p>A <strong>monitor</strong> combines a lock with coordination support. Think of a meeting room: one person owns the room; others queue to enter. A person inside can wait for a condition, release the room, and later compete to enter again.</p>
+            <div class="diagram">              +----------------------+
+                |      ENTRY SET       |
+                | threads waiting for   |
+                | synchronized monitor  |
+                +-----------+----------+
+                | monitor becomes available
+                v
+                +----------------------+
+                |    OWNER THREAD      |
+                | runs critical code   |
+                +-----------+----------+
+                | calls obj.wait()
+                | releases this monitor
+                v
+                +----------------------+
+                |       WAIT SET       |
+                | waiting for notify,  |
+                | timeout or interrupt |
+                +----------------------+</div>
+            <ul><li><code>wait()</code> must be called while owning that same object's monitor; it releases that monitor and suspends the thread.</li><li><code>notify()</code> wakes one arbitrary waiter; it does not hand over the lock immediately. The awakened thread must re-acquire the monitor.</li><li><code>notifyAll()</code> wakes all waiters; they compete to re-acquire the monitor and should re-check their conditions.</li><li>Use <code>while</code>, not <code>if</code>, around <code>wait()</code> because wakeups can be spurious and conditions may no longer be true when the thread resumes.</li></ul>
+            <pre class="code">class OneSlotBuffer {
+    private String value;
+    private boolean full;
 
-          <!-- Incident 1 -->
-          <div class="callout callout-production">
-            <div class="callout-title">🚨 Incident 1: Over-Draft Race Condition in Multi-Node Digital Wallet</div>
-            <p><strong>Scenario:</strong> During a gaming tournament withdrawal rush, a customer with $100 in their wallet issued 5 rapid-fire withdrawal requests of $100 each. All 5 requests succeeded, leaving the platform with a $400 deficit.</p>
-          </div>
+    public synchronized void put(String item) throws InterruptedException {
+        while (full) {
+            wait(); // releases this object's monitor
+        }
+        value = item;
+        full = true;
+        notifyAll();
+    }
 
-          <div class="callout callout-warning">
-            <div class="callout-title">🔍 Root Cause Analysis (RCA)</div>
-            <p>
-              The withdrawal service implemented balance checking using non-atomic logic:
-            </p>
-            <pre><code>// BROKEN CODE:
-if (wallet.getBalance() &gt;= amount) { // Step 1: Check
-    wallet.debit(amount);            // Step 2: Act
-}</code></pre>
-            <p>
-              Under high concurrency, 5 threads read <code>getBalance() == 100</code> simultaneously before any thread executed <code>debit()</code>. Even though <code>debit()</code> had internal synchronization, the <em>check-then-act</em> boundary was unprotected.
-            </p>
-          </div>
+    public synchronized String take() throws InterruptedException {
+        while (!full) {
+            wait();
+        }
+        String result = value;
+        value = null;
+        full = false;
+        notifyAll();
+        return result;
+    }
+}</pre>
+            <p>For most production producer-consumer code, prefer higher-level utilities such as <code>BlockingQueue</code>, <code>Semaphore</code>, or <code>Condition</code> over manually coordinating <code>wait/notify</code>.</p>
+            <div class="callout warning"><strong>Correction to a common myth:</strong> “Always use <code>notifyAll()</code>” is a useful safe default for many condition patterns, not a universal law. Use <code>notify()</code> only when the design proves waking one waiter is correct; otherwise, <code>notifyAll()</code> avoids waking the wrong category of waiter and leaving the system stuck.</div>
+        </section>
 
-          <div class="callout callout-solution">
-            <div class="callout-title">💡 Production Resolution</div>
-            <p>Replaced with an atomic state transition using database pessimistic locking or compare-and-swap balance updates:</p>
-            <pre><code>// OPTIMISTIC CAS PATTERN:
-public void withdraw(long amount) {
+        <section class="section" id="volatile">
+            <h2>6. <code>volatile</code>: Visibility and Ordering, Not Compound Atomicity</h2>
+            <p><strong>Kid-friendly analogy:</strong> A shared whiteboard is useful only if everyone sees the latest writing. <code>volatile</code> gives a visibility and ordering guarantee for one variable. It does not make a multi-step update indivisible.</p>
+            <pre class="code">class Worker {
+    private volatile boolean running = true;
+
+    void stop() {
+        running = false;
+    }
+
+    void work() {
+        while (running) {
+            doSmallUnitOfWork();
+        }
+    }
+
+    private void doSmallUnitOfWork() {
+        // short work; real code should also define interruption/shutdown behavior
+    }
+}</pre>
+            <p>A write to a volatile field happens-before a subsequent read of that same field. The JVM and hardware implement the Java Memory Model's guarantees using the mechanisms appropriate to the platform; don't assume this literally means every access reads or writes RAM.</p>
+            <h3>Why volatile doesn't fix <code>count++</code></h3>
+            <pre class="code">private volatile int count = 0;
+
+void increment() {
+    count++; // still a read-modify-write race
+}</pre>
+            <p>Two threads can both read 7, both compute 8, and both write 8. Visibility is not the same as mutual exclusion or atomicity.</p>
+            <div class="grid2">
+                <div class="card"><h3>Good use cases</h3><ul><li>Independent stop/running flag.</li><li>Publishing an immutable configuration reference.</li><li>State where one write and one read are sufficient and no compound invariant exists.</li></ul></div>
+                <div class="card"><h3>Not sufficient for</h3><ul><li><code>count++</code> or <code>balance -= amount</code>.</li><li>Check-then-act logic.</li><li>Keeping several variables consistent as one unit.</li></ul></div>
+            </div>
+        </section>
+
+        <section class="section" id="atomic">
+            <h2>7. Atomic Variables</h2>
+            <p>Classes such as <code>AtomicInteger</code>, <code>AtomicLong</code>, and <code>AtomicReference</code> provide atomic operations on a single value, often implemented with compare-and-set primitives and memory-ordering support.</p>
+            <pre class="code">import java.util.concurrent.atomic.AtomicInteger;
+
+class SafeCounter {
+    private final AtomicInteger count = new AtomicInteger();
+
+    void increment() {
+        count.incrementAndGet();
+    }
+
+    int value() {
+        return count.get();
+    }
+}</pre>
+            <p>This prevents lost updates for the counter. It does not automatically make a multi-field operation atomic—for example, decrementing inventory and inserting an order still needs a broader consistency strategy.</p>
+            <h3>AtomicReference: atomic state replacement</h3>
+            <pre class="code">record Config(String endpoint, int timeoutMs) {}
+
+AtomicReference<Config> config =
+    new AtomicReference<>(new Config("https://api.example", 500));
+
+void updateTimeout(int newTimeout) {
+    config.updateAndGet(old ->
+        new Config(old.endpoint(), newTimeout));
+}</pre>
+            <h3>AtomicLong vs. LongAdder</h3>
+            <div class="tablewrap"><table><thead><tr><th>Tool</th><th>Best fit</th><th>Trade-off</th></tr></thead><tbody>
+            <tr><td><code>AtomicLong</code></td><td>Exact atomic value; sequence numbers or coordination decisions.</td><td>Heavy contention can cause repeated CAS retries.</td></tr>
+            <tr><td><code>LongAdder</code></td><td>High-contention statistics such as request counts.</td><td><code>sum()</code> is not a single atomic snapshot while updates are happening; don't use it for strict business invariants.</td></tr>
+            <tr><td><code>synchronized</code></td><td>Protecting multiple related fields or a compound invariant.</td><td>Contending threads may block; lock scope matters.</td></tr>
+            </tbody></table></div>
+            <div class="callout solution"><strong>Thumb rule:</strong> Use atomics for simple state transitions on one value. Use a lock when multiple variables must change together. Use <code>LongAdder</code> for high-throughput statistics, not for an account balance or inventory truth.</div>
+        </section>
+
+        <section class="section" id="cas">
+            <h2>8. CAS: Compare-And-Set / Compare-And-Swap</h2>
+            <p>CAS means: “Change the value to the new value only if it is still the value I observed.” The comparison and conditional update happen atomically. If another thread changed it first, the operation fails and the caller may retry.</p>
+            <div class="diagram">Observed current value = 5
+                Expected value = 5, new value = 6
+
+                CAS(5 -> 6)
+                |
+                +-- current still 5? -- YES --> update to 6, success
+                |
+                +-- current is 7? ----- NO ---> no update, failure; re-read/retry</div>
+            <pre class="code">import java.util.concurrent.atomic.AtomicInteger;
+
+AtomicInteger stock = new AtomicInteger(10);
+
+boolean reserveOne() {
     while (true) {
-        long current = balance.get();
-        if (current &lt; amount) {
-            throw new InsufficientFundsException();
+        int current = stock.get();
+        if (current <= 0) {
+            return false;
         }
-        if (balance.compareAndSet(current, current - amount)) {
-            return; // Atomically debited!
+        if (stock.compareAndSet(current, current - 1)) {
+            return true;
         }
-        // CAS failed due to concurrent withdrawal, retry loop immediately
+        // Someone changed stock; re-read and retry.
     }
-}</code></pre>
-          </div>
+}</pre>
+            <p>CAS is optimistic: a thread attempts an update without acquiring a traditional monitor lock. Under contention, retries may burn CPU, so lock-free does not automatically mean faster or fairer.</p>
+            <h3>The ABA problem</h3>
+            <p>A thread reads A; another thread changes A → B → A; the first thread sees A again and CAS succeeds even though the state changed in between. For reference-based algorithms where history matters, use a version/stamp such as <code>AtomicStampedReference</code> or redesign the state representation.</p>
+            <pre class="code">AtomicStampedReference<Node> head =
+    new AtomicStampedReference<>(initialNode, 0);
 
-          <!-- Incident 2 -->
-          <div class="callout callout-production">
-            <div class="callout-title">🚨 Incident 2: High CPU Spikes via Spin Contention on AtomicInteger in Metrics Engine</div>
-            <p><strong>Scenario:</strong> A microservice handling 80,000 requests/sec observed CPU utilization climbing to 95% on 64-core AWS instances, with application throughput degrading drastically.</p>
-          </div>
+int[] stampHolder = new int[1];
+Node oldHead = head.get(stampHolder);
+int oldStamp = stampHolder[0];
 
-          <div class="callout callout-warning">
-            <div class="callout-title">🔍 Root Cause Analysis (RCA)</div>
-            <p>
-              The telemetry library tracked global request counts using a single shared <code>AtomicLong</code>. Across 64 CPU cores, hundreds of threads executed <code>incrementAndGet()</code> simultaneously. Because 63 out of 64 threads failed their CAS on every clock cycle, the CPU cores entered tight spin-retry loops, generating millions of invalidation messages across the hardware CPU interconnect bus.
-            </p>
-          </div>
-
-          <div class="callout callout-solution">
-            <div class="callout-title">💡 Production Resolution</div>
-            <p>Replaced <code>AtomicLong</code> with <strong><code>LongAdder</code></strong> for high-throughput metrics and throughput counters:</p>
-            <pre><code>// High-concurrency throughput counter:
-private final LongAdder requestCounter = new LongAdder();
-
-public void onRequest() {
-    requestCounter.increment(); // Lock-free striped increment, zero bus contention!
-}</code></pre>
-          </div>
+boolean updated = head.compareAndSet(
+    oldHead, newHead, oldStamp, oldStamp + 1
+);</pre>
+            <p>CAS and atomic classes are often implemented with CPU/JVM primitives (e.g. compare-exchange instructions or VarHandle operations), but exact implementation details vary by JVM and processor.</p>
         </section>
 
-        <!-- SECTION 6: PRODUCTION DIAGNOSTICS TOOLKIT -->
-        <section>
-          <h2>6. Production Triage & Inspection Toolkit</h2>
+        <section class="section" id="production">
+            <h2>9. Real Production Incidents: Symptoms, Root Cause, Fix</h2>
+            <div class="callout production"><strong>Incident A — Duplicate or oversold inventory</strong><p>Two request threads both read stock = 1 and both pass the check. The service oversells because the check and decrement were separate operations.</p><p><strong>Fix:</strong> For in-memory state, protect the entire check-and-decrement with one lock or CAS loop. For a multi-instance service, use a database conditional update (for example, update only where stock is sufficient), transaction/locking, and idempotency where needed. A JVM monitor cannot coordinate separate service instances.</p></div>
+            <div class="callout production"><strong>Incident B — High CPU from a contended atomic counter</strong><p>A global <code>AtomicLong</code> is updated on every request by hundreds of threads. Under high contention, CAS retries and cache-coherence traffic reduce throughput.</p><p><strong>Fix:</strong> For telemetry counters, evaluate <code>LongAdder</code>, per-thread metrics, or metrics aggregation. Benchmark under realistic contention; don't replace atomics blindly.</p></div>
+            <div class="callout production"><strong>Incident C — Application hangs due to lock contention</strong><p>A synchronized method performs a slow remote API call while holding the monitor. Other requests queue behind it and latency climbs.</p><p><strong>Fix:</strong> Keep only shared-state mutation under the lock; perform slow I/O outside it when correctness allows. Use thread dumps and Java Flight Recorder to locate monitor contention.</p></div>
+            <div class="callout production"><strong>Incident D — Stale shutdown flag</strong><p>A worker loops on a non-volatile boolean that another thread changes. Without a proper happens-before relationship, the worker may not observe the update promptly—or at all under the Java Memory Model.</p><p><strong>Fix:</strong> Use <code>volatile</code>, an atomic variable, or interruption / structured task cancellation. Design shutdown so blocking operations can also be unblocked.</p></div>
+            <h3>Production diagnostics</h3>
+            <pre class="code"># Find JVM threads blocked waiting to enter a monitor
+jcmd <PID> Thread.print -l
 
-          <div class="code-header">
-            <span>Profiling Monitor Contention & Lock Wait Events</span>
-            <span>Bash</span>
-          </div>
-          <pre><code># 1. Detect Threads Blocked on Intrinsic Monitors in JVM Thread Dump
-jstack &lt;PID&gt; | grep "waiting to lock" -B 2 -A 5
+# Capture a JFR recording with lock/monitor events (JDK options vary)
+jcmd <PID> JFR.start name=locks settings=profile duration=30s filename=locks.jfr
 
-# Example output identifying offending lock:
-# "http-nio-8080-exec-14" #32 daemon prio=5 os_prio=0 tid=0x00007f nid=0x1a2b waiting to lock &lt;0x0000000712345678&gt;
-#   at com.myapp.service.OrderService.processOrder(OrderService.java:62)
-
-# 2. Record Monitor Contention events with JDK Flight Recorder (JFR)
-jcmd &lt;PID&gt; JFR.start name=contention_profile settings=profile.jfc duration=30s filename=locks.jfr
-
-# 3. Analyze lock hold times and contention using jcmd
-jcmd &lt;PID&gt; Thread.print -l</code></pre>
+# On Linux, inspect per-thread CPU
+top -H -p <PID></pre>
+            <p class="muted small">A thread dump is a snapshot: correlate repeated dumps and metrics rather than diagnosing from a single line. JFR settings and command options can vary by JDK version.</p>
         </section>
 
-        <!-- SECTION 7: SENIOR INTERVIEW Q&A -->
-        <section>
-          <h2>7. Senior / Staff Technical Interview Q&A</h2>
-
-          <div class="callout callout-interview">
-            <div class="callout-title">🎯 Q1: Why is volatile not sufficient to make a singleton instance thread-safe on its own?</div>
-            <p><strong>Answer:</strong> <code>volatile</code> only provides visibility and prevents instruction reordering during initialization; it does not provide mutual exclusion. If two threads check <code>if (instance == null)</code> concurrently without a <code>synchronized</code> block, both threads can enter the initialization block simultaneously and instantiate two separate singleton objects. Mutual exclusion via <code>synchronized</code> combined with <code>volatile</code> (Double-Checked Locking) is required to ensure exactly one instance is created.</p>
-          </div>
-
-          <div class="callout callout-interview">
-            <div class="callout-title">🎯 Q2: What is Lock Inflation / Lock Escalation in the HotSpot JVM?</div>
-            <p><strong>Answer:</strong> HotSpot optimizes <code>synchronized</code> blocks dynamically through three tiers:
-              <br>
-              1. <strong>Biased Lock:</strong> Optimized for single-thread lock access; writes thread ID to Mark Word without CAS.
-              <br>
-              2. <strong>Lightweight Lock:</strong> When multiple threads access the lock without overlapping contention, threads use atomic CAS to exchange the object's Mark Word with a displaced mark word on their stack frame (zero OS kernel transitions).
-              <br>
-              3. <strong>Heavyweight Lock:</strong> When true concurrent contention occurs and CAS fails repeatedly, the lock inflates into an OS Mutex monitor. Contending threads are parked in the OS wait queue, incurring kernel context switches.
-            </p>
-          </div>
-
-          <div class="callout callout-interview">
-            <div class="callout-title">🎯 Q3: When should you prefer synchronized/ReentrantLock over Atomic/CAS operations?</div>
-            <p><strong>Answer:</strong> Under <strong>low to moderate contention</strong>, CAS and Atomic variables are significantly faster because they avoid kernel context switches and thread parking. However, under <strong>heavy contention with complex multi-variable state mutations</strong>, CAS loops enter continuous CPU-spinning failure, consuming 100% CPU. In those scenarios, blocking locks (<code>ReentrantLock</code>) are superior because they park contending threads, freeing the CPU cores for the thread currently holding the lock to finish its critical section quickly.</p>
-          </div>
-
-          <div class="callout callout-interview">
-            <div class="callout-title">🎯 Q4: Why must wait() and notify() always be called inside a while loop rather than an if statement?</div>
-            <p><strong>Answer:</strong> Due to <strong>Spurious Wakeups</strong> and race conditions. A waiting thread can wake up without any thread calling <code>notify()</code> (spurious wakeup allowed by POSIX thread specifications). Furthermore, if <code>notifyAll()</code> is called, multiple threads wake up, but only one can consume the condition; by the time the second thread re-acquires the lock, the condition may no longer hold true. Checking the condition in a <code>while (!condition) wait();</code> loop ensures the predicate is re-evaluated before proceeding.</p>
-          </div>
+        <section class="section" id="thumb">
+            <h2>10. Thumb Rules to Memorize</h2>
+            <div class="grid2">
+                <div class="card"><h3>Choose <code>synchronized</code> when…</h3><ul><li>A compound invariant must be protected.</li><li>Several fields must be read/updated consistently.</li><li>You want simple, lexical lock management.</li></ul></div>
+                <div class="card"><h3>Choose <code>volatile</code> when…</h3><ul><li>You need visibility for a single independent state flag/reference.</li><li>Operations do not depend on read-modify-write atomicity.</li><li>You can explain the happens-before relationship.</li></ul></div>
+                <div class="card"><h3>Choose atomics/CAS when…</h3><ul><li>A single value needs an atomic transition.</li><li>The retry logic is correct and bounded enough for expected contention.</li><li>Lock-free behavior is useful, not just fashionable.</li></ul></div>
+                <div class="card"><h3>Production safety</h3><ul><li>Do not hold locks across slow I/O unnecessarily.</li><li>Never assume a JVM lock coordinates multiple machines.</li><li>Measure contention; optimize based on evidence.</li></ul></div>
+            </div>
+            <div class="callout warning"><strong>One-line memory trick:</strong> <code>synchronized</code> = mutual exclusion + visibility; <code>volatile</code> = visibility + ordering for that field; <code>Atomic*</code> = atomic operations on a value; <code>CAS</code> = update only if the observed value is still current.</div>
         </section>
 
-      </main>
-    </div>
-  </div>
+        <section class="section" id="interview">
+            <h2>11. Interview Questions & Model Answers</h2>
+            <details><summary>Q1. What is a race condition?</summary><p>It is when the correctness of a program depends on how concurrent operations interleave. For example, two threads incrementing a shared integer can both read the same value and overwrite each other's update. I would protect the full operation with synchronization or use an atomic operation if it is a single-value update.</p></details>
+            <details><summary>Q2. What is a critical section?</summary><p>The code region that accesses shared mutable state and must obey a concurrency invariant. I keep it as small as possible while ensuring the entire check-and-update sequence is protected.</p></details>
+            <details><summary>Q3. What is the difference between a synchronized method and block?</summary><p>An instance synchronized method locks <code>this</code> for the whole method. A synchronized block locks the specific object expression for only the enclosed region. Blocks allow a smaller critical section and a private lock object.</p></details>
+            <details><summary>Q4. What is the difference between intrinsic lock and monitor?</summary><p>The intrinsic lock is Java's built-in locking mechanism associated with an object. The monitor is the coordination mechanism around that lock, including ownership and wait-set behavior used by <code>wait/notify</code>.</p></details>
+            <details><summary>Q5. Does volatile make count++ thread-safe?</summary><p>No. It guarantees visibility and ordering for volatile accesses, but <code>count++</code> is a compound read-modify-write operation. Use <code>AtomicInteger</code> for a counter or synchronization if the operation belongs to a larger invariant.</p></details>
+            <details><summary>Q6. What is CAS and why can it be useful?</summary><p>Compare-and-set atomically updates a value only if it matches an expected value. It supports optimistic lock-free algorithms, but retries under contention can consume CPU and algorithms must account for issues such as ABA.</p></details>
+            <details><summary>Q7. Is an atomic variable always better than synchronized?</summary><p>No. Atomics are excellent for single-value operations. Synchronization is often clearer and more appropriate when multiple values or steps must remain consistent. Performance depends on contention and workload.</p></details>
+            <details><summary>Q8. Why use while around wait()?</summary><p>Threads can wake spuriously, and another thread may change the condition before the awakened thread reacquires the monitor. The condition must be checked again after every wakeup.</p></details>
+            <details><summary>Q9. Can synchronized protect data across two service instances?</summary><p>No. It coordinates threads that share the same monitor in one JVM. Cross-instance consistency needs a shared coordination mechanism such as a database transaction/conditional update, a distributed lock when justified, or an architecture that avoids shared mutable state.</p></details>
+            <details><summary>Q10. How would you debug monitor contention in production?</summary><p>I would correlate latency and CPU metrics, capture repeated thread dumps with lock information, inspect which threads own and wait for monitors, and use JFR to profile contention and lock hold times. Then I'd reduce lock scope or redesign the shared state and verify with load tests.</p></details>
+            <h3>Interview answer structure</h3>
+            <div class="diagram">Definition → Simple example → What goes wrong → Java solution → Trade-off → Production use case</div>
+            <p>Example: “For a request counter, <code>AtomicLong</code> makes increments atomic. If it is only telemetry and there is heavy contention, I would consider <code>LongAdder</code>. If the counter controls a financial invariant, I would not treat it as just a metric; I would protect the business operation and persist the invariant in a transactional shared store.”</p>
+        </section>
 
-  <footer>
-    <p>Interview A-Z Handbook &bull; Built for GitHub Pages &bull; Production Grade Interview Prep</p>
-  </footer>
-
-  <script src="../../assets/js/main.js"></script>
-</body>
-</html>
+        <section class="section" id="tracker">
+            <h2>12. Progress Tracker</h2>
+            <p class="muted">Check each item after you can explain it without reading. Your progress is stored in this browser.</p>
+            <div class="progress-ui"><div class="progressbar"><div class="progressfill" id="progressfill"></div></div><p class="small" id="progresslabel">0 of 9 topics mastered</p></div>
+            <div class="checklist" id="checklist">
+                <label><input type="checkbox" data-topic="race"> Explain race conditions and lost updates.</label>
+                <label><input type="checkbox" data-topic="critical"> Identify and protect a complete critical section.</label>
+                <label><input type="checkbox" data-topic="sync"> Compare synchronized methods and blocks.</label>
+                <label><input type="checkbox" data-topic="locks"> Explain intrinsic locks and reentrancy.</label>
+                <label><input type="checkbox" data-topic="monitor"> Draw monitor entry set and wait set; explain wait/notify.</label>
+                <label><input type="checkbox" data-topic="volatile"> Explain volatile visibility and why it does not make ++ atomic.</label>
+                <label><input type="checkbox" data-topic="atomic"> Choose between AtomicInteger, AtomicLong, LongAdder and locks.</label>
+                <label><input type="checkbox" data-topic="cas"> Explain CAS retries and ABA.</label>
+                <label><input type="checkbox" data-topic="prod"> Diagnose one real production concurrency failure.</label>
+            </div>
+            <button class="nav-btn" onclick="resetProgress()" style="margin-top:1rem">Reset progress</button>
+        </section>
+        <footer><p>Interview A–Z Handbook · Java Concurrency · Built for GitHub Pages</p><p><a href="../../index.html" class="nav-link">Home</a></p></footer>
+    </main></div>
+<script>
+    const boxes=[...document.querySelectorAll('#checklist input')];
+    const key='syncMasterclassProgressV1';
+    function renderProgress(){let saved={};try{saved=JSON.parse(localStorage.getItem(key)||'{}')}catch(e){}boxes.forEach(b=>b.checked=!!saved[b.dataset.topic]);const n=boxes.filter(b=>b.checked).length;document.getElementById('progressfill').style.width=(n/boxes.length*100)+'%';document.getElementById('progresslabel').textContent=`${n} of ${boxes.length} topics mastered`;localStorage.setItem(key,JSON.stringify(Object.fromEntries(boxes.map(b=>[b.dataset.topic,b.checked]))))}
+    boxes.forEach(b=>b.addEventListener('change',renderProgress));
+    function resetProgress(){boxes.forEach(b=>b.checked=false);renderProgress()}
+    renderProgress();
+</script>
+</body></html>

@@ -2,358 +2,153 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Module 7: Database Transactions, ACID, MVCC & Isolation Levels | Interview A-Z</title>
-  <link rel="stylesheet" href="../../assets/css/style.css">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Module 7 Part 3 — Transactions, ACID & Isolation | Interview A-Z</title>
+  <style>
+    :root{--bg:#0b1120;--panel:#111b2e;--panel2:#17243a;--text:#e6edf7;--muted:#9eb0c9;--line:#2b3b54;--cyan:#38bdf8;--violet:#a5b4fc;--green:#86efac;--amber:#fcd34d;--red:#fca5a5;--code:#080e19}
+    *{box-sizing:border-box}html{scroll-behavior:smooth;scroll-padding-top:84px}body{margin:0;background:var(--bg);color:var(--text);font:16px/1.7 Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,sans-serif}a{color:var(--cyan)}.navbar{position:sticky;top:0;z-index:5;background:#0c1424ee;backdrop-filter:blur(12px);border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center;padding:13px clamp(16px,4vw,48px);gap:18px}.brand{font-weight:800}.brand-badge{background:linear-gradient(135deg,var(--cyan),var(--violet));color:#0b1120;border-radius:6px;padding:3px 8px;font-size:11px;letter-spacing:.07em;margin-right:9px}.navlinks{display:flex;gap:16px;align-items:center;flex-wrap:wrap}.navlinks a{font-size:13px;text-decoration:none;font-weight:650}.pdf{border:0;border-radius:7px;padding:9px 12px;background:linear-gradient(135deg,var(--cyan),var(--violet));color:#07101d;font-weight:800;cursor:pointer}.layout{max-width:1440px;margin:auto;display:grid;grid-template-columns:250px minmax(0,1fr);gap:30px;padding:28px 24px}.sidebar{position:sticky;top:82px;align-self:start;max-height:calc(100vh - 100px);overflow:auto;border:1px solid var(--line);background:var(--panel);border-radius:14px;padding:18px}.sidebar h3{margin:0 0 10px;font-size:14px}.sidebar a{display:block;text-decoration:none;color:var(--muted);font-size:12px;padding:5px 0}.sidebar a:hover{color:var(--cyan)}.progress{height:6px;background:#26364d;border-radius:8px;overflow:hidden;margin:9px 0}.progress span{display:block;height:100%;width:0;background:var(--cyan);transition:width .2s}.content{min-width:0;max-width:1000px}.crumb{color:var(--muted);font-size:13px;margin-bottom:14px}.hero{padding:30px;border:1px solid var(--line);border-radius:18px;background:radial-gradient(ellipse at top right,#1b3653 0,transparent 58%),var(--panel);margin-bottom:24px}.hero h1{font-size:clamp(28px,4vw,43px);line-height:1.15;margin:10px 0 14px}.hero p{color:var(--muted);max-width:850px}.pills{display:flex;gap:8px;flex-wrap:wrap}.pill{border:1px solid #3a4e6d;border-radius:20px;padding:3px 10px;font-size:12px;color:var(--cyan)}section{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:26px;margin:20px 0}h2{font-size:25px;line-height:1.25;margin:0 0 14px}h3{font-size:19px;margin:26px 0 8px;color:#d5e6ff}h4{font-size:16px;margin:16px 0 6px}p{margin:10px 0}li{margin:6px 0}ul,ol{padding-left:24px}.muted{color:var(--muted)}.callout{border-left:4px solid var(--cyan);background:#0d192a;padding:15px 18px;border-radius:0 10px 10px 0;margin:16px 0}.warn{border-color:var(--amber)}.danger{border-color:var(--red)}.good{border-color:var(--green)}pre{white-space:pre-wrap;overflow-wrap:anywhere;background:var(--code);border:1px solid var(--line);border-radius:10px;padding:16px;overflow:auto;color:#d6e7ff;font:13px/1.65 "JetBrains Mono",Consolas,monospace}code{font-family:"JetBrains Mono",Consolas,monospace;color:#bae6fd;background:#091321;padding:2px 5px;border-radius:4px;font-size:.9em}pre code{background:none;padding:0;color:inherit}table{width:100%;border-collapse:collapse;margin:15px 0;font-size:14px}th,td{border:1px solid var(--line);padding:10px 12px;text-align:left;vertical-align:top}th{background:#1b2a41;color:#d9e8fb}tr:nth-child(even) td{background:#0d1727}.tag{font-size:11px;border-radius:5px;padding:2px 6px;background:#233752;color:#bde8ff}.grid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}.mini{border:1px solid var(--line);border-radius:10px;padding:15px;background:#0d1727}.mini h4{margin-top:0}.footer{text-align:center;color:var(--muted);padding:30px;font-size:12px}.checklist label{display:flex;gap:10px;align-items:flex-start;padding:7px 0;border-bottom:1px solid #233047}.checklist input{margin-top:7px;accent-color:var(--cyan)}.quiz button{background:#203653;color:var(--text);border:1px solid #3a5578;padding:8px 12px;border-radius:7px;cursor:pointer;margin:5px 5px 5px 0}.answer{display:none;color:var(--green);padding:8px 0}.small{font-size:13px;color:var(--muted)}@media(max-width:900px){.layout{grid-template-columns:1fr;padding:16px}.sidebar{position:relative;top:auto;max-height:none}.toc{columns:2}.navbar{position:relative;align-items:flex-start}.grid2{grid-template-columns:1fr}}@media print{body{background:white;color:#111;font-size:11pt}.navbar,.sidebar,.pdf{display:none!important}.layout{display:block;padding:0;max-width:none}.hero,section{background:white;border:1px solid #bbb;color:#111;break-inside:avoid}.hero p,.muted,.crumb,.small{color:#444}.callout,pre{background:#f4f6f8;color:#111}code{color:#111;background:#eee}a{color:#111;text-decoration:none}h2,h3{color:#111}details{display:block} }
+  </style>
 </head>
 <body>
+<nav class="navbar"><div class="brand"><span class="brand-badge">INTERVIEW A–Z</span>Engineering Handbook</div><div class="navlinks"><a href="../../index.html">🏠 Home Directory</a><a href="../../index.html#topics">📚 All Modules</a><a href="https://github.com/ChakradharReddy01/InterViewPrep" target="_blank" rel="noopener">GitHub</a><button class="pdf" onclick="document.querySelectorAll('details').forEach(d=>d.open=true);window.print()">📄 Save to PDF</button></div></nav>
+<div class="layout">
+  <aside class="sidebar"><h3>On This Page</h3><div class="small">Study progress</div><div class="progress"><span id="progressbar"></span></div><div id="progresslabel" class="small">0% complete</div><nav id="toc" class="toc"></nav></aside>
+  <main class="content">
+    <div class="crumb"><a href="../../index.html">Home</a> / Module 7: SQL & Databases / Transactions, ACID & Isolation</div>
+    <header class="hero"><div class="pills"><span class="pill">SQL Transactions</span><span class="pill">Concurrency Control</span><span class="pill">Backend Engineering</span><span class="pill">Interview Deep Dive</span></div><h1>Module 7 (Part 3): Transactions, ACID & Isolation Levels</h1><p>A practical masterclass on transaction guarantees, the four standard isolation levels, and the read anomalies they allow or prevent. Learn through timelines, SQL examples, engine behavior, production failure patterns, and interview-ready explanations.</p><p class="muted">Suggested time: 45–60 minutes · Target: Java backend, SQL, and software engineering interviews</p></header>
+    <section id="roadmap"><h2>0. Learning Roadmap</h2><p>A <strong>transaction</strong> groups database operations into one logical unit. The central challenge is preserving correct results when operations fail or run concurrently.</p><div class="grid2"><div class="mini"><h4>First: correctness</h4><ul><li>Understand ACID</li><li>Know commit and rollback</li><li>Identify the invariant your transaction must preserve</li></ul></div><div class="mini"><h4>Then: concurrency</h4><ul><li>Learn dirty, non-repeatable, and phantom reads</li><li>Compare isolation levels</li><li>Choose locking or retry strategies deliberately</li></ul></div></div><div class="callout good"><strong>Key mental model:</strong> ACID describes the guarantees a transaction should receive. Isolation level describes how concurrent transactions may observe and affect one another. The exact implementation depends on the database engine.</div></section>
+    <section id="acid"><h2>1. ACID Properties</h2><p>ACID is the set of four commonly cited properties of reliable database transactions.</p><table><thead><tr><th>Property</th><th>Meaning</th><th>Example</th><th>Typical mechanisms</th></tr></thead><tbody><tr><td><strong>Atomicity</strong></td><td>All operations in a transaction succeed together, or the transaction is rolled back.</td><td>A bank transfer must debit one account and credit another—or do neither.</td><td>Undo information, transaction logs, rollback/recovery.</td></tr><tr><td><strong>Consistency</strong></td><td>A committed transaction preserves defined constraints and business invariants.</td><td>Account balance cannot be negative if the rule is enforced.</td><td>Constraints, keys, validation, correct transaction logic.</td></tr><tr><td><strong>Isolation</strong></td><td>Concurrent transactions are controlled so their interleaving follows the chosen isolation guarantees.</td><td>Two withdrawals must not both spend the same available funds.</td><td>Locks, MVCC, serializable conflict detection.</td></tr><tr><td><strong>Durability</strong></td><td>After a successful commit, changes survive the failures covered by the database's durability configuration.</td><td>A confirmed payment remains recorded after a process restart.</td><td>Write-ahead/redo logging, durable storage, flush policy, replication configuration.</td></tr></tbody></table>
+      <h3>1.1 A bank-transfer example</h3><pre><code>BEGIN;
 
-  <!-- Top Navigation -->
-    <!-- Top Navigation -->
-    <nav class="navbar">
-    <div class="brand">
-      <a href="../../index.html" class="brand-link" style="display: flex; align-items: center; gap: 0.75rem; text-decoration: none; color: inherit;">
-        <span class="brand-badge" style="background: linear-gradient(135deg, #38bdf8, #818cf8); color: #0f172a; padding: 0.15rem 0.55rem; border-radius: 6px; font-size: 0.75rem; font-weight: 800; letter-spacing: 0.05em; text-transform: uppercase;">Interview A-Z</span>
-        <span style="font-weight: 700; font-size: 1.15rem; color: #fff;">Engineering Handbook</span>
-      </a>
-    </div>
-    <div class="nav-links navlinks" style="display: flex; gap: 1.25rem; align-items: center;">
-      <a href="../../index.html" class="nav-link" style="text-decoration: none; font-weight: 600; font-size: 0.95rem;">🏠 Home</a>
-      <a href="../../index.html#topics" class="nav-link" style="text-decoration: none; font-weight: 600; font-size: 0.95rem;">📚 All Modules</a>
-      <a href="https://github.com/ChakradharReddy01/InterViewPrep" target="_blank" class="nav-link" style="text-decoration: none; font-weight: 600; font-size: 0.95rem;">GitHub</a>
-      <button onclick="document.querySelectorAll('details').forEach(d=>d.open=true);window.print();" class="nav-btn-pdf" title="Save page as PDF" style="display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.35rem 0.85rem; font-size: 0.85rem; font-weight: 700; background: linear-gradient(135deg, #38bdf8, #818cf8); color: #0f172a; border: none; border-radius: 6px; cursor: pointer; transition: transform 0.15s ease, box-shadow 0.15s ease; box-shadow: 0 2px 8px rgba(56,189,248,0.25);">
-        <span>📄</span> Save to PDF
-      </button>
-    </div>
-  </nav>
+UPDATE accounts
+SET balance = balance - 100
+WHERE account_id = 101 AND balance >= 100;
 
-  <div class="container">
-    <div class="article-layout">
-      <!-- Sticky Sidebar Table of Contents -->
-      <aside class="sidebar-toc">
-        <h3>On This Page</h3>
-        <ul class="toc-links" id="dynamic-toc">
-          <!-- Dynamically populated via main.js -->
-        </ul>
-      </aside>
+-- Application must verify that exactly one row was updated.
 
-      <!-- Main Article Content -->
-      <main class="article-content">
-        <!-- Breadcrumb -->
-        <nav class="breadcrumb">
-          <a href="../../index.html">Home</a>
-          <span>/</span>
-          <span>Module 7: SQL & Databases</span>
-          <span>/</span>
-          <span style="color: #fff;">Transactions, ACID & Isolation</span>
-        </nav>
+UPDATE accounts
+SET balance = balance + 100
+WHERE account_id = 202;
 
-        <!-- Article Header -->
-        <header class="article-header">
-          <h1>Module 7 (Part 3): Database Transactions, ACID Internals, Isolation Levels & MVCC</h1>
-          <div class="article-meta">
-            <span class="badge badge-spring">Transactions</span>
-            <span class="badge badge-advanced">MVCC & WAL</span>
-            <span class="badge badge-prod">Concurrency Anomalies & Locking</span>
-            <span>⏱️ 55 min deep dive</span>
-            <span>Target Roles: SDE-2, SDE-3, Database & Backend Architect</span>
-          </div>
-        </header>
+COMMIT;</code></pre><p>If a required step fails, the application should roll back rather than commit a half-transfer. In real code, validate both accounts, check update counts, and handle errors. A database transaction does not automatically make incorrect business logic correct.</p>
+      <div class="callout warn"><strong>Consistency is not a magical repair service.</strong> The database can enforce declared constraints, but application-level invariants must be encoded and protected appropriately. If the transaction commits a logically invalid state that no constraint prevents, ACID does not infer the intended business rule.</div>
+      <h3>1.2 Commit, rollback, and transaction boundaries</h3><ul><li><code>BEGIN</code> / <code>START TRANSACTION</code> begins a transaction in engines that use these commands.</li><li><code>COMMIT</code> makes the transaction's changes committed.</li><li><code>ROLLBACK</code> abandons the transaction's uncommitted changes.</li><li>Autocommit behavior and nested-transaction support vary by database and framework. A nested Spring <code>@Transactional</code> method does not necessarily create a separate physical database transaction.</li></ul>
+      <pre><code>BEGIN;
+UPDATE inventory SET quantity = quantity - 1 WHERE product_id = 42;
+-- An error occurs before the order is successfully recorded.
+ROLLBACK; -- Undo the inventory change too.</code></pre>
+    </section>
+    <section id="isolation"><h2>2. Isolation: What Problem Does It Solve?</h2><p>Multiple requests can read and modify the same records at the same time. Without adequate concurrency control, the final result can depend on timing.</p><h3>2.1 A lost-update race</h3><pre><code>Initial balance = 100
 
-        <!-- SECTION 1: ACID UNDER THE HOOD -->
-        <section>
-          <h2>1. ACID Under the Hood: Physical Engine Mechanics</h2>
+Transaction A reads 100       Transaction B reads 100
+A calculates 100 + 50 = 150   B calculates 100 - 20 = 80
+A writes 150                  B writes 80
+A commits                    B commits
 
-          <p>
-            In relational database management systems (RDBMS), a <strong>Transaction</strong> is a logical unit of work consisting of one or more SQL operations executed against the database. The engine guarantees the <strong>ACID</strong> contract not through magic, but through precise physical data structures:
-          </p>
+Final balance = 80
+The +50 update was overwritten.</code></pre><p>Merely wrapping read-then-write code in a transaction does not guarantee that every lost-update pattern is prevented at every isolation level. Use an atomic SQL update, a row lock, optimistic version checking, or stronger isolation as appropriate.</p>
+      <pre><code>-- Atomic arithmetic; include a business-rule guard.
+UPDATE wallet
+SET balance = balance - 20
+WHERE wallet_id = 7 AND balance >= 20;
 
-          <table style="width:100%; border-collapse:collapse; margin: 1.5rem 0;">
-            <thead>
-              <tr style="background: rgba(255,255,255,0.05); text-align: left;">
-                <th style="padding: 10px; border: 1px solid var(--border-color);">ACID Pillar</th>
-                <th style="padding: 10px; border: 1px solid var(--border-color);">Architectural Guarantee</th>
-                <th style="padding: 10px; border: 1px solid var(--border-color);">Under-the-Hood Engine Mechanism</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td style="padding: 10px; border: 1px solid var(--border-color);"><strong>Atomicity</strong><br>(All or Nothing)</td>
-                <td style="padding: 10px; border: 1px solid var(--border-color);">Either all modifications within the transaction are permanently applied, or all changes are rolled back with zero side effects.</td>
-                <td style="padding: 10px; border: 1px solid var(--border-color);">
-                  <strong>Undo Logs / Rollback Segments:</strong> Records before-images of modified data. If a rollback occurs (or crash happens), the engine replays undo records in reverse order to restore previous page states.
-                </td>
-              </tr>
-              <tr>
-                <td style="padding: 10px; border: 1px solid var(--border-color);"><strong>Consistency</strong><br>(Invariant Preservation)</td>
-                <td style="padding: 10px; border: 1px solid var(--border-color);">Transactions take the database from one valid state satisfying all schemas, invariants, and constraints to another valid state.</td>
-                <td style="padding: 10px; border: 1px solid var(--border-color);">
-                  Enforced via primary keys, foreign key referential integrity, <code>CHECK</code> constraints, unique indexes, and application-level business invariants.
-                </td>
-              </tr>
-              <tr>
-                <td style="padding: 10px; border: 1px solid var(--border-color);"><strong>Isolation</strong><br>(Concurrency Control)</td>
-                <td style="padding: 10px; border: 1px solid var(--border-color);">Concurrent transactions execute without stepping on each other's intermediate uncommitted states as if executed serially.</td>
-                <td style="padding: 10px; border: 1px solid var(--border-color);">
-                  <strong>Multi-Version Concurrency Control (MVCC)</strong>, Snapshot Isolation, and Pessimistic Lock Managers (Two-Phase Locking / 2PL).
-                </td>
-              </tr>
-              <tr>
-                <td style="padding: 10px; border: 1px solid var(--border-color);"><strong>Durability</strong><br>(Surviving Crashes)</td>
-                <td style="padding: 10px; border: 1px solid var(--border-color);">Once a transaction commits, its modifications are permanently recorded and survive power outages or operating system crashes.</td>
-                <td style="padding: 10px; border: 1px solid var(--border-color);">
-                  <strong>Write-Ahead Logging (WAL) & Redo Logs:</strong> Modifications are written sequentially to an append-only WAL on non-volatile disk and flushed via <code>fsync()</code> <em>before</em> dirty data pages are flushed from RAM to disk tablespaces.
-                </td>
-              </tr>
-            </tbody>
-          </table>
+-- Alternative: lock the row before reading and deciding.
+BEGIN;
+SELECT balance FROM wallet WHERE wallet_id = 7 FOR UPDATE;
+-- Validate and update while holding the lock.
+COMMIT;</code></pre>
+      <h3>2.2 Two broad implementation ideas</h3><div class="grid2"><div class="mini"><h4>Lock-based concurrency</h4><p>Transactions acquire locks to protect data. Locks can make conflicting operations wait; poor lock ordering can produce deadlocks.</p></div><div class="mini"><h4>MVCC (multi-version concurrency control)</h4><p>The engine retains row versions or undo information so readers can see a consistent version without necessarily blocking writers. Details differ by engine and isolation level.</p></div></div><div class="callout"><strong>Important:</strong> “MVCC” does not mean “no locks” and does not guarantee serializable behavior by itself. Writes, explicit locking reads, and constraint checks can still block or conflict.</div></section>
+    <section id="dirty"><h2>3. Dirty Read</h2><p>A <strong>dirty read</strong> occurs when transaction B reads a change made by transaction A before A commits. If A rolls back, B has read a value that never became committed data.</p><pre><code>Initial balance = 1000
 
-          <pre><code>WAL (Write-Ahead Logging) Sequence during COMMIT:
-1. Transaction executes UPDATE account SET balance = 900 WHERE id = 1;
-2. Engine creates Redo/Undo log record in RAM log buffer.
-3. Client issues COMMIT;
-4. Engine writes log record to WAL file on disk and executes fsync().
-5. Disk controller confirms WAL persist -> Server sends "COMMIT SUCCESS" to client!
-6. Dirty page in RAM Buffer Pool (balance=900) is lazily flushed to database tablespace later (Checkpointer process).</code></pre>
-        </section>
+A: BEGIN
+A: UPDATE accounts SET balance = 500 WHERE id = 10; -- not committed
+B: SELECT balance FROM accounts WHERE id = 10;      -- sees 500
+A: ROLLBACK;                                        -- balance returns to 1000
+B: makes a decision based on 500                    -- unsafe</code></pre><div class="callout danger"><strong>Why it matters:</strong> a payment, inventory, or fraud decision based on uncommitted data can become invalid when the writer rolls back.</div><p>Standard behavior summary: <strong>READ UNCOMMITTED</strong> permits dirty reads in the SQL isolation model. READ COMMITTED, REPEATABLE READ, and SERIALIZABLE prevent them. Some engines implement READ UNCOMMITTED more strictly than the minimum standard; for example, PostgreSQL treats it as READ COMMITTED.</p></section>
+    <section id="nonrepeatable"><h2>4. Non-Repeatable Read</h2><p>A <strong>non-repeatable read</strong> happens when a transaction reads a row, another transaction commits an update or deletion of that row, and the first transaction reads that same row again and sees a different result.</p><pre><code>Initial balance = 1000
 
-        <!-- SECTION 2: THE CONCURRENCY READ PHENOMENA -->
-        <section>
-          <h2>2. The Concurrency Read Phenomena (Anomalies)</h2>
+A: BEGIN
+A: SELECT balance FROM accounts WHERE id = 10; -- 1000
+B: UPDATE accounts SET balance = 800 WHERE id = 10;
+B: COMMIT;
+A: SELECT balance FROM accounts WHERE id = 10; -- 800 at READ COMMITTED</code></pre><p>READ COMMITTED prevents dirty reads but commonly takes a fresh committed view for each statement, so the second query can see B's committed update. REPEATABLE READ is designed to prevent a transaction from seeing a changed version of the same row on a repeated read, though exact snapshot and locking behavior is engine-specific.</p><div class="callout"><strong>Interview distinction:</strong> non-repeatable read is about a row already found; the row's values or existence changes between reads.</div></section>
+    <section id="phantom"><h2>5. Phantom Read</h2><p>A <strong>phantom read</strong> occurs when the same predicate query returns a different set of rows because another transaction inserts or deletes rows that satisfy that predicate and commits.</p><pre><code>A: BEGIN
+A: SELECT COUNT(*) FROM orders WHERE status = 'PENDING'; -- 5
 
-          <p>
-            When multiple transactions read and write to the same rows concurrently without isolation, three classic ANSI SQL read phenomena can corrupt data:
-          </p>
+B: INSERT INTO orders(id, status) VALUES (999, 'PENDING');
+B: COMMIT;
 
-          <h3>2.1 Dirty Read</h3>
-          <p>
-            <strong>Definition:</strong> Transaction $T_1$ modifies a row but has <strong>not yet committed</strong>. Transaction $T_2$ reads the uncommitted row. If $T_1$ subsequently issues a <code>ROLLBACK</code>, $T_2$ has acted on "dirty" phantom data that never legally existed in the database.
-          </p>
-          <pre><code>Timeline:
-Tx 1: BEGIN;
-Tx 1: UPDATE accounts SET balance = 500 WHERE id = 10; (Original was 1000)
-Tx 2: BEGIN;
-Tx 2: SELECT balance FROM accounts WHERE id = 10; ---> Reads 500! (DIRTY READ!)
-Tx 1: ROLLBACK; (Balance reverts to 1000)
-Tx 2: Dispatches money based on non-existent balance of 500!</code></pre>
+A: SELECT COUNT(*) FROM orders WHERE status = 'PENDING'; -- may be 6</code></pre><p>The issue is not necessarily a changed value on one existing row; it is a changed result set for the same condition.</p><div class="callout warn"><strong>Engine nuance:</strong> the SQL standard's isolation table allows phantoms at REPEATABLE READ, but implementations differ. MySQL InnoDB commonly prevents phantom results for ordinary consistent reads with its repeatable-read snapshot and uses next-key/gap locks for relevant locking operations. PostgreSQL's REPEATABLE READ provides a stable snapshot and prevents ordinary phantom reads, but can still allow serialization anomalies such as write skew. Do not assume every database's level name has identical behavior.</div></section>
+    <section id="levels"><h2>6. The Four Standard Isolation Levels</h2><p>Think of the levels as increasingly strict control over which concurrent effects can become visible. Stronger isolation can reduce anomalies but may increase blocking, aborts, retries, and latency.</p><table><thead><tr><th>Level</th><th>Dirty read</th><th>Non-repeatable read</th><th>Phantom read</th><th>Practical interpretation</th></tr></thead><tbody><tr><td><strong>READ UNCOMMITTED</strong></td><td>Allowed by standard</td><td>Possible</td><td>Possible</td><td>Weakest isolation; dirty reads may be permitted, though engine implementations vary.</td></tr><tr><td><strong>READ COMMITTED</strong></td><td>Prevented</td><td>Possible</td><td>Possible</td><td>Each statement sees committed data according to the engine's statement-level visibility rules.</td></tr><tr><td><strong>REPEATABLE READ</strong></td><td>Prevented</td><td>Prevented</td><td>Standard permits it; engine-dependent in practice</td><td>Repeated reads of existing rows are stable; snapshot and locking details matter.</td></tr><tr><td><strong>SERIALIZABLE</strong></td><td>Prevented</td><td>Prevented</td><td>Prevented as a serializable outcome</td><td>Transactions behave as if run in some serial order; conflicts may block or abort a transaction that must be retried.</td></tr></tbody></table>
+      <h3>6.1 READ UNCOMMITTED</h3><ul><li>Weakest standard isolation level.</li><li>May expose uncommitted changes, making decisions based on data that can be rolled back.</li><li>Rarely appropriate for business-critical reads such as balances, inventory, or order state.</li></ul><h3>6.2 READ COMMITTED</h3><ul><li>Prevents dirty reads.</li><li>Two statements in one transaction can see different committed values.</li><li>Common default in PostgreSQL and Oracle; SQL Server commonly uses locking READ COMMITTED unless row-versioning options change read behavior. Check the database configuration rather than assuming.</li></ul><pre><code>-- PostgreSQL-style example
+BEGIN TRANSACTION ISOLATION LEVEL READ COMMITTED;
+SELECT balance FROM accounts WHERE id = 10;
+-- another transaction commits an update
+SELECT balance FROM accounts WHERE id = 10; -- may see the new value
+COMMIT;</code></pre><h3>6.3 REPEATABLE READ</h3><ul><li>Prevents dirty and non-repeatable reads.</li><li>Phantom behavior and write-skew behavior vary by engine and implementation.</li><li>MySQL InnoDB commonly defaults to REPEATABLE READ; PostgreSQL's REPEATABLE READ uses snapshot isolation and can allow write skew.</li></ul><pre><code>-- PostgreSQL example
+BEGIN TRANSACTION ISOLATION LEVEL REPEATABLE READ;
+SELECT balance FROM accounts WHERE id = 10;
+-- another transaction commits an update
+SELECT balance FROM accounts WHERE id = 10; -- same transaction snapshot
+COMMIT;</code></pre><h3>6.4 SERIALIZABLE</h3><ul><li>Strongest standard isolation level.</li><li>Guarantees a result equivalent to some serial execution of concurrent transactions.</li><li>May use strict locking or serializable conflict detection. A transaction can fail with a serialization error and must be retried safely.</li></ul><pre><code>-- PostgreSQL-style example
+BEGIN TRANSACTION ISOLATION LEVEL SERIALIZABLE;
+-- read facts, check invariant, write changes
+COMMIT;
+-- Application must handle serialization failure by retrying
+-- the complete transaction, with a bounded retry policy.</code></pre><div class="callout good"><strong>Production rule:</strong> choose isolation based on the invariant and access pattern, not by automatically selecting the strongest level for every query.</div></section>
+    <section id="comparison"><h2>7. Anomalies at a Glance</h2><table><thead><tr><th>Anomaly</th><th>What changes?</th><th>Quick example</th><th>Common prevention approach</th></tr></thead><tbody><tr><td>Dirty read</td><td>Visibility of uncommitted data</td><td>Read 500, writer rolls back to 1000</td><td>READ COMMITTED or stronger</td></tr><tr><td>Non-repeatable read</td><td>Previously read row's value/existence</td><td>Balance reads 1000, then 800</td><td>REPEATABLE READ or stronger, depending on engine</td></tr><tr><td>Phantom read</td><td>Rows matching a predicate</td><td>Pending-order count changes 5 to 6</td><td>SERIALIZABLE or engine-specific predicate/range locking/snapshot behavior</td></tr><tr><td>Lost update</td><td>One concurrent write overwrites another</td><td>Two updates both calculate from balance 100</td><td>Atomic SQL, version column, row lock, or stronger isolation</td></tr><tr><td>Write skew</td><td>Disjoint writes jointly violate an invariant</td><td>Two on-call doctors both take leave</td><td>SERIALIZABLE or explicit locking of the invariant's coordination point</td></tr></tbody></table><p class="small">Lost update and write skew are useful extended concurrency anomalies, not the three classic read phenomena listed in the requested syllabus.</p></section>
+    <section id="engine"><h2>8. Database Engine Notes: MVCC, Locks, and Logs</h2><h3>8.1 MVCC snapshots</h3><p>With multi-version concurrency control, a transaction can read a version that was visible at its snapshot rather than necessarily reading the newest physical row version. In a common model, READ COMMITTED uses a new visibility snapshot per statement, while REPEATABLE READ uses a transaction-level snapshot. This is a conceptual model; consult the chosen engine's documentation for exact semantics.</p><h3>8.2 Write-ahead logging (WAL) and durability</h3><ol><li>The transaction modifies data and the engine records the necessary log information.</li><li>At commit, the database ensures the required commit log record is durably persisted according to its configuration.</li><li>The database can acknowledge commit after the configured durability condition is met.</li><li>Data pages can be written to their main table files later; recovery uses logs to restore a consistent state.</li></ol><div class="callout warn">Do not oversimplify the physical sequence: redo/undo design, flush policies, replication acknowledgements, and synchronous-commit settings differ among engines. “COMMIT returned” means durability according to that database's configured guarantees.</div><h3>8.3 Deadlocks and retries</h3><p>A deadlock occurs when transactions wait on one another in a cycle. Databases typically detect a victim transaction and abort it. Applications should handle deadlock/serialization failures with bounded retries, and transactions should acquire locks in a consistent order where possible.</p><pre><code>-- Keep transactions short.
+-- Lock multiple rows in a consistent order (for example, ascending account_id).
+-- Do not call slow external APIs while holding database locks.
+-- Retry only recognized transient transaction failures.
+-- Make retries safe: avoid duplicating external side effects.</code></pre></section>
+    <section id="java"><h2>9. Java / Spring Transaction Examples</h2><h3>9.1 Declarative transaction boundary</h3><pre><code>@Service
+public class TransferService {
+    private final AccountRepository accounts;
 
-          <h3>2.2 Non-Repeatable Read (Fuzzy Read)</h3>
-          <p>
-            <strong>Definition:</strong> Transaction $T_1$ reads a row. Transaction $T_2$ modifies or deletes that row and <strong>commits</strong>. Transaction $T_1$ reads the exact same row again within the same transaction and discovers that its values have changed.
-          </p>
-          <pre><code>Timeline:
-Tx 1: BEGIN;
-Tx 1: SELECT balance FROM accounts WHERE id = 10; ---> Reads 1000
-Tx 2: BEGIN;
-Tx 2: UPDATE accounts SET balance = 800 WHERE id = 10;
-Tx 2: COMMIT;
-Tx 1: SELECT balance FROM accounts WHERE id = 10; ---> Reads 800! (NON-REPEATABLE READ!)
-Tx 1: Same query inside same transaction yielded different data for the same row!</code></pre>
+    public TransferService(AccountRepository accounts) {
+        this.accounts = accounts;
+    }
 
-          <h3>2.3 Phantom Read</h3>
-          <p>
-            <strong>Definition:</strong> Transaction $T_1$ reads a <strong>set of rows satisfying a search predicate</strong> (e.g. range query <code>WHERE age &gt; 30</code>). Transaction $T_2$ inserts new rows (or deletes rows) satisfying that predicate and <strong>commits</strong>. When $T_1$ re-executes the exact same range query, a new "phantom" row appears in the result set that was not present previously.
-          </p>
-          <pre><code>Timeline:
-Tx 1: BEGIN;
-Tx 1: SELECT COUNT(*) FROM orders WHERE status = 'PENDING'; ---> Returns 5
-Tx 2: BEGIN;
-Tx 2: INSERT INTO orders (id, status) VALUES (999, 'PENDING');
-Tx 2: COMMIT;
-Tx 1: SELECT COUNT(*) FROM orders WHERE status = 'PENDING'; ---> Returns 6! (PHANTOM READ!)</code></pre>
+    @Transactional
+    public void transfer(long fromId, long toId, BigDecimal amount) {
+        Account from = accounts.findByIdForUpdate(fromId)
+            .orElseThrow();
+        Account to = accounts.findByIdForUpdate(toId)
+            .orElseThrow();
 
-          <h3>2.4 Extended Anomalies: Lost Update & Write Skew</h3>
-          <ul>
-            <li><strong>Lost Update:</strong> Two concurrent transactions read the same initial state (e.g. balance = 100). $T_1$ adds 50 and commits (150). $T_2$ subtracts 20 based on its old read (100 - 20 = 80) and commits. $T_1$'s update is completely overwritten and lost forever!</li>
-            <li><strong>Write Skew (Snapshot Isolation Anomaly):</strong> Two concurrent transactions read overlapping data sets, make decisions based on an invariant, and write to disjoint rows. <em>Example:</em> A hospital rule states "At least 1 doctor must be on call". Both Doctor Alice and Doctor Bob are on call. Both simultaneously request leave. Under Repeatable Read/Snapshot Isolation, both see 2 active doctors, both approve their own leave, and the hospital is left with <strong>zero doctors on call</strong>!</li>
-          </ul>
-        </section>
+        if (from.getBalance().compareTo(amount) < 0) {
+            throw new InsufficientFundsException();
+        }
 
-        <!-- SECTION 3: THE 4 ANSI SQL ISOLATION LEVELS -->
-        <section>
-          <h2>3. The 4 ANSI SQL Isolation Levels</h2>
+        from.debit(amount);
+        to.credit(amount);
+        // On successful method completion, Spring normally commits.
+        // A qualifying unchecked exception normally triggers rollback
+        // by default; configure rollback rules for checked exceptions.
+    }
+}</code></pre><p class="small">Illustrative pseudocode: repository locking method and exception types must be implemented. Spring transaction behavior also depends on proxy boundaries, transaction manager, propagation, and rollback rules.</p><h3>9.2 Setting isolation in Spring</h3><pre><code>@Transactional(isolation = Isolation.READ_COMMITTED)
+public void processOrder() {
+    // Database operations within this transaction
+}</code></pre><ul><li>The isolation setting is applied when a new transaction is started; behavior with an existing transaction depends on propagation and transaction-manager settings.</li><li>Self-invocation within the same Spring bean may bypass proxy-based transaction interception.</li><li>Use the database's actual isolation semantics, not only the annotation name.</li></ul><h3>9.3 Optimistic locking with a version field</h3><pre><code>@Entity
+public class Inventory {
+    @Id
+    private Long id;
 
-          <p>
-            The ANSI/ISO SQL standard defines four transaction isolation levels based on which concurrency anomalies they prevent:
-          </p>
+    private int quantity;
 
-          <table style="width:100%; border-collapse:collapse; margin: 1.5rem 0;">
-            <thead>
-              <tr style="background: rgba(255,255,255,0.05); text-align: left;">
-                <th style="padding: 10px; border: 1px solid var(--border-color);">Isolation Level</th>
-                <th style="padding: 10px; border: 1px solid var(--border-color);">Dirty Read</th>
-                <th style="padding: 10px; border: 1px solid var(--border-color);">Non-Repeatable Read</th>
-                <th style="padding: 10px; border: 1px solid var(--border-color);">Phantom Read</th>
-                <th style="padding: 10px; border: 1px solid var(--border-color);">Lost Update</th>
-                <th style="padding: 10px; border: 1px solid var(--border-color);">Default Database Engines</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td style="padding: 10px; border: 1px solid var(--border-color);"><strong>READ UNCOMMITTED</strong></td>
-                <td style="padding: 10px; border: 1px solid var(--border-color); color: #ff5555;">Allowed</td>
-                <td style="padding: 10px; border: 1px solid var(--border-color); color: #ff5555;">Allowed</td>
-                <td style="padding: 10px; border: 1px solid var(--border-color); color: #ff5555;">Allowed</td>
-                <td style="padding: 10px; border: 1px solid var(--border-color); color: #ff5555;">Allowed</td>
-                <td style="padding: 10px; border: 1px solid var(--border-color);">Rarely used. (Postgres treats it as Read Committed).</td>
-              </tr>
-              <tr>
-                <td style="padding: 10px; border: 1px solid var(--border-color);"><strong>READ COMMITTED</strong></td>
-                <td style="padding: 10px; border: 1px solid var(--border-color); color: #50fa7b;">Prevented</td>
-                <td style="padding: 10px; border: 1px solid var(--border-color); color: #ff5555;">Allowed</td>
-                <td style="padding: 10px; border: 1px solid var(--border-color); color: #ff5555;">Allowed</td>
-                <td style="padding: 10px; border: 1px solid var(--border-color); color: #ff5555;">Possible</td>
-                <td style="padding: 10px; border: 1px solid var(--border-color);"><strong>PostgreSQL, Oracle, SQL Server.</strong></td>
-              </tr>
-              <tr>
-                <td style="padding: 10px; border: 1px solid var(--border-color);"><strong>REPEATABLE READ</strong></td>
-                <td style="padding: 10px; border: 1px solid var(--border-color); color: #50fa7b;">Prevented</td>
-                <td style="padding: 10px; border: 1px solid var(--border-color); color: #50fa7b;">Prevented</td>
-                <td style="padding: 10px; border: 1px solid var(--border-color); color: #50fa7b;">Prevented*</td>
-                <td style="padding: 10px; border: 1px solid var(--border-color); color: #50fa7b;">Prevented</td>
-                <td style="padding: 10px; border: 1px solid var(--border-color);"><strong>MySQL InnoDB</strong> (prevents phantoms via Next-Key Locking).</td>
-              </tr>
-              <tr>
-                <td style="padding: 10px; border: 1px solid var(--border-color);"><strong>SERIALIZABLE</strong></td>
-                <td style="padding: 10px; border: 1px solid var(--border-color); color: #50fa7b;">Prevented</td>
-                <td style="padding: 10px; border: 1px solid var(--border-color); color: #50fa7b;">Prevented</td>
-                <td style="padding: 10px; border: 1px solid var(--border-color); color: #50fa7b;">Prevented</td>
-                <td style="padding: 10px; border: 1px solid var(--border-color); color: #50fa7b;">Prevented</td>
-                <td style="padding: 10px; border: 1px solid var(--border-color);">Strictest. Uses 2PL or SSI (Serializable Snapshot Isolation).</td>
-              </tr>
-            </tbody>
-          </table>
-
-          <div class="callout callout-solution">
-            <div class="callout-title">💡 Why does MySQL InnoDB prevent Phantom Reads in Repeatable Read?</div>
-            <p>
-              Under the strict ANSI SQL standard, Repeatable Read is allowed to experience Phantom Reads. However, MySQL InnoDB's default implementation goes beyond the standard:
-            </p>
-            <p>
-              1. <strong>Consistent Non-Locking Reads (Plain SELECT):</strong> InnoDB reads from a single static MVCC Read View established at the beginning of the transaction. Any rows inserted by other transactions have transaction IDs greater than the snapshot and are invisible.
-            </p>
-            <p>
-              2. <strong>Locking Reads (SELECT FOR UPDATE / UPDATE):</strong> InnoDB utilizes <strong>Next-Key Locking</strong> (a combination of a record lock on the index record plus a <strong>gap lock</strong> on the gap before the index record). Gap locks physically block other transactions from inserting new rows into the scanned range!
-            </p>
-          </div>
-        </section>
-
-        <!-- SECTION 4: MVCC & LOCKING MECHANISMS -->
-        <section>
-          <h2>4. MVCC (Multi-Version Concurrency Control) Internals</h2>
-
-          <h3>4.1 Why MVCC? "Readers Never Block Writers, Writers Never Block Readers"</h3>
-          <p>
-            In traditional locking databases (Two-Phase Locking / 2PL), a read query acquires a Shared Lock (S-Lock) on rows, blocking write queries from acquiring Exclusive Locks (X-Locks). High concurrency leads to massive lock contention.
-          </p>
-          <p>
-            <strong>MVCC</strong> solves this by storing multiple timestamped versions of each row. When a transaction updates a row, the engine does not overwrite the old row in-place; it creates a <strong>new version</strong> while preserving older versions for active concurrent readers:
-          </p>
-
-          <pre><code>How PostgreSQL Implements MVCC (Tuple Header Fields):
-Every row on disk contains hidden system columns:
-- xmin: The transaction ID that inserted this row version.
-- xmax: The transaction ID that deleted or updated this row version (0 if active).
-
-Tuple Version Chain:
-+----+---------+--------+--------+---------------------------------------+
-| id | balance | xmin   | xmax   | Visibility Rule                       |
-+----+---------+--------+--------+---------------------------------------+
-|  1 |    1000 | Tx 100 | Tx 105 | Visible only to transactions < 105    |
-|  1 |     900 | Tx 105 | Tx 110 | Visible to transactions between 105-110|
-|  1 |     750 | Tx 110 | 0      | Currently active latest version!      |
-+----+---------+--------+--------+---------------------------------------+</code></pre>
-
-          <h3>4.2 Read Committed vs Repeatable Read in MVCC</h3>
-          <ul>
-            <li><strong>In Read Committed:</strong> The database engine creates a <strong>new Read View (Snapshot) at the start of every single SQL statement</strong>. If $T_2$ commits between statement 1 and statement 2 of $T_1$, statement 2 sees the new data (causing Non-Repeatable Reads).</li>
-            <li><strong>In Repeatable Read:</strong> The database engine creates a <strong>single Read View at the start of the first read query in the transaction</strong>. All subsequent queries throughout the transaction read from that exact same immutable snapshot.</li>
-          </ul>
-        </section>
-
-        <!-- SECTION 5: REAL-WORLD PRODUCTION WAR STORIES -->
-        <section>
-          <h2>5. Real-World Production War Stories (RCA & Solutions)</h2>
-
-          <!-- POST-MORTEM 1 -->
-          <div class="callout callout-production">
-            <div class="callout-title">🚨 Incident 1: $140,000 Lost Balance Anomaly in Read Committed via Race Condition</div>
-            <p><strong>Environment:</strong> Peer-to-peer wallet transfer microservice running on PostgreSQL with Spring Boot default `@Transactional` (Read Committed).</p>
-            <p><strong>The Failure:</strong> During a flash marketing promotion where users received concurrent cashback rewards and sent payments simultaneously, wallet balances became desynchronized, resulting in negative balances and an unexplained $140k accounting deficit.</p>
-            <p><strong>Root Cause Analysis (RCA):</strong></p>
-            <ul>
-              <li>The transfer code executed a standard <code>SELECT balance FROM wallet WHERE id = 10;</code> followed by an in-memory Java calculation: <code>int newBalance = oldBalance + cashback;</code>, followed by <code>UPDATE wallet SET balance = newBalance WHERE id = 10;</code>.</li>
-              <li>Two concurrent transactions $T_1$ (cashback +$10) and $T_2$ (spend -$50) read the exact same balance of $100 simultaneously under Read Committed.</li>
-              <li>$T_1$ updated balance to $110 and committed. A millisecond later, $T_2$ blindly wrote <code>balance = 50</code> (100 - 50) and committed, completely overwriting $T_1$'s cashback!</li>
-            </ul>
-            <p><strong>The Fix:</strong> Eliminate the Lost Update by avoiding in-memory arithmetic or using atomic database locks:</p>
-            <pre><code class="language-sql">-- Solution A: Atomic In-Place SQL Update (No in-memory calculation)
-UPDATE wallet SET balance = balance - 50 WHERE id = 10 AND balance >= 50;
-
--- Solution B: Pessimistic Locking inside Transaction
-SELECT balance FROM wallet WHERE id = 10 FOR UPDATE; -- Acquires row-level exclusive lock</code></pre>
-          </div>
-
-          <!-- POST-MORTEM 2 -->
-          <div class="callout callout-production">
-            <div class="callout-title">🚨 Incident 2: MySQL Deadlock Explosion via Gap Locks on Non-Unique Foreign Keys</div>
-            <p><strong>Environment:</strong> High-throughput order placement system on MySQL 8.0 (InnoDB Repeatable Read).</p>
-            <p><strong>The Failure:</strong> During peak load (3,000 orders/sec), API instances threw cascading <code>CannotAcquireLockException: Deadlock found when trying to get lock; try restarting transaction</code>. Throughput collapsed to zero.</p>
-            <p><strong>Root Cause Analysis (RCA):</strong></p>
-            <ul>
-              <li>Under Repeatable Read, MySQL InnoDB uses <strong>Next-Key Locks (Record Lock + Gap Lock)</strong> for searches on non-unique secondary indexes.</li>
-              <li>Multiple threads simultaneously executed <code>SELECT * FROM order_items WHERE order_id = ? FOR UPDATE;</code> before inserting items.</li>
-              <li>Because <code>order_id</code> had a non-unique index, each thread acquired a <strong>Gap Lock</strong> on the phantom range surrounding the order ID.</li>
-              <li>When Thread A attempted to insert an item into the gap, it blocked waiting for Thread B's gap lock. Thread B simultaneously attempted to insert into the same gap, waiting for Thread A's gap lock &rarr; <strong>Mutual Deadlock</strong>!</li>
-            </ul>
-            <p><strong>The Fix:</strong> For high-throughput OLTP systems with heavy insert workloads, switch the transaction isolation level to <strong>READ COMMITTED</strong> (where gap locking is disabled for searches and row locks only are acquired), or enforce strict sequential resource ordering.</p>
-          </div>
-        </section>
-
-        <!-- SECTION 6: SENIOR INTERVIEW Q&A -->
-        <section>
-          <h2>6. Senior & Staff Engineer Interview Q&A</h2>
-
-          <div class="callout callout-interview">
-            <div class="callout-title">Q1: What is the fundamental difference between a Non-Repeatable Read and a Phantom Read?</div>
-            <p><strong>Answer:</strong></p>
-            <ul>
-              <li><strong>Non-Repeatable Read:</strong> Concerns <strong>modifications or deletions of existing individual rows</strong> that were previously read. Prevented by locking the existing rows (shared read lock) or taking a row-level snapshot.</li>
-              <li><strong>Phantom Read:</strong> Concerns <strong>new rows being inserted</strong> into a table that satisfy a search range predicate (e.g. <code>WHERE department_id = 5</code>). Row-level locks on existing records cannot prevent phantoms because the new row did not exist when locks were granted! Phantoms can only be prevented via predicate locking, Gap/Next-Key locking, or Snapshot Isolation.</li>
-            </ul>
-          </div>
-
-          <div class="callout callout-interview">
-            <div class="callout-title">Q2: Why does PostgreSQL require VACUUM while MySQL InnoDB does not?</div>
-            <p><strong>Answer:</strong> This is a direct consequence of their differing MVCC architectures:</p>
-            <ul>
-              <li><strong>PostgreSQL:</strong> Stores all row versions (xmin, xmax) directly inside the main heap data table pages (append-only architecture). Old, dead row versions ("dead tuples") accumulate on disk. <strong>VACUUM</strong> is required to reclaim space occupied by dead tuples and freeze transaction IDs to prevent transaction ID wraparound.</li>
-              <li><strong>MySQL InnoDB:</strong> Modifies rows <strong>in-place</strong> in the clustered index and writes old versions out to a separate <strong>Undo Log tablespace</strong>. Active readers reconstruct older views by traversing the undo rollback pointers (<code>DB_ROLL_PTR</code>). Once no active transaction requires the undo records, InnoDB's background <strong>Purge Threads</strong> automatically deallocate the undo space without bloating the main tablespace.</li>
-            </ul>
-          </div>
-
-          <div class="callout callout-interview">
-            <div class="callout-title">Q3: What is Write Skew, and why doesn't Repeatable Read prevent it?</div>
-            <p><strong>Answer:</strong> Write Skew occurs in Snapshot Isolation / Repeatable Read when two concurrent transactions read overlapping data, verify a common constraint, but make disjoint updates that violate the constraint when committed together.</p>
-            <p>
-              Under Repeatable Read, the engine only checks for conflicts when two transactions attempt to update the <strong>exact same row</strong> (first-committer-wins rule). In Write Skew, Transaction 1 updates Row A and Transaction 2 updates Row B. Because the write sets are disjoint, neither transaction experiences a row lock conflict. Both commit cleanly, but their combined result leaves the database in an invalid state. Write Skew can only be prevented using <code>SERIALIZABLE</code> isolation or explicit <code>SELECT ... FOR UPDATE</code> locks.
-            </p>
-          </div>
-        </section>
-
-      </main>
-    </div>
-  </div>
-
-  <footer class="footer">
-    <div class="container">
-      <p>&copy; 2026 Interview A-Z Knowledge Base. Designed for Senior & Lead Engineering Interviews.</p>
-    </div>
-  </footer>
-
-  <script src="../../assets/js/main.js"></script>
-</body>
-</html>
+    @Version
+    private long version;
+}</code></pre><p>With JPA optimistic locking, the provider uses the version to detect conflicting updates. A transaction may fail with an optimistic-lock exception instead of silently overwriting a concurrent change. The application must decide whether to reject or retry the operation.</p></section>
+    <section id="production"><h2>10. Production Scenarios and Root-Cause Analysis</h2><h3>Scenario A: Wallet balance loses an update</h3><p><strong>Symptom:</strong> balances are unexpectedly overwritten during concurrent cashback and payment requests.</p><p><strong>Likely cause:</strong> both requests read the same old value, calculate in application memory, and write absolute values. READ COMMITTED alone does not prevent every lost-update implementation pattern.</p><p><strong>Fix options:</strong> atomic arithmetic SQL with a balance guard, <code>SELECT ... FOR UPDATE</code>, optimistic version checks, or serializable isolation with retry. Add ledger-based reconciliation for money movement.</p><h3>Scenario B: A rule is violated despite REPEATABLE READ</h3><p><strong>Symptom:</strong> two transactions each pass a check but together violate a cross-row invariant.</p><p><strong>Example:</strong> at least one doctor must remain on call; two transactions each see two doctors on call and independently remove a different doctor from the on-call set.</p><p><strong>Likely cause:</strong> snapshot isolation can permit write skew because the transactions write different rows.</p><p><strong>Fix options:</strong> SERIALIZABLE with retry, explicit locking of a shared coordination row, or a schema/design that makes the invariant enforceable atomically.</p><h3>Scenario C: Deadlocks or lock waits increase sharply</h3><p><strong>Symptom:</strong> API latency and deadlock exceptions rise under peak traffic.</p><p><strong>Investigate:</strong> deadlock reports, lock wait graphs, transaction duration, query plans, missing indexes, and inconsistent row-lock ordering. For MySQL InnoDB REPEATABLE READ, range and gap/next-key locking may be relevant to locking reads and inserts.</p><p><strong>Remediation:</strong> shorten transactions, index predicates, lock resources in a consistent order, use bounded retries, and consider READ COMMITTED only after validating the changed semantics and workload.</p><div class="callout danger"><strong>Avoid a blanket fix:</strong> lowering isolation can reduce some locking but may reintroduce anomalies. Reproduce the concurrency pattern and verify the business invariant before changing isolation.</div></section>
+    <section id="interview"><h2>11. Interview Questions and Strong Answers</h2><details open><summary><strong>Q1. What are ACID properties?</strong></summary><p>Atomicity makes the transaction all-or-nothing; consistency preserves defined constraints; isolation controls concurrent interactions; durability makes committed changes survive failures covered by the configured durability guarantees.</p></details><details><summary><strong>Q2. What is the difference between dirty, non-repeatable, and phantom reads?</strong></summary><p>Dirty read: reading uncommitted data. Non-repeatable read: rereading an existing row and seeing its committed value or existence change. Phantom read: rerunning a predicate query and getting a different set of matching rows.</p></details><details><summary><strong>Q3. Does READ COMMITTED prevent lost updates?</strong></summary><p>Not universally. It prevents dirty reads, but a read-calculate-write sequence can still overwrite another update. Use atomic SQL, row locks, optimistic versioning, or stronger isolation according to the workload.</p></details><details><summary><strong>Q4. Does REPEATABLE READ always prevent phantom reads?</strong></summary><p>No universal answer from the level name alone. The standard permits phantoms at REPEATABLE READ, while implementations differ: MySQL InnoDB and PostgreSQL have distinct snapshot and locking behavior.</p></details><details><summary><strong>Q5. Why can SERIALIZABLE transactions fail?</strong></summary><p>The engine may detect that concurrent execution cannot safely be equivalent to a serial order. It aborts one transaction so the application can retry the complete transaction.</p></details><details><summary><strong>Q6. What is MVCC?</strong></summary><p>Multi-version concurrency control maintains or reconstructs multiple row versions so transactions can read versions consistent with their visibility rules. It can reduce reader-writer blocking but does not eliminate all locks or conflicts.</p></details><details><summary><strong>Q7. What is write skew?</strong></summary><p>Concurrent transactions read overlapping state, then update disjoint rows. Both updates can succeed while their combined result violates a shared invariant. Serializable isolation or explicit coordination can prevent it.</p></details><details><summary><strong>Q8. How should an application handle deadlocks?</strong></summary><p>Keep transactions short, lock resources consistently, inspect deadlock reports and query plans, and retry recognized transient failures with a bounded policy. Ensure retries do not duplicate external side effects.</p></details><details><summary><strong>Q9. Is a Spring @Transactional annotation enough to guarantee correctness?</strong></summary><p>No. Correctness depends on transaction boundaries, proxy invocation, rollback rules, isolation, database behavior, locking, and business logic. A transaction groups operations; it does not automatically prevent all races.</p></details><details><summary><strong>Q10. When should you use pessimistic vs optimistic locking?</strong></summary><p>Pessimistic locking is useful when conflicts are likely and a resource must be protected during a decision. Optimistic locking is useful when conflicts are less common and the application can detect and handle concurrent changes.</p></details></section>
+    <section id="practice"><h2>12. Study Checklist</h2><p class="muted">Tick each topic as you can explain it without notes.</p><div class="checklist" id="checks"><label><input type="checkbox">Explain all four ACID properties with a bank-transfer example.</label><label><input type="checkbox">Explain why a transaction can still contain incorrect business logic.</label><label><input type="checkbox">Draw a dirty-read timeline including rollback.</label><label><input type="checkbox">Explain non-repeatable read using the same row read twice.</label><label><input type="checkbox">Explain phantom read using a range/predicate query.</label><label><input type="checkbox">Compare READ UNCOMMITTED and READ COMMITTED.</label><label><input type="checkbox">Explain REPEATABLE READ engine-specific behavior.</label><label><input type="checkbox">Explain SERIALIZABLE and why retries may be required.</label><label><input type="checkbox">Recognize lost update and write skew.</label><label><input type="checkbox">Describe MVCC, locks, deadlocks, and WAL at a high level.</label><label><input type="checkbox">Explain how Spring @Transactional boundaries and rollback rules work.</label><label><input type="checkbox">Recommend a safe strategy for a concurrent wallet update.</label></div><div class="progress"><span id="checkbar"></span></div><div id="checklabel" class="small">0 of 12 completed</div></section>
+    <section id="quick"><h2>13. Final Quick-Revision Sheet</h2><ul><li><strong>Atomicity:</strong> all or nothing.</li><li><strong>Consistency:</strong> preserve declared constraints and business invariants.</li><li><strong>Isolation:</strong> govern concurrent visibility and conflicts.</li><li><strong>Durability:</strong> committed data survives failures covered by configuration.</li><li><strong>Dirty read:</strong> read uncommitted data.</li><li><strong>Non-repeatable read:</strong> same row read again, changed value or existence.</li><li><strong>Phantom read:</strong> same predicate query, changed matching row set.</li><li><strong>READ UNCOMMITTED:</strong> weakest; dirty reads may be allowed.</li><li><strong>READ COMMITTED:</strong> no dirty reads; repeated statements can see newer commits.</li><li><strong>REPEATABLE READ:</strong> stable repeated row reads; phantom/write-skew semantics depend on engine.</li><li><strong>SERIALIZABLE:</strong> equivalent to serial execution; handle aborts/retries.</li><li><strong>Practical rule:</strong> encode invariants, keep transactions short, and choose concurrency controls intentionally.</li></ul></section>
+  </main></div>
+<footer class="footer">© 2026 Interview A–Z Knowledge Base · Transactions, ACID & Isolation</footer>
+<script>
+  const headings=[...document.querySelectorAll('main section')];const toc=document.getElementById('toc');headings.forEach(s=>{const h=s.querySelector('h2');if(h){const a=document.createElement('a');a.href='#'+s.id;a.textContent=h.textContent;toc.appendChild(a)}});
+  function updateProgress(){const boxes=[...document.querySelectorAll('#checks input')];const n=boxes.filter(b=>b.checked).length;document.getElementById('checkbar').style.width=(n/boxes.length*100)+'%';document.getElementById('checklabel').textContent=n+' of '+boxes.length+' completed';document.getElementById('progressbar').style.width=(n/boxes.length*100)+'%';document.getElementById('progresslabel').textContent=Math.round(n/boxes.length*100)+'% complete'}
+  document.querySelectorAll('#checks input').forEach(b=>b.addEventListener('change',updateProgress));updateProgress();
+</script>
+</body></html>

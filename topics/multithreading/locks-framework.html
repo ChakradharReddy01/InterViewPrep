@@ -1,257 +1,240 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Module 2: Locks Framework (ReentrantLock, StampedLock & Condition) | Interview A-Z</title>
-  <link rel="stylesheet" href="../../assets/css/style.css">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Module 2: Java Locks Masterclass | Interview A-Z</title>
+    <style>
+        :root{--bg:#0b1120;--panel:#111b2e;--panel2:#162238;--text:#e5edf8;--muted:#a8b7cc;--line:#293a55;--blue:#38bdf8;--violet:#818cf8;--green:#34d399;--amber:#fbbf24;--red:#fb7185;--code:#080e19}
+        *{box-sizing:border-box}html{scroll-behavior:smooth;scroll-padding-top:90px}body{margin:0;background:var(--bg);color:var(--text);font:16px/1.72 Inter,system-ui,-apple-system,Segoe UI,sans-serif}
+        a{color:var(--blue)}.navbar{position:sticky;top:0;z-index:20;display:flex;justify-content:space-between;align-items:center;gap:1rem;padding:.85rem 1.5rem;background:rgba(8,14,25,.94);border-bottom:1px solid var(--line);backdrop-filter:blur(12px)}.brand{display:flex;align-items:center;gap:.7rem;font-weight:800}.brand-badge{font-size:.72rem;letter-spacing:.08em;background:linear-gradient(135deg,var(--blue),var(--violet));color:#08111e;padding:.2rem .5rem;border-radius:6px}.navlinks{display:flex;align-items:center;gap:1rem;flex-wrap:wrap}.navlinks a{font-size:.9rem;text-decoration:none;font-weight:650}.nav-btn{border:0;border-radius:7px;padding:.55rem .85rem;background:linear-gradient(135deg,var(--blue),var(--violet));color:#08111e;font-weight:800;cursor:pointer}
+        .layout{max-width:1500px;margin:auto;padding:1.5rem;display:grid;grid-template-columns:250px minmax(0,1fr);gap:1.5rem}.sidebar{position:sticky;top:88px;align-self:start;max-height:calc(100vh - 105px);overflow:auto;background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:1rem}.sidebar h3{margin:.2rem 0 .8rem;font-size:.95rem}.sidebar a{display:block;padding:.36rem .5rem;color:var(--muted);font-size:.86rem;text-decoration:none;border-radius:6px}.sidebar a:hover{background:var(--panel2);color:var(--blue)}main{min-width:0}.breadcrumb{font-size:.85rem;color:var(--muted);margin:.2rem 0 1rem}.hero{padding:1.7rem;background:linear-gradient(135deg,#132641,#171b38);border:1px solid #304463;border-radius:18px;margin-bottom:1.3rem}.hero h1{font-size:clamp(2rem,4vw,3rem);line-height:1.12;margin:.6rem 0}.hero p{color:#c5d3e7;max-width:850px}.chips{display:flex;flex-wrap:wrap;gap:.5rem}.chip{border:1px solid #395170;border-radius:999px;padding:.2rem .65rem;font-size:.78rem;color:#c5d8f1}.section{background:var(--panel);border:1px solid var(--line);border-radius:15px;padding:1.35rem;margin:1rem 0}.section h2{font-size:1.55rem;margin:.1rem 0 1rem}.section h3{font-size:1.12rem;margin:1.25rem 0 .4rem;color:#c5e7ff}.section p,.section li{color:#d1dced}.muted{color:var(--muted)!important}.grid2,.grid3{display:grid;gap:1rem}.grid2{grid-template-columns:repeat(2,minmax(0,1fr))}.grid3{grid-template-columns:repeat(3,minmax(0,1fr))}.card{padding:1rem;background:var(--panel2);border:1px solid var(--line);border-radius:11px}.card h3{margin-top:0}.callout{margin:1rem 0;padding:1rem 1.1rem;border-left:4px solid var(--blue);background:#102338;border-radius:0 10px 10px 0}.warning{border-color:var(--amber);background:#2a2415}.production{border-color:var(--red);background:#2a1824}.solution{border-color:var(--green);background:#102820}.diagram{overflow:auto;background:#080e19;border:1px solid var(--line);border-radius:10px;padding:1rem;margin:1rem 0;color:#b8e7ff;font:.9rem/1.55 ui-monospace,SFMono-Regular,Consolas,monospace;white-space:pre}.codehead{display:flex;justify-content:space-between;color:var(--muted);font-size:.8rem;margin-top:1rem}.code{overflow:auto;background:var(--code);border:1px solid var(--line);border-radius:9px;padding:1rem;color:#d6e4f5;font:.88rem/1.65 ui-monospace,SFMono-Regular,Consolas,monospace;white-space:pre}.tablewrap{overflow-x:auto}table{border-collapse:collapse;width:100%;font-size:.91rem}th,td{text-align:left;vertical-align:top;border:1px solid var(--line);padding:.7rem}th{background:#1b2a41;color:#d9edff}td{color:#d1dced}details{background:var(--panel2);border:1px solid var(--line);border-radius:9px;padding:.8rem 1rem;margin:.7rem 0}summary{cursor:pointer;font-weight:750;color:#d7eaff}.checklist label{display:flex;gap:.65rem;align-items:flex-start;padding:.5rem 0;border-bottom:1px solid var(--line);color:#d1dced}.checklist input{margin-top:.4rem;accent-color:var(--blue)}footer{text-align:center;color:var(--muted);padding:2rem;border-top:1px solid var(--line)}.progressbar{height:8px;background:#26344a;border-radius:999px;overflow:hidden}.progressfill{height:100%;width:0;background:linear-gradient(90deg,var(--blue),var(--violet));transition:width .2s}.small{font-size:.86rem}
+        @media(max-width:950px){.layout{grid-template-columns:1fr;padding:1rem}.sidebar{position:relative;top:0;max-height:none}.sidebar nav{columns:2}.grid3,.grid2{grid-template-columns:1fr}.navbar{padding:.75rem 1rem}.navlinks{gap:.55rem}}
+        @media print{body{background:#fff;color:#111;font-size:11pt}.navbar,.sidebar,.nav-btn,.progress-ui{display:none!important}.layout{display:block;padding:0;max-width:none}.hero,.section,.card,.callout{background:#fff!important;color:#111!important;border:1px solid #bbb;break-inside:avoid}.section p,.section li,.muted,.hero p,td{color:#222!important}.diagram,.code{background:#f5f5f5;color:#111;white-space:pre-wrap;overflow-wrap:anywhere}.section h2,.section h3,summary{color:#111}.hero{background:#f4f7fb!important}.chip{color:#222;border-color:#aaa}a{color:#111}details{break-inside:avoid}}
+    </style>
 </head>
 <body>
-
-  <!-- Top Navigation -->
-    <!-- Top Navigation -->
-    <nav class="navbar">
-    <div class="brand">
-      <a href="../../index.html" class="brand-link" style="display: flex; align-items: center; gap: 0.75rem; text-decoration: none; color: inherit;">
-        <span class="brand-badge" style="background: linear-gradient(135deg, #38bdf8, #818cf8); color: #0f172a; padding: 0.15rem 0.55rem; border-radius: 6px; font-size: 0.75rem; font-weight: 800; letter-spacing: 0.05em; text-transform: uppercase;">Interview A-Z</span>
-        <span style="font-weight: 700; font-size: 1.15rem; color: #fff;">Engineering Handbook</span>
-      </a>
-    </div>
-    <div class="nav-links navlinks" style="display: flex; gap: 1.25rem; align-items: center;">
-      <a href="../../index.html" class="nav-link" style="text-decoration: none; font-weight: 600; font-size: 0.95rem;">🏠 Home</a>
-      <a href="../../index.html#topics" class="nav-link" style="text-decoration: none; font-weight: 600; font-size: 0.95rem;">📚 All Modules</a>
-      <a href="https://github.com/ChakradharReddy01/InterViewPrep" target="_blank" class="nav-link" style="text-decoration: none; font-weight: 600; font-size: 0.95rem;">GitHub</a>
-      <button onclick="document.querySelectorAll('details').forEach(d=>d.open=true);window.print();" class="nav-btn-pdf" title="Save page as PDF" style="display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.35rem 0.85rem; font-size: 0.85rem; font-weight: 700; background: linear-gradient(135deg, #38bdf8, #818cf8); color: #0f172a; border: none; border-radius: 6px; cursor: pointer; transition: transform 0.15s ease, box-shadow 0.15s ease; box-shadow: 0 2px 8px rgba(56,189,248,0.25);">
-        <span>📄</span> Save to PDF
-      </button>
-    </div>
-  </nav>
-
-  <div class="container">
-    <div class="article-layout">
-      <!-- Sticky Sidebar Table of Contents -->
-      <aside class="sidebar-toc">
-        <h3>On This Page</h3>
-        <ul class="toc-links" id="dynamic-toc">
-          <!-- Dynamically populated via main.js -->
-        </ul>
-      </aside>
-
-      <!-- Main Article Content -->
-      <main class="article-content">
-        <!-- Breadcrumb -->
-        <nav class="breadcrumb">
-          <a href="../../index.html">Home</a>
-          <span>/</span>
-          <span>Module 2: Multithreading</span>
-          <span>/</span>
-          <span style="color: #fff;">Locks Framework</span>
-        </nav>
-
-        <!-- Article Header -->
-        <header class="article-header">
-          <h1>Module 2: Advanced Locks Framework (ReentrantLock, StampedLock & Condition)</h1>
-          <div class="article-meta">
-            <span class="badge badge-multithread">Locks Framework</span>
-            <span class="badge badge-advanced">AQS Internals</span>
-            <span class="badge badge-prod">Optimistic Locking</span>
-            <span>⏱️ 45 min deep dive</span>
-            <span>Target Roles: SDE-2, SDE-3, Senior Concurrency Engineer</span>
-          </div>
+<nav class="navbar">
+    <div class="brand"><span class="brand-badge">INTERVIEW A–Z</span><span>Engineering Handbook</span></div>
+    <div class="navlinks"><a href="../../index.html" class="nav-link">Home</a><a href="../../index.html#topics">All Modules</a><a href="https://github.com/ChakradharReddy01/InterViewPrep" target="_blank" rel="noreferrer">GitHub</a><button class="nav-btn" onclick="document.querySelectorAll('details').forEach(d=>d.open=true);window.print()">Print / Save PDF</button></div>
+</nav>
+<div class="layout">
+    <aside class="sidebar"><h3>On This Page</h3><nav>
+        <a href="#overview">Start here</a><a href="#reentrant">1. ReentrantLock</a><a href="#rw">2. ReadWriteLock</a><a href="#stamped">3. StampedLock</a><a href="#condition">4. Condition</a><a href="#comparison">5. Comparison guide</a><a href="#production">6. Production issues</a><a href="#thumb">7. Thumb rules</a><a href="#interview">8. Interview Q&amp;A</a><a href="#tracker">9. Progress tracker</a>
+    </nav></aside>
+    <main>
+        <div class="breadcrumb"><a href="../../index.html">Home</a> / Module 2: Multithreading / Locks</div>
+        <header class="hero" id="overview">
+            <div class="chips"><span class="chip">Java Concurrency</span><span class="chip">Lock Framework</span><span class="chip">Production Engineering</span><span class="chip">Interview Prep</span></div>
+            <h1>Advanced Java Locks: ReentrantLock, ReentrantReadWriteLock, StampedLock &amp; Condition</h1>
+            <p>Understand the lock tools beyond <code>synchronized</code>: when each lock helps, how to use it safely, what can go wrong in production, and how to explain the trade-offs in an interview. The explanations begin with simple analogies and then move into implementation details.</p>
+            <div class="grid3">
+                <div class="card"><h3>ReentrantLock</h3><p class="small">One owner at a time, with timeouts, interruptible acquisition, and optional fairness.</p></div>
+                <div class="card"><h3>ReadWriteLock</h3><p class="small">Many readers may coexist; writers need exclusive access.</p></div>
+                <div class="card"><h3>StampedLock + Condition</h3><p class="small">Optimistic reads for selected workloads; separate condition queues for coordination.</p></div>
+            </div>
         </header>
 
-        <!-- SECTION 1: REENTRANTLOCK & AQS -->
-        <section>
-          <h2>1. ReentrantLock Architecture & AQS Internals</h2>
+        <section class="section" id="reentrant">
+            <h2>1. ReentrantLock</h2>
+            <p><strong>Kid-friendly analogy:</strong> Imagine a room with one key. Only the person holding the key may enter. When finished, they must return the key. <code>ReentrantLock</code> is an explicit lock that your code acquires and releases.</p>
+            <p>It implements <code>java.util.concurrent.locks.Lock</code> and is useful when you need capabilities that intrinsic <code>synchronized</code> does not directly expose: timed acquisition, interruptible waiting, optional fairness, and multiple <code>Condition</code> queues.</p>
+            <h3>Basic safe pattern</h3>
+            <pre class="code">import java.util.concurrent.locks.ReentrantLock;
 
-          <h3>1.1 What is ReentrantLock?</h3>
-          <p>
-            <code>ReentrantLock</code> is a mutual exclusion lock implementing the <code>Lock</code> interface. Unlike intrinsic <code>synchronized</code> locks, it provides:
-          </p>
-          <ul>
-            <li><strong>Timed Lock Acquisition:</strong> <code>tryLock(timeout, unit)</code> avoids indefinite blocking and deadlocks.</li>
-            <li><strong>Interruptible Lock Acquisition:</strong> <code>lockInterruptibly()</code> allows a waiting thread to be cancelled via <code>Thread.interrupt()</code>.</li>
-            <li><strong>Fairness Policies:</strong> Optional FIFO fair queueing (<code>new ReentrantLock(true)</code>) to prevent thread starvation.</li>
-            <li><strong>Multiple Wait Conditions:</strong> Associated with multiple independent <code>Condition</code> objects (e.g. <code>notFull</code>, <code>notEmpty</code>).</li>
-          </ul>
+class Inventory {
+    private final ReentrantLock lock = new ReentrantLock();
+    private int stock = 10;
 
-          <div class="code-header">
-            <span>Canonical ReentrantLock Pattern</span>
-            <span>Java</span>
-          </div>
-          <pre><code>private final ReentrantLock lock = new ReentrantLock();
-
-public void performOperation() {
-    lock.lock(); // Never put lock() inside the try block!
-    try {
-        // Critical section logic
-    } finally {
-        lock.unlock(); // Always release in finally to prevent permanent lock leaks!
+    boolean reserveOne() {
+        lock.lock();
+        try {
+            if (stock == 0) {
+                return false;
+            }
+            stock--;
+            return true;
+        } finally {
+            lock.unlock(); // always release in finally
+        }
     }
-}</code></pre>
+}</pre>
+            <div class="callout warning"><strong>Critical rule:</strong> acquire the lock before entering the <code>try</code>, then unlock in <code>finally</code>. If code throws after acquiring the lock, <code>finally</code> still releases it. Never call <code>unlock()</code> unless the current thread successfully acquired that lock.</div>
+            <h3>Useful acquisition choices</h3>
+            <div class="tablewrap"><table><thead><tr><th>Method</th><th>Behavior</th><th>Use case</th></tr></thead><tbody>
+            <tr><td><code>lock()</code></td><td>Waits until acquired; not interruptible while waiting.</td><td>Ordinary critical sections where waiting is acceptable.</td></tr>
+            <tr><td><code>lockInterruptibly()</code></td><td>Allows a waiting thread to stop waiting when interrupted.</td><td>Cancelable tasks and responsive shutdown.</td></tr>
+            <tr><td><code>tryLock()</code></td><td>Returns immediately with success/failure.</td><td>Optional work or avoiding indefinite waiting.</td></tr>
+            <tr><td><code>tryLock(timeout, unit)</code></td><td>Waits up to a time limit, then returns false.</td><td>Bounded lock wait with fallback/error response.</td></tr>
+            </tbody></table></div>
+            <h3>Timeout example</h3>
+            <pre class="code">boolean updateWithDeadline() throws InterruptedException {
+    if (!lock.tryLock(200, java.util.concurrent.TimeUnit.MILLISECONDS)) {
+        return false; // report busy / retry later / degrade safely
+    }
+    try {
+        updateSharedState();
+        return true;
+    } finally {
+        lock.unlock();
+    }
+}</pre>
+            <p>Timeouts bound the time spent waiting for this lock; they do not automatically bound work performed after the lock is acquired. A caller should define what a timeout means operationally—retry, return a busy response, or use a fallback.</p>
+            <h3>Fair vs. non-fair</h3>
+            <ul><li><strong>Non-fair (default):</strong> a new thread may acquire the lock ahead of queued waiters. Often gives higher throughput but does not promise first-come-first-served behavior.</li><li><strong>Fair:</strong> queued waiters are favored in approximate arrival order, reducing some starvation risks but often lowering throughput.</li></ul>
+            <pre class="code">ReentrantLock fairLock = new ReentrantLock(true);</pre>
+            <h3>Reentrancy</h3>
+            <p>The same thread can acquire the same <code>ReentrantLock</code> multiple times. It must release it the same number of times before another thread can acquire it.</p>
+            <pre class="code">lock.lock();
+try {
+    nestedOperation(); // may acquire the same lock again
+} finally {
+    lock.unlock();
+}
 
-          <h3>1.2 Under the Hood: AbstractQueuedSynchronizer (AQS)</h3>
-          <p>
-            <code>ReentrantLock</code> delegates its synchronization to an internal helper class that extends <strong>AbstractQueuedSynchronizer (AQS)</strong>.
-          </p>
-          <ul>
-            <li><strong>Volatile State:</strong> A single 32-bit volatile integer (<code>private volatile int state;</code>). In <code>ReentrantLock</code>, <code>state == 0</code> means unlocked; <code>state &gt; 0</code> represents the reentrant hold count.</li>
-            <li><strong>FIFO Node Queue:</strong> A doubly-linked CLH lock queue where blocked threads are queued as <code>Node</code> objects and parked using <code>LockSupport.park()</code>.</li>
-            <li><strong>Fair vs. Non-Fair:</strong>
-              <ul>
-                <li><em>Non-Fair (Default):</em> When a thread invokes <code>lock()</code>, it immediately attempts an atomic CAS on the state without checking if other threads are waiting in the queue. Gives dramatically higher throughput due to CPU cache warmth.</li>
-                <li><em>Fair:</em> Checks <code>hasQueuedPredecessors()</code> first. If threads are already waiting, the newcomer is appended to the tail of the queue. Lower throughput due to frequent thread parking.</li>
-              </ul>
-            </li>
-          </ul>
+void nestedOperation() {
+    lock.lock();
+    try {
+        // reentrant acquisition succeeds for the owning thread
+    } finally {
+        lock.unlock();
+    }
+}</pre>
+            <div class="callout solution"><strong>Use it when:</strong> you need interruptible or timed lock acquisition, fairness configuration, or multiple condition queues. If you only need straightforward mutual exclusion, <code>synchronized</code> may be simpler.</div>
         </section>
 
-        <!-- SECTION 2: REENTRANTREADWRITELOCK -->
-        <section>
-          <h2>2. ReentrantReadWriteLock (Read-Heavy Concurrency)</h2>
+        <section class="section" id="rw">
+            <h2>2. ReentrantReadWriteLock</h2>
+            <p><strong>Kid-friendly analogy:</strong> In a library, many people can read the same book at once, but someone editing the master copy needs the room to themselves. A read-write lock models this pattern.</p>
+            <ul><li><strong>Read lock:</strong> multiple threads can hold it together, provided no writer owns the lock and acquisition policy allows them through.</li><li><strong>Write lock:</strong> exclusive; while held, no other reader or writer can enter the protected region.</li></ul>
+            <div class="diagram">Reader A ---- READ LOCK ----\
+                Reader B ---- READ LOCK -----+---- can read concurrently
+                Reader C ---- READ LOCK ----/
+                Writer   ---- WRITE LOCK ---- exclusive access
+                blocks readers and other writers</div>
+            <h3>Example: in-memory configuration cache</h3>
+            <pre class="code">import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
-          <h3>2.1 The Shared Read / Exclusive Write Paradigm</h3>
-          <p>
-            Standard mutual exclusion locks do not scale for <strong>Read-Heavy</strong> workloads where 99% of requests only read data without mutating it. <code>ReentrantReadWriteLock</code> splits locking into two complementary locks:
-          </p>
-          <ul>
-            <li><strong>Read Lock (Shared):</strong> Multiple threads can acquire the read lock concurrently as long as no thread holds or is waiting for the write lock.</li>
-            <li><strong>Write Lock (Exclusive):</strong> Only one thread can hold the write lock. While held, all read and write attempts are blocked.</li>
-          </ul>
+class ConfigCache {
+    private final Map<String, String> data = new HashMap<>();
+    private final ReentrantReadWriteLock rw = new ReentrantReadWriteLock();
+    private final Lock readLock = rw.readLock();
+    private final Lock writeLock = rw.writeLock();
 
-          <div class="code-header">
-            <span>Production ReadWriteLock Cache Pattern</span>
-            <span>Java</span>
-          </div>
-          <pre><code>public class HighThroughputCache&lt;K, V&gt; {
-    private final Map&lt;K, V&gt; store = new HashMap&lt;&gt;();
-    private final ReentrantReadWriteLock rwLock = new ReentrantReadWriteLock();
-    private final Lock readLock = rwLock.readLock();
-    private final Lock writeLock = rwLock.writeLock();
-
-    public V get(K key) {
+    String get(String key) {
         readLock.lock();
         try {
-            return store.get(key); // Unlimited concurrent readers!
+            return data.get(key);
         } finally {
             readLock.unlock();
         }
     }
 
-    public void put(K key, V value) {
+    void put(String key, String value) {
         writeLock.lock();
         try {
-            store.put(key, value); // Mutual exclusion
+            data.put(key, value);
         } finally {
             writeLock.unlock();
         }
     }
-}</code></pre>
+}</pre>
+            <p>This example protects the <code>HashMap</code> because it is not safe for concurrent mutation. The lock only protects accesses that use the same lock; returning a mutable object from the map may still expose state that callers can modify without protection.</p>
+            <h3>Fairness, starvation, upgrade and downgrade</h3>
+            <ul><li>The default policy is non-fair. Under some access patterns, writers can wait a long time. Construct with <code>new ReentrantReadWriteLock(true)</code> if fairness is more important than peak throughput, then measure the impact.</li><li><strong>Do not attempt a read-to-write upgrade by holding the read lock and then blocking on the write lock.</strong> The read lock prevents a writer from acquiring exclusive access, so this pattern can deadlock.</li><li><strong>Downgrading is possible:</strong> acquire the write lock, acquire the read lock while still holding the write lock, then release the write lock. This lets the thread keep read protection after updating.</li></ul>
+            <pre class="code">Lock read = rw.readLock();
+Lock write = rw.writeLock();
 
-          <div class="callout callout-warning">
-            <div class="callout-title">⚠️ The Write Starvation & Upgrading Gotcha</div>
-            <p>
-              1. <strong>Write Starvation:</strong> Under continuous streams of concurrent readers, writer threads can be starved indefinitely because new readers keep arriving and acquiring shared locks.
-              <br>
-              2. <strong>No Lock Upgrades:</strong> A thread holding a Read lock <strong>cannot upgrade</strong> to a Write lock (calling <code>writeLock.lock()</code> while holding <code>readLock</code> results in an immediate deadlock). However, <strong>Lock Downgrading</strong> (Write lock $\rightarrow$ Read lock $\rightarrow$ release Write lock) is fully supported.
-            </p>
-          </div>
+write.lock();
+try {
+    refreshCache();
+    read.lock(); // downgrade: acquire read before releasing write
+} finally {
+    write.unlock();
+}
+try {
+    useFreshCacheUnderReadLock();
+} finally {
+    read.unlock();
+}</pre>
+            <div class="callout warning"><strong>Thumb rule:</strong> Read-write locks are not automatically faster. They add coordination overhead. Consider them when reads are frequent, the protected read work is substantial, writes are relatively rare, and profiling shows a normal mutex is a bottleneck.</div>
         </section>
 
-        <!-- SECTION 3: STAMPEDLOCK -->
-        <section>
-          <h2>3. StampedLock (Optimistic Read Locks - Java 8)</h2>
+        <section class="section" id="stamped">
+            <h2>3. StampedLock</h2>
+            <p><strong>Kid-friendly analogy:</strong> Instead of asking permission to read immediately, you take a quick look and note a version stamp. After reading, you check whether anyone changed the data while you were looking. If a writer did change it, throw away the result and read safely under a lock.</p>
+            <p><code>StampedLock</code> provides write locks, read locks, and <strong>optimistic reads</strong>. An optimistic read does not hold a read lock. It returns a stamp that can later be validated. This can help read-mostly workloads when reads are short and writers are infrequent.</p>
+            <h3>Correct optimistic read pattern</h3>
+            <pre class="code">import java.util.concurrent.locks.StampedLock;
 
-          <h3>3.1 Why StampedLock Was Introduced</h3>
-          <p>
-            <code>StampedLock</code> overcomes the write starvation of <code>ReentrantReadWriteLock</code> by introducing a third mode: <strong>Optimistic Read</strong>.
-          </p>
-          <p>
-            An optimistic read <strong>does not acquire a lock at all</strong>! It simply returns a 64-bit numerical <code>stamp</code> (version token). The reader reads values into local variables, and then verifies whether a writer intervened by calling <code>validate(stamp)</code>. If no writer acquired the lock, the read succeeded with <strong>zero cache line invalidation and zero synchronization overhead</strong>!
-          </p>
+class Point {
+    private double x;
+    private double y;
+    private final StampedLock lock = new StampedLock();
 
-          <div class="code-header">
-            <span>Optimistic Read Pattern in StampedLock</span>
-            <span>Java</span>
-          </div>
-          <pre><code>public class Point {
-    private double x, y;
-    private final StampedLock sl = new StampedLock();
-
-    public double distanceFromOrigin() {
-        // 1. Try an Optimistic Read (Does NOT acquire a lock!)
-        long stamp = sl.tryOptimisticRead();
+    double distanceFromOrigin() {
+        long stamp = lock.tryOptimisticRead();
         double currentX = x;
         double currentY = y;
 
-        // 2. Validate if a writer mutated state while we read
-        if (!sl.validate(stamp)) {
-            // Optimistic read failed! Fall back to a fully pessimistic Read Lock:
-            stamp = sl.readLock();
+        if (!lock.validate(stamp)) {
+            stamp = lock.readLock();
             try {
                 currentX = x;
                 currentY = y;
             } finally {
-                sl.unlockRead(stamp);
+                lock.unlockRead(stamp);
             }
         }
-        return Math.sqrt(currentX * currentX + currentY * currentY);
+        return Math.hypot(currentX, currentY);
     }
 
-    public void move(double deltaX, double deltaY) {
-        long stamp = sl.writeLock(); // Exclusive write lock
+    void move(double newX, double newY) {
+        long stamp = lock.writeLock();
         try {
-            x += deltaX;
-            y += deltaY;
+            x = newX;
+            y = newY;
         } finally {
-            sl.unlockWrite(stamp);
+            lock.unlockWrite(stamp);
         }
     }
-}</code></pre>
-
-          <div class="callout callout-production">
-            <div class="callout-title">🚨 StampedLock Architectural Warning: NOT Reentrant!</div>
-            <p>
-              Unlike <code>ReentrantLock</code>, <code>StampedLock</code> is <strong>NOT REENTRANT</strong>! If a thread holding a write lock attempts to acquire the write lock again, it will <strong>deadlock itself</strong> immediately!
-            </p>
-          </div>
+}</pre>
+            <p>The reader copies the fields to local variables, validates the stamp, and falls back to a read lock if a write overlapped. Validation must happen before the read result is trusted. Keep the optimistic read region simple; do not use unvalidated data to make irreversible decisions.</p>
+            <h3>StampedLock rules that matter</h3>
+            <ul><li><strong>Not reentrant:</strong> a thread must not recursively acquire a lock mode it already holds as if it were reentrant; designs that do this can deadlock.</li><li>Lock methods return a stamp token. Pass the correct token to the corresponding unlock method.</li><li>It does not implement the <code>Lock</code> interface in the same way as <code>ReentrantLock</code>; its API is stamp-based.</li><li>Optimistic reads can fail validation. Always implement a safe fallback.</li><li>It is more complex than a read-write lock; use it only when measurement shows the optimistic-read pattern is beneficial.</li></ul>
+            <div class="callout warning"><strong>Safety warning:</strong> Optimistic reads are not “read anything without protection.” The fields and object graph must be designed so that reading during a concurrent write is safe enough to validate and retry. Avoid dereferencing mutable structures in a way that can break before validation.</div>
         </section>
 
-        <!-- SECTION 4: CONDITION -->
-        <section>
-          <h2>4. Condition (Multiple Wait-Sets per Lock)</h2>
-          <p>
-            In intrinsic synchronization, every object has exactly one wait set (<code>wait()</code>, <code>notify()</code>). <code>Condition</code> replaces monitor methods with <code>await()</code>, <code>signal()</code>, and <code>signalAll()</code>, bound directly to a <code>Lock</code> instance.
-          </p>
-          <p>
-            This allows creating <strong>multiple distinct wait sets</strong> for different predicates (e.g., waiting for buffer to not be full vs. waiting for buffer to not be empty).
-          </p>
+        <section class="section" id="condition">
+            <h2>4. Condition</h2>
+            <p><strong>Kid-friendly analogy:</strong> In a classroom, one queue waits for seats to become free, while another queue waits for students to arrive. A <code>Condition</code> lets threads wait for different conditions associated with the same lock.</p>
+            <p>A <code>Condition</code> is created by calling <code>newCondition()</code> on a <code>Lock</code>. It provides <code>await()</code>, <code>signal()</code>, and <code>signalAll()</code>, which correspond conceptually to object monitor waiting and notification—but can support multiple distinct wait queues per lock.</p>
+            <h3>Bounded buffer: producer and consumer</h3>
+            <pre class="code">import java.util.concurrent.locks.Condition;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
-          <div class="code-header">
-            <span>Production Bounded Buffer (Producer-Consumer with Condition)</span>
-            <span>Java</span>
-          </div>
-          <pre><code>public class BoundedBuffer&lt;T&gt; {
+class BoundedBuffer<T> {
     private final Object[] items = new Object[100];
-    private int putptr, takeptr, count;
+    private int putIndex, takeIndex, count;
 
     private final Lock lock = new ReentrantLock();
-    private final Condition notFull  = lock.newCondition(); // Wait-set for Producers
-    private final Condition notEmpty = lock.newCondition(); // Wait-set for Consumers
+    private final Condition notFull = lock.newCondition();
+    private final Condition notEmpty = lock.newCondition();
 
-    public void put(T x) throws InterruptedException {
-        lock.lock();
+    public void put(T item) throws InterruptedException {
+        lock.lockInterruptibly();
         try {
             while (count == items.length) {
-                notFull.await(); // Producers sleep here when buffer is full
+                notFull.await();
             }
-            items[putptr] = x;
-            if (++putptr == items.length) putptr = 0;
+            items[putIndex] = item;
+            putIndex = (putIndex + 1) % items.length;
             count++;
-            notEmpty.signal(); // Wakes up only waiting CONSUMERS!
+            notEmpty.signal(); // a consumer may proceed
         } finally {
             lock.unlock();
         }
@@ -259,95 +242,119 @@ public void performOperation() {
 
     @SuppressWarnings("unchecked")
     public T take() throws InterruptedException {
-        lock.lock();
+        lock.lockInterruptibly();
         try {
             while (count == 0) {
-                notEmpty.await(); // Consumers sleep here when buffer is empty
+                notEmpty.await();
             }
-            T x = (T) items[takeptr];
-            if (++takeptr == items.length) takeptr = 0;
+            T item = (T) items[takeIndex];
+            items[takeIndex] = null;
+            takeIndex = (takeIndex + 1) % items.length;
             count--;
-            notFull.signal(); // Wakes up only waiting PRODUCERS!
-            return x;
+            notFull.signal(); // a producer may proceed
+            return item;
         } finally {
             lock.unlock();
         }
     }
-}</code></pre>
+}</pre>
+            <h3>How it works visually</h3>
+            <div class="diagram">Producer                         Shared buffer                     Consumer
+                --------                         -------------                     --------
+                if buffer full:
+                notFull.await()  -----------> waits in notFull queue
+
+                put item ---------------------> count increases
+                notEmpty.signal() -----------------------------------------------> wakes consumer
+
+                take item <------------------------------------------------------- count decreases
+                notFull.signal() <------------- wakes producer if one is waiting</div>
+            <ul><li>Call <code>await()</code> while holding the associated lock. It releases the lock while waiting and reacquires it before returning.</li><li>Use a <code>while</code> loop, not <code>if</code>, to re-check the condition after wakeup.</li><li>Always unlock in <code>finally</code>.</li><li>Choose <code>signal()</code> when one waiting thread is enough and the condition design is clear; use <code>signalAll()</code> when multiple waiters may now proceed or when signaling one waiter could leave the system stuck.</li><li>If <code>await()</code> throws <code>InterruptedException</code>, it is usually best to propagate it or restore the interrupt flag if you catch it and cannot propagate it.</li></ul>
+            <div class="callout solution"><strong>Production shortcut:</strong> For a standard producer-consumer queue, prefer <code>BlockingQueue</code> unless you need custom coordination. It already handles waiting, signaling, capacity, and many edge cases.</div>
         </section>
 
-        <!-- SECTION 5: REAL-TIME PRODUCTION ISSUES -->
-        <section>
-          <h2>5. Real-Time Production Issues & Post-Mortems</h2>
-
-          <!-- Incident 1 -->
-          <div class="callout callout-production">
-            <div class="callout-title">🚨 Incident 1: Write Starvation Outage in Stock Price Broadcast Engine</div>
-            <p><strong>Scenario:</strong> During a market opening surge, an order matching engine's price updates lagged by 45 seconds. The writer thread updating market ticks was completely frozen, while read queries for stock quotes continued returning stale data.</p>
-          </div>
-
-          <div class="callout callout-warning">
-            <div class="callout-title">🔍 Root Cause Analysis (RCA)</div>
-            <p>
-              The market feed cache used a non-fair <code>ReentrantReadWriteLock</code>. Under 100,000 requests/sec, thousands of reader threads continuously acquired and released the shared read lock. Because at least one reader held the read lock at any given microsecond, the writer thread waiting for the exclusive write lock was starved and never granted access.
-            </p>
-          </div>
-
-          <div class="callout callout-solution">
-            <div class="callout-title">💡 Production Resolution</div>
-            <ul>
-              <li><strong>Migrated to StampedLock:</strong> Replaced <code>ReentrantReadWriteLock</code> with <code>StampedLock</code>'s optimistic reads. Writers immediately acquire the write lock without waiting for optimistic readers.</li>
-              <li><strong>Alternative:</strong> If using <code>ReentrantReadWriteLock</code>, instantiate with fairness enabled (<code>new ReentrantReadWriteLock(true)</code>) to prevent reader barge-in when a writer is queued.</li>
-            </ul>
-          </div>
-
-          <!-- Incident 2 -->
-          <div class="callout callout-production">
-            <div class="callout-title">🚨 Incident 2: Permanent Thread Lockup via Missing finally Block on ReentrantLock</div>
-            <p><strong>Scenario:</strong> After throwing a runtime <code>IllegalArgumentException</code> in a payment processing service, all subsequent transactions hung indefinitely. Kubernetes readiness probes failed, causing cascading container restarts.</p>
-          </div>
-
-          <div class="callout callout-warning">
-            <div class="callout-title">🔍 Root Cause Analysis (RCA)</div>
-            <p>
-              An engineer called <code>lock.lock()</code> and placed <code>lock.unlock()</code> at the end of the method body <strong>without a try-finally block</strong>. When an unexpected exception was thrown midway through the method, execution aborted and <code>unlock()</code> was never called. The lock remained permanently held by the dead thread, blocking all future threads forever.
-            </p>
-          </div>
-
-          <div class="callout callout-solution">
-            <div class="callout-title">💡 Production Resolution</div>
-            <p>Enforced SonarQube rule: <em>Every call to <code>Lock.lock()</code> must be immediately followed by a <code>try-finally</code> block with <code>Lock.unlock()</code> in the <code>finally</code> clause.</em></p>
-          </div>
+        <section class="section" id="comparison">
+            <h2>5. Which Lock Should You Choose?</h2>
+            <div class="tablewrap"><table><thead><tr><th>Tool</th><th>Best for</th><th>Key advantage</th><th>Main risk / cost</th></tr></thead><tbody>
+            <tr><td><code>synchronized</code></td><td>Simple mutual exclusion</td><td>Simple syntax and automatic release</td><td>No timed acquisition or multiple condition queues</td></tr>
+            <tr><td><code>ReentrantLock</code></td><td>Explicit lock control</td><td>Timed/interruptible acquisition, fairness option, Conditions</td><td>Must unlock in <code>finally</code></td></tr>
+            <tr><td><code>ReentrantReadWriteLock</code></td><td>Read-heavy shared state</td><td>Concurrent readers with exclusive writers</td><td>Coordination overhead, potential writer delays, no direct read-to-write upgrade</td></tr>
+            <tr><td><code>StampedLock</code></td><td>Read-mostly data with safe optimistic reads</td><td>Optimistic reads may avoid reader lock coordination</td><td>Not reentrant; stamp handling and validation are easy to misuse</td></tr>
+            <tr><td><code>Condition</code></td><td>Threads waiting for predicates</td><td>Multiple wait queues per lock</td><td>Must manage predicates, loops, signaling and lock lifecycle correctly</td></tr>
+            </tbody></table></div>
+            <div class="diagram">Need simple mutual exclusion?
+                |
+                +-- yes --> synchronized
+                |
+                +-- Need timeout / interruptible acquire / several conditions?
+                |              |
+                |              +--> ReentrantLock + Condition
+                |
+                +-- Read-heavy shared state, occasional writes?
+                |              |
+                |              +--> benchmark ReentrantReadWriteLock
+                |                     or StampedLock optimistic reads
+                |
+                +-- Standard producer-consumer queue?
+                |
+                +--> BlockingQueue first</div>
         </section>
 
-        <!-- SECTION 6: SENIOR INTERVIEW Q&A -->
-        <section>
-          <h2>6. Senior / Staff Technical Interview Q&A</h2>
-
-          <div class="callout callout-interview">
-            <div class="callout-title">🎯 Q1: Why should lock.lock() be called OUTSIDE the try block?</div>
-            <p><strong>Answer:</strong> If <code>lock.lock()</code> is placed inside the <code>try</code> block, and an unchecked exception occurs during the lock acquisition (e.g. <code>Error</code>, <code>OutOfMemoryError</code>), the flow jumps straight to the <code>finally</code> block and invokes <code>lock.unlock()</code>. Attempting to unlock a lock that was never successfully acquired by the current thread throws an <code>IllegalMonitorStateException</code>, which masks the real underlying error and corrupts state.</p>
-          </div>
-
-          <div class="callout callout-interview">
-            <div class="callout-title">🎯 Q2: Can a thread holding a Read Lock in ReentrantReadWriteLock upgrade to a Write Lock?</div>
-            <p><strong>Answer:</strong> <strong>No.</strong> Attempting to acquire a write lock while currently holding a read lock results in an immediate deadlock. To acquire a write lock, all read locks must first be completely released. However, a thread holding a Write lock <em>can</em> acquire a Read lock and then release the Write lock (known as <strong>Lock Downgrading</strong>).</p>
-          </div>
-
-          <div class="callout callout-interview">
-            <div class="callout-title">🎯 Q3: How does StampedLock achieve higher performance than ReentrantReadWriteLock?</div>
-            <p><strong>Answer:</strong> <code>ReentrantReadWriteLock</code> requires modifying shared memory state (incrementing the read lock counter in AQS via atomic CAS) on <em>every single read operation</em>. Across multiple CPU cores, this causes heavy cache line invalidation. <code>StampedLock</code>'s optimistic read does not mutate any memory state or execute any CAS—it simply reads a volatile stamp and executes memory barriers. As long as writes are infrequent, reads operate at raw hardware memory speed.</p>
-          </div>
+        <section class="section" id="production">
+            <h2>6. Production Issues and Solutions</h2>
+            <div class="callout production"><strong>Incident A — Lock leak after an exception</strong><p><strong>Symptom:</strong> requests begin hanging after a validation exception; threads pile up waiting for one lock.</p><p><strong>Cause:</strong> code acquired a <code>ReentrantLock</code> but called <code>unlock()</code> only at the end of the method. An exception skipped the unlock.</p><p><strong>Solution:</strong> always use <code>try/finally</code>; enforce the pattern in review and static analysis.</p></div>
+            <div class="callout production"><strong>Incident B — Writer waits behind continuous readers</strong><p><strong>Symptom:</strong> cache refresh or configuration updates are delayed while reads keep succeeding.</p><p><strong>Cause:</strong> lock policy and workload allow long reader activity or reader traffic delays a writer.</p><p><strong>Solution:</strong> measure lock wait times; consider fair <code>ReentrantReadWriteLock</code>, shorter read critical sections, immutable snapshot replacement, or a carefully validated <code>StampedLock</code> optimistic-read design. No lock is a universal fix.</p></div>
+            <div class="callout production"><strong>Incident C — Deadlock from attempted lock upgrade</strong><p><strong>Symptom:</strong> a thread holds a read lock and waits forever for the write lock.</p><p><strong>Cause:</strong> the thread's own read hold prevents the exclusive write lock from being acquired.</p><p><strong>Solution:</strong> release read lock, acquire write lock, then re-check the condition before modifying. Or redesign the operation; avoid assuming upgrade is atomic.</p></div>
+            <div class="callout production"><strong>Incident D — Incorrect optimistic read</strong><p><strong>Symptom:</strong> intermittent inconsistent calculations or exceptions under concurrent writes.</p><p><strong>Cause:</strong> code trusted fields read optimistically before validating the stamp, or traversed mutable structures unsafely.</p><p><strong>Solution:</strong> copy only safe-to-read fields into locals, validate before using the result, and fall back to a real read lock on failure.</p></div>
+            <div class="callout production"><strong>Incident E — Wrong wait queue signaled</strong><p><strong>Symptom:</strong> producers and consumers stop making progress even though a condition may now be true.</p><p><strong>Cause:</strong> a single generic wait queue or incorrect signaling wakes a thread whose predicate is still false.</p><p><strong>Solution:</strong> use distinct conditions such as <code>notFull</code> and <code>notEmpty</code>, loop around <code>await()</code>, and signal the waiter category that can make progress.</p></div>
+            <h3>Diagnostics checklist</h3>
+            <ul><li>Capture multiple thread dumps and identify lock owners and waiters.</li><li>Measure lock wait duration, hold duration, queue depth, throughput, and request latency.</li><li>Use Java Flight Recorder to inspect monitor/park events where available.</li><li>Load-test with realistic reader/writer ratios before choosing a lock implementation.</li><li>Never assume that a JVM lock protects shared data across multiple JVMs or containers.</li></ul>
         </section>
 
-      </main>
-    </div>
-  </div>
+        <section class="section" id="thumb">
+            <h2>7. Thumb Rules to Memorize</h2>
+            <div class="grid2">
+                <div class="card"><h3>ReentrantLock</h3><ul><li>Every successful acquisition needs a matching unlock.</li><li>Unlock in <code>finally</code>.</li><li>Use timed or interruptible acquisition when waiting must be bounded or cancellable.</li></ul></div>
+                <div class="card"><h3>ReentrantReadWriteLock</h3><ul><li>Use only when reads dominate and contention makes it worthwhile.</li><li>Read-to-write upgrade is not supported as a simple blocking operation.</li><li>Write-to-read downgrade is possible in the right order.</li></ul></div>
+                <div class="card"><h3>StampedLock</h3><ul><li>Optimistic reads must be validated.</li><li>Use the exact stamp to unlock.</li><li>It is not reentrant; keep the design simple.</li></ul></div>
+                <div class="card"><h3>Condition</h3><ul><li>Call <code>await()</code> while holding its associated lock.</li><li>Check the predicate in a <code>while</code> loop.</li><li>Use separate Conditions for separate predicates when helpful.</li></ul></div>
+            </div>
+            <div class="callout warning"><strong>Memory trick:</strong> ReentrantLock = control; ReadWriteLock = shared readers / exclusive writer; StampedLock = stamp + validate; Condition = wait for a specific condition.</div>
+        </section>
 
-  <footer>
-    <p>Interview A-Z Handbook &bull; Built for GitHub Pages &bull; Production Grade Interview Prep</p>
-  </footer>
+        <section class="section" id="interview">
+            <h2>8. Interview Questions with Model Answers</h2>
+            <details><summary>Q1. Why use ReentrantLock instead of synchronized?</summary><p>Both provide mutual exclusion. I choose <code>ReentrantLock</code> when I need timed acquisition, interruptible waiting, an optional fairness policy, or multiple <code>Condition</code> queues. Otherwise, <code>synchronized</code> is often simpler and releases its monitor automatically at scope exit.</p></details>
+            <details><summary>Q2. Why must unlock be in finally?</summary><p>Any exception or early return after acquiring a lock could skip ordinary cleanup code. A <code>finally</code> block guarantees release on normal and exceptional exits, preventing lock leaks and indefinite blocking.</p></details>
+            <details><summary>Q3. What is the difference between fair and non-fair ReentrantLock?</summary><p>A fair lock favors queued waiters and can reduce starvation risk, but may reduce throughput. A non-fair lock lets a new arrival acquire ahead of queued threads, often improving throughput but offering no strict arrival-order guarantee.</p></details>
+            <details><summary>Q4. When does ReentrantReadWriteLock help?</summary><p>It can help when shared state is read frequently, writes are relatively rare, and the protected read operation is large enough that allowing concurrent readers offsets the coordination cost. I would benchmark it rather than assume it is faster.</p></details>
+            <details><summary>Q5. Why is read-to-write lock upgrade dangerous?</summary><p>A writer needs exclusive access, but the current thread's read hold prevents that exclusivity. Blocking on the write lock while retaining the read lock can deadlock. Release the read lock, acquire write, and re-check the predicate.</p></details>
+            <details><summary>Q6. How does StampedLock optimistic reading work?</summary><p>The reader gets an optimistic stamp, copies the relevant fields, and validates the stamp. If a writer intervened, validation fails and the reader repeats the read under a real read lock. It can reduce reader coordination in read-mostly workloads, but is more complex and not reentrant.</p></details>
+            <details><summary>Q7. What is a Condition and why have multiple Conditions?</summary><p>A Condition is a wait queue associated with a Lock. It allows threads to wait for predicates such as “buffer not full” and “buffer not empty” separately, so a producer can signal a consumer rather than waking an unrelated producer.</p></details>
+            <details><summary>Q8. Why use while instead of if around await?</summary><p>A wakeup does not prove the condition is true. Wakeups may be spurious, and another thread may consume the available resource before the awakened thread reacquires the lock. The predicate must be re-checked in a loop.</p></details>
+            <details><summary>Q9. Are these locks distributed locks?</summary><p>No. They coordinate threads inside the same JVM process. For shared state across application instances, use an appropriate shared-system mechanism such as database constraints/transactions or a distributed coordination service where justified.</p></details>
+            <details><summary>Q10. How do you decide which lock is fastest?</summary><p>I would identify the invariant and workload first, then measure contention and throughput under representative read/write ratios. Correctness and maintainability come first; optimistic or read-write locks should be chosen only when their trade-offs fit the workload.</p></details>
+            <h3>Interview response framework</h3>
+            <div class="diagram">What it is → Why it exists → Short Java example → Failure mode → Trade-off → Real use case</div>
+        </section>
 
-  <script src="../../assets/js/main.js"></script>
-</body>
-</html>
+        <section class="section" id="tracker">
+            <h2>9. Progress Tracker</h2>
+            <p class="muted">Mark each topic only when you can explain the API, write a safe example, and describe one failure mode.</p>
+            <div class="progress-ui"><div class="progressbar"><div class="progressfill" id="progressfill"></div></div><p class="small" id="progresslabel">0 of 4 topics mastered</p></div>
+            <div class="checklist" id="checklist">
+                <label><input type="checkbox" data-topic="reentrant"> I can write safe ReentrantLock code and explain fairness, timeout and interruption.</label>
+                <label><input type="checkbox" data-topic="rw"> I can explain read/write sharing, starvation, upgrade and downgrade.</label>
+                <label><input type="checkbox" data-topic="stamped"> I can implement an optimistic read with validation and fallback.</label>
+                <label><input type="checkbox" data-topic="condition"> I can implement producer-consumer coordination with Condition.</label>
+            </div>
+            <button class="nav-btn" onclick="resetProgress()" style="margin-top:1rem">Reset progress</button>
+        </section>
+        <footer><p>Interview A–Z Handbook · Java Concurrency · Built for GitHub Pages</p><p><a href="../../index.html" class="nav-link">Home</a></p></footer>
+    </main></div>
+<script>
+    const boxes=[...document.querySelectorAll('#checklist input')], key='locksMasterclassProgressV1';
+    function renderProgress(){let saved={};try{saved=JSON.parse(localStorage.getItem(key)||'{}')}catch(e){}boxes.forEach(b=>b.checked=!!saved[b.dataset.topic]);const n=boxes.filter(b=>b.checked).length;document.getElementById('progressfill').style.width=(n/boxes.length*100)+'%';document.getElementById('progresslabel').textContent=`${n} of ${boxes.length} topics mastered`;localStorage.setItem(key,JSON.stringify(Object.fromEntries(boxes.map(b=>[b.dataset.topic,b.checked]))))}
+    boxes.forEach(b=>b.addEventListener('change',renderProgress));function resetProgress(){boxes.forEach(b=>b.checked=false);renderProgress()}renderProgress();
+</script>
+</body></html>
